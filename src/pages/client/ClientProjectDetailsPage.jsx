@@ -1,6 +1,6 @@
+import { getClientProject } from '@/api/projectsApi'
 import ProjectDetailContent from '@/components/projects/ProjectDetailContent'
 import ProjectDetailsPageFrame from '@/components/projects/ProjectDetailsPageFrame'
-import { getClientProject } from '@/api/projectsApi'
 import { useCallback, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
@@ -56,7 +56,28 @@ export default function ClientProjectDetailsPage() {
       onBack={() => navigate('/client/projects')}
       emptyMessage={t('projects.not_found')}
     >
-      <ProjectDetailContent project={project} role="CLIENT" onRefresh={fetchProject} />
+      <ProjectDetailContent
+        project={project}
+        role="CLIENT"
+        onRefresh={fetchProject}
+        itemActionRenderer={(item) => (
+          <button
+            type="button"
+            onClick={() => navigate(`/client/items/${item.projectItemId}/daily-updates`, {
+              state: {
+                projectId: project?.projectId,
+                projectNameAr: project?.nameAr,
+                projectNameEn: project?.nameEn,
+                itemNameAr: item.itemNameAr,
+                itemNameEn: item.itemNameEn,
+              },
+            })}
+            className="text-xs font-medium text-cyan-300 transition-colors hover:text-cyan-200"
+          >
+            {t('nav.daily_updates', { defaultValue: 'Daily Updates' })}
+          </button>
+        )}
+      />
     </ProjectDetailsPageFrame>
   )
 }

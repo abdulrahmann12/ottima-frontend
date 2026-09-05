@@ -1,6 +1,7 @@
+import { getEngineerProject } from '@/api/projectsApi'
 import ProjectDetailContent from '@/components/projects/ProjectDetailContent'
 import ProjectDetailsPageFrame from '@/components/projects/ProjectDetailsPageFrame'
-import { getEngineerProject } from '@/api/projectsApi'
+import Button from '@/components/ui/Button'
 import { useCallback, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
@@ -56,7 +57,21 @@ export default function EngineerProjectDetailsPage() {
       onBack={() => navigate('/engineer/projects')}
       emptyMessage={t('projects.not_found')}
     >
-      <ProjectDetailContent project={project} role="ENGINEER" onRefresh={fetchProject} />
+      <div className="space-y-5">
+        <div className="flex justify-end">
+          <Button
+            type="button"
+            className="w-auto"
+            onClick={() => navigate(`/engineer/projects/${projectId}/daily-updates`, {
+              state: { projectSummary: project },
+            })}
+          >
+            {t('nav.daily_updates', { defaultValue: 'Daily Updates' })}
+          </Button>
+        </div>
+
+        <ProjectDetailContent project={project} role="ENGINEER" onRefresh={fetchProject} />
+      </div>
     </ProjectDetailsPageFrame>
   )
 }

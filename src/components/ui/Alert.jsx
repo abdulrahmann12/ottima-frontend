@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { CheckCircle, XCircle, InfoCircle } from './icons/Globe'
+import { useEffect, useState } from 'react'
+import { CheckCircle, InfoCircle, XCircle } from './icons/Globe'
 
 const VARIANTS = {
   error: {
@@ -30,6 +30,10 @@ const VARIANTS = {
  */
 export default function Alert({ variant = 'error', message, onClose, className = '' }) {
   const [dismissed, setDismissed] = useState(false)
+
+  useEffect(() => {
+    setDismissed(false)
+  }, [message])
 
   if (!message || dismissed) return null
 

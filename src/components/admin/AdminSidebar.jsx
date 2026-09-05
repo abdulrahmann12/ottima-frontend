@@ -1,9 +1,9 @@
-import { NavLink, useNavigate } from 'react-router-dom'
-import { useTranslation } from 'react-i18next'
-import { useState } from 'react'
-import useUIStore from '@/store/uiStore'
-import useAuthStore from '@/store/authStore'
 import { logout as logoutApi } from '@/api/authApi'
+import useAuthStore from '@/store/authStore'
+import useUIStore from '@/store/uiStore'
+import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
+import { NavLink, useNavigate } from 'react-router-dom'
 
 /**
  * AdminSidebar — collapsible desktop navigation + mobile overlay drawer
@@ -41,6 +41,11 @@ const NAV_ITEMS = [
     key: 'projects',
     to: '/admin/projects',
     icon: ProjectsIcon,
+  },
+  {
+    key: 'daily_updates',
+    to: '/admin/daily-updates',
+    icon: DailyUpdatesIcon,
   },
   {
     key: 'profile',
@@ -255,6 +260,18 @@ export function ProjectsIcon({ className }) {
   return (
     <svg className={className} fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
       <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 21h16.5M5.25 21V9.75l6.75-4.5 6.75 4.5V21M9 21v-5.25h6V21M9 10.5h.008v.008H9V10.5Zm6 0h.008v.008H15V10.5Z" />
+    </svg>
+  )
+}
+
+export function DailyUpdatesIcon({ className }) {
+  return (
+    <svg className={className} fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M16.5 3.75h1.875A1.875 1.875 0 0 1 20.25 5.625v12.75a1.875 1.875 0 0 1-1.875 1.875H5.625A1.875 1.875 0 0 1 3.75 18.375V5.625A1.875 1.875 0 0 1 5.625 3.75H7.5m9 0V2.625m0 1.125v1.125m0-1.125h-9m9 0H7.5m0 0V2.625m0 1.125v1.125m8.25 4.5h-7.5m7.5 3h-7.5m4.5 3h-4.5"
+      />
     </svg>
   )
 }

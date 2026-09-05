@@ -25,6 +25,7 @@ export default function ClientLayout() {
       navItems={NAV_ITEMS}
       panelSubtitle={t('portal.client')}
       pageTitleResolver={(pathname) => {
+        if (pathname.includes('/daily-updates')) return 'nav.daily_updates'
         if (pathname.startsWith('/client/projects')) return 'nav.projects'
         if (pathname.startsWith('/client/profile')) return 'nav.profile'
         return 'nav.projects'

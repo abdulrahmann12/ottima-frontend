@@ -124,16 +124,30 @@ export default function AdminProjectDetailsPage() {
         onBack={() => navigate('/admin/projects')}
         emptyMessage={t('projects.not_found')}
       >
-        <ProjectDetailContent
-          project={project}
-          role="ADMIN"
-          onRefresh={fetchProject}
-          itemHeaderAction={
-            <Button type="button" onClick={openAssignModal}>
-              + {t('projects.assign_new_item')}
+        <div className="space-y-5">
+          <div className="flex justify-end">
+            <Button
+              type="button"
+              className="w-auto"
+              onClick={() => navigate(`/admin/projects/${projectId}/daily-updates`, {
+                state: { projectSummary: project },
+              })}
+            >
+              {t('nav.daily_updates', { defaultValue: 'Daily Updates' })}
             </Button>
-          }
-        />
+          </div>
+
+          <ProjectDetailContent
+            project={project}
+            role="ADMIN"
+            onRefresh={fetchProject}
+            itemHeaderAction={
+              <Button type="button" onClick={openAssignModal}>
+                + {t('projects.assign_new_item')}
+              </Button>
+            }
+          />
+        </div>
       </ProjectDetailsPageFrame>
 
       <Modal

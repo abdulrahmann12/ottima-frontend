@@ -24,6 +24,7 @@ export default function ProjectDetailContent({
   role,
   onRefresh,
   itemHeaderAction = null,
+  itemActionRenderer = null,
 }) {
   const { t, i18n } = useTranslation()
   const isAdmin = role === 'ADMIN'
@@ -197,6 +198,7 @@ export default function ProjectDetailContent({
               t={t}
               i18n={i18n}
               onMutate={mutate}
+              itemActionRenderer={itemActionRenderer}
             />
           ))}
         </div>
@@ -205,7 +207,7 @@ export default function ProjectDetailContent({
   )
 }
 
-function ProjectItemCard({ item, projectId, isAdmin, isEngineer, saving, t, i18n, onMutate }) {
+function ProjectItemCard({ item, projectId, isAdmin, isEngineer, saving, t, i18n, onMutate, itemActionRenderer }) {
   const [showItemEdit, setShowItemEdit] = useState(false)
   const [showProgress, setShowProgress] = useState(false)
   const name = i18n.language === 'ar' ? item.itemNameAr : item.itemNameEn
@@ -255,6 +257,12 @@ function ProjectItemCard({ item, projectId, isAdmin, isEngineer, saving, t, i18n
         <p className="mt-2 text-xs text-slate-500">
           {t('projects.spent')}: <span className="text-slate-400">{fmt(item.calculatedSpent)}</span>
         </p>
+      )}
+
+      {itemActionRenderer && (
+        <div className="mt-3 flex border-t border-surface-border/50 pt-3">
+          {itemActionRenderer(item)}
+        </div>
       )}
 
       {isAdmin && (

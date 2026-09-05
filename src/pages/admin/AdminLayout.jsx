@@ -37,7 +37,9 @@ export default function AdminLayout() {
     return <Navigate to="/login/admin" replace state={{ from: location }} />
   }
 
-  const titleKey = location.pathname.startsWith('/admin/projects/')
+  const titleKey = location.pathname.includes('/daily-updates')
+    ? 'nav.daily_updates'
+    : location.pathname.startsWith('/admin/projects/')
     ? 'nav.projects'
     : PAGE_TITLES[location.pathname] ?? 'nav.dashboard'
   const pageTitle = t(titleKey)

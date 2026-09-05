@@ -15,11 +15,16 @@ import Dashboard from '@/pages/admin/Dashboard'
 import RolesPage from '@/pages/admin/roles/RolesPage'
 import StandardItemsPage from '@/pages/admin/standard-items/StandardItemsPage'
 import UsersPage from '@/pages/admin/users/UsersPage'
+import AdminDailyUpdates from '@/pages/daily-updates/AdminDailyUpdates'
+import AdminProjectDailyUpdatesPage from '@/pages/daily-updates/AdminProjectDailyUpdatesPage'
+import ClientItemDailyUpdatesPage from '@/pages/daily-updates/ClientItemDailyUpdatesPage'
+import EngineerDailyUpdates from '@/pages/daily-updates/EngineerDailyUpdates'
 import ProfilePage from '@/pages/profile/ProfilePage'
 import AdminProjectDetailsPage from '@/pages/projects/AdminProjectDetailsPage'
 import ProjectsPage from '@/pages/projects/ProjectsPage'
 
 // Engineer shell + page
+import EngineerProjectDailyUpdatesPage from '@/pages/daily-updates/EngineerProjectDailyUpdatesPage'
 import EngineerLayout from '@/pages/engineer/EngineerLayout'
 import EngineerProjectDetailsPage from '@/pages/engineer/EngineerProjectDetailsPage'
 import EngineerProjectsPage from '@/pages/engineer/EngineerProjectsPage'
@@ -59,15 +64,19 @@ export default function App() {
           <Route path="users"          element={<UsersPage />} />
           <Route path="roles"          element={<RolesPage />} />
           <Route path="standard-items" element={<StandardItemsPage />} />
+          <Route path="daily-updates"  element={<AdminDailyUpdates />} />
           <Route path="projects"       element={<ProjectsPage />} />
           <Route path="projects/:projectId" element={<AdminProjectDetailsPage />} />
+          <Route path="projects/:projectId/daily-updates" element={<AdminProjectDailyUpdatesPage />} />
         </Route>
 
         {/* Engineer */}
         <Route path="/engineer" element={<EngineerLayout />}>
           <Route index element={<Navigate to="/engineer/projects" replace />} />
+          <Route path="daily-updates" element={<EngineerDailyUpdates />} />
           <Route path="projects"  element={<EngineerProjectsPage />} />
           <Route path="projects/:projectId" element={<EngineerProjectDetailsPage />} />
+          <Route path="projects/:projectId/daily-updates" element={<EngineerProjectDailyUpdatesPage />} />
           <Route path="profile" element={<ProfilePage />} />
           <Route path="dashboard" element={<Navigate to="/engineer/projects" replace />} />
         </Route>
@@ -77,6 +86,7 @@ export default function App() {
           <Route index element={<Navigate to="/client/projects" replace />} />
           <Route path="projects"  element={<ClientProjectsPage />} />
           <Route path="projects/:projectId" element={<ClientProjectDetailsPage />} />
+          <Route path="items/:projectItemId/daily-updates" element={<ClientItemDailyUpdatesPage />} />
           <Route path="profile" element={<ProfilePage />} />
           <Route path="dashboard" element={<Navigate to="/client/projects" replace />} />
         </Route>
