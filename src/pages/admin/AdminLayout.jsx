@@ -1,9 +1,9 @@
-import { useState } from 'react'
-import { Navigate, Outlet, useLocation } from 'react-router-dom'
-import { useTranslation } from 'react-i18next'
-import useAuthStore from '@/store/authStore'
-import AdminSidebar from '@/components/admin/AdminSidebar'
 import AdminHeader from '@/components/admin/AdminHeader'
+import AdminSidebar from '@/components/admin/AdminSidebar'
+import useAuthStore from '@/store/authStore'
+import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
+import { Navigate, Outlet, useLocation } from 'react-router-dom'
 
 /**
  * AdminLayout — protected shell for all /admin/* routes
@@ -23,6 +23,7 @@ const PAGE_TITLES = {
   '/admin/users':          'nav.users',
   '/admin/roles':          'nav.roles',
   '/admin/standard-items': 'nav.standard_items',
+  '/admin/projects':       'nav.projects',
 }
 
 export default function AdminLayout() {
@@ -36,7 +37,9 @@ export default function AdminLayout() {
     return <Navigate to="/login/admin" replace state={{ from: location }} />
   }
 
-  const titleKey = PAGE_TITLES[location.pathname] ?? 'nav.dashboard'
+  const titleKey = location.pathname.startsWith('/admin/projects/')
+    ? 'nav.projects'
+    : PAGE_TITLES[location.pathname] ?? 'nav.dashboard'
   const pageTitle = t(titleKey)
 
   return (

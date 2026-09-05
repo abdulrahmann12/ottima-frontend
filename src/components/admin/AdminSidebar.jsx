@@ -38,6 +38,11 @@ const NAV_ITEMS = [
     icon: CatalogIcon,
   },
   {
+    key: 'projects',
+    to: '/admin/projects',
+    icon: ProjectsIcon,
+  },
+  {
     key: 'profile',
     to: '/profile',
     icon: ProfileIcon,
@@ -237,6 +242,14 @@ function CatalogIcon({ className }) {
     <svg className={className} fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
       <path strokeLinecap="round" strokeLinejoin="round"
         d="M9 4.5v15m6-15v15m-10.875 0h15.75c.621 0 1.125-.504 1.125-1.125V5.625c0-.621-.504-1.125-1.125-1.125H4.125C3.504 4.5 3 5.004 3 5.625v12.75c0 .621.504 1.125 1.125 1.125Z" />
+    </svg>
+  )
+}
+
+function ProjectsIcon({ className }) {
+  return (
+    <svg className={className} fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 21h16.5M5.25 21V9.75l6.75-4.5 6.75 4.5V21M9 21v-5.25h6V21M9 10.5h.008v.008H9V10.5Zm6 0h.008v.008H15V10.5Z" />
     </svg>
   )
 }
