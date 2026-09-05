@@ -2,6 +2,7 @@ import { assignProjectItems, getAdminProject } from '@/api/projectsApi'
 import { getAllStandardItems } from '@/api/standardItemsApi'
 import Modal from '@/components/admin/Modal'
 import ProjectDetailContent from '@/components/projects/ProjectDetailContent'
+import ProjectDetailsPageFrame from '@/components/projects/ProjectDetailsPageFrame'
 import ProjectItemAssignmentFields from '@/components/projects/ProjectItemAssignmentFields'
 import Alert from '@/components/ui/Alert'
 import Button from '@/components/ui/Button'
@@ -105,63 +106,35 @@ export default function AdminProjectDetailsPage() {
   const projectName = i18n.language === 'ar' ? project?.nameAr : project?.nameEn
   const projectAddress = i18n.language === 'ar' ? project?.addressAr : project?.addressEn
   const assignedStandardItemIds = project?.items?.map((item) => item.standardItemId).filter(Boolean) ?? []
+  const projectMeta = project ? `${project.clientName} · ${project.engineerName}` : null
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-        <div>
-          <button
-            type="button"
-            onClick={() => navigate('/admin/projects')}
-            className="text-sm font-medium text-brand-300 transition-colors hover:text-brand-200"
-          >
-            ← {t('projects.back_to_projects')}
-          </button>
-          <h1 className="mt-3 text-3xl font-bold text-white">
-            {loading ? t('common.loading') : projectName || t('projects.details')}
-          </h1>
-          <p className="mt-1 text-sm text-slate-500">
-            {projectAddress || t('projects.details_subtitle')}
-          </p>
-          {project && (
-            <p className="mt-2 text-xs uppercase tracking-wider text-slate-500">
-              {project.clientName} · {project.engineerName}
-            </p>
-          )}
-        </div>
-      </div>
-
-      <Alert message={error} variant="error" onClose={() => setError(null)} />
-      <Alert message={success} variant="success" onClose={() => setSuccess(null)} />
-
-      {loading && (
-        <div className="space-y-3 rounded-2xl border border-surface-border bg-surface-card p-6 shadow-xl">
-          {Array.from({ length: 4 }).map((_, index) => (
-            <div key={index} className="h-20 animate-pulse rounded-xl bg-slate-800/60" />
-          ))}
-        </div>
-      )}
-
-      {!loading && !project && !error && (
-        <div className="rounded-2xl border border-surface-border bg-surface-card p-8 text-center shadow-xl">
-          <p className="text-sm text-slate-400">{t('projects.not_found')}</p>
-        </div>
-      )}
-
-      {!loading && project && (
-        <div className="rounded-2xl border border-surface-border bg-surface-card p-6 shadow-xl">
-          <ProjectDetailContent
-            project={project}
-            role="ADMIN"
-            onRefresh={fetchProject}
-            itemHeaderAction={
-              <Button type="button" onClick={openAssignModal}>
-                + {t('projects.assign_new_item')}
-              </Button>
-            }
-          />
-        </div>
-      )}
+    <>
+      <ProjectDetailsPageFrame
+        loading={loading}
+        project={project}
+        title={loading ? t('common.loading') : projectName || t('projects.details')}
+        subtitle={projectAddress || t('projects.details_subtitle')}
+        metaLine={projectMeta}
+        error={error}
+        success={success}
+        onClearError={() => setError(null)}
+        onClearSuccess={() => setSuccess(null)}
+        backLabel={t('projects.back_to_projects')}
+        onBack={() => navigate('/admin/projects')}
+        emptyMessage={t('projects.not_found')}
+      >
+        <ProjectDetailContent
+          project={project}
+          role="ADMIN"
+          onRefresh={fetchProject}
+          itemHeaderAction={
+            <Button type="button" onClick={openAssignModal}>
+              + {t('projects.assign_new_item')}
+            </Button>
+          }
+        />
+      </ProjectDetailsPageFrame>
 
       <Modal
         isOpen={assignModalOpen}
@@ -204,6 +177,6 @@ export default function AdminProjectDetailsPage() {
           </div>
         </form>
       </Modal>
-    </div>
+    </>
   )
 }

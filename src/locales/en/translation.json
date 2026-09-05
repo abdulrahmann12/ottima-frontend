@@ -19,6 +19,10 @@
     "switch": "العربية",
     "current": "English"
   },
+  "portal": {
+    "client": "Client Portal",
+    "engineer": "Engineer Portal"
+  },
   "role": {
     "select_title": "Welcome to OTTIMA",
     "select_subtitle": "Select your role to continue",
@@ -323,6 +327,8 @@
     "no_available_items": "All catalog items are already assigned to this project.",
     "back_to_projects": "Back to Projects",
     "details_subtitle": "Review project setup, append items, and manage delivery from one page.",
+    "client_details_subtitle": "Follow project progress and item status from a full project overview.",
+    "engineer_details_subtitle": "Review assigned work and update item progress from a full project overview.",
     "not_found": "This project could not be found."
   },
   "table": {

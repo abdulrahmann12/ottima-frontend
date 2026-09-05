@@ -1,10 +1,10 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useNavigate } from 'react-router-dom'
 import ProjectTable from '@/components/projects/ProjectTable'
-import ProjectDetailModal from '@/components/projects/ProjectDetailModal'
 import Alert from '@/components/ui/Alert'
 import useProjectsStore from '@/store/projectsStore'
-import { getClientProjects, getClientProject } from '@/api/projectsApi'
+import { getClientProjects } from '@/api/projectsApi'
 
 const PAGE_SIZE = 10
 
@@ -12,12 +12,11 @@ const PAGE_SIZE = 10
  * ClientProjectsPage — read-only project dashboard for clients.
  *
  * Lists projects via GET /api/v1/client/projects (paginated).
- * Clicking a row fetches full detail via GET /api/v1/client/projects/:id
- * and opens the ProjectDetailModal (client mode) — financial transparency,
- * no mutation controls.
+ * Clicking a row navigates to a full-page detail route at /client/projects/:id.
  */
 export default function ClientProjectsPage() {
   const { t } = useTranslation()
+  const navigate = useNavigate()
   const { clientPage, setClientPage } = useProjectsStore()
 
   const [projects, setProjects] = useState([])
@@ -25,9 +24,6 @@ export default function ClientProjectsPage() {
   const [totalElements, setTotalElements] = useState(0)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
-
-  const [selectedProject, setSelectedProject] = useState(null)
-  const [loadingDetail, setLoadingDetail] = useState(false)
 
   // ── Fetch list ──────────────────────────────────────────
   const fetchProjects = useCallback(async () => {
@@ -50,18 +46,7 @@ export default function ClientProjectsPage() {
     fetchProjects()
   }, [fetchProjects])
 
-  // ── Open detail view ─────────────────────────────────────
-  const handleRowClick = async (project) => {
-    setLoadingDetail(true)
-    try {
-      const { data } = await getClientProject(project.projectId)
-      setSelectedProject(data.data ?? project)
-    } catch {
-      setSelectedProject(project)
-    } finally {
-      setLoadingDetail(false)
-    }
-  }
+  const handleRowClick = (project) => navigate(`/client/projects/${project.projectId}`, { state: { projectSummary: project } })
 
   return (
     <div className="space-y-5">
@@ -72,12 +57,6 @@ export default function ClientProjectsPage() {
       </div>
 
       <Alert message={error} variant="error" onClose={() => setError(null)} />
-
-      {loadingDetail && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
-          <div className="rounded-2xl bg-surface p-6 text-sm text-slate-400">{t('common.loading')}</div>
-        </div>
-      )}
 
       {/* ── Card container ──────────────────────────── */}
       <div className="overflow-hidden rounded-2xl border border-surface-border bg-surface-card shadow-xl">
@@ -103,14 +82,6 @@ export default function ClientProjectsPage() {
           role="CLIENT"
         />
       </div>
-
-      {/* ── Detail modal (read-only) ─────────────────── */}
-      <ProjectDetailModal
-        project={selectedProject}
-        role="CLIENT"
-        onClose={() => setSelectedProject(null)}
-        onRefresh={() => fetchProjects()}
-      />
     </div>
   )
 }

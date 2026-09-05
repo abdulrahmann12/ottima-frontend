@@ -50,7 +50,12 @@ const NAV_ITEMS = [
 ]
 
 
-export default function AdminSidebar({ mobileOpen, onClose }) {
+export default function AdminSidebar({
+  mobileOpen,
+  onClose,
+  navItems = NAV_ITEMS,
+  panelSubtitle = 'Admin Panel',
+}) {
   const { t } = useTranslation()
   const { sidebarCollapsed, toggleSidebar } = useUIStore()
   const { refreshToken, clearAuth } = useAuthStore()
@@ -87,14 +92,14 @@ export default function AdminSidebar({ mobileOpen, onClose }) {
         {!sidebarCollapsed && (
           <div className="min-w-0">
             <p className="text-white font-bold text-base tracking-tight truncate">OTTIMA</p>
-            <p className="text-slate-600 text-[10px] truncate">Admin Panel</p>
+            <p className="text-slate-600 text-[10px] truncate">{panelSubtitle}</p>
           </div>
         )}
       </div>
 
       {/* Navigation */}
       <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto scrollbar-thin">
-        {NAV_ITEMS.map(({ key, to, icon: Icon }) => (
+        {navItems.map(({ key, to, icon: Icon }) => (
           <NavLink
             key={key}
             to={to}
@@ -219,7 +224,7 @@ function OttimaLogoMark() {
   )
 }
 
-function DashboardIcon({ className }) {
+export function DashboardIcon({ className }) {
   return (
     <svg className={className} fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
       <path strokeLinecap="round" strokeLinejoin="round"
@@ -228,7 +233,7 @@ function DashboardIcon({ className }) {
   )
 }
 
-function RolesIcon({ className }) {
+export function RolesIcon({ className }) {
   return (
     <svg className={className} fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
       <path strokeLinecap="round" strokeLinejoin="round"
@@ -237,7 +242,7 @@ function RolesIcon({ className }) {
   )
 }
 
-function CatalogIcon({ className }) {
+export function CatalogIcon({ className }) {
   return (
     <svg className={className} fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
       <path strokeLinecap="round" strokeLinejoin="round"
@@ -246,7 +251,7 @@ function CatalogIcon({ className }) {
   )
 }
 
-function ProjectsIcon({ className }) {
+export function ProjectsIcon({ className }) {
   return (
     <svg className={className} fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
       <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 21h16.5M5.25 21V9.75l6.75-4.5 6.75 4.5V21M9 21v-5.25h6V21M9 10.5h.008v.008H9V10.5Zm6 0h.008v.008H15V10.5Z" />
@@ -254,7 +259,7 @@ function ProjectsIcon({ className }) {
   )
 }
 
-function UsersIcon({ className }) {
+export function UsersIcon({ className }) {
   return (
     <svg className={className} fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
       <path strokeLinecap="round" strokeLinejoin="round"
@@ -263,7 +268,7 @@ function UsersIcon({ className }) {
   )
 }
 
-function ProfileIcon({ className }) {
+export function ProfileIcon({ className }) {
   return (
     <svg className={className} fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
       <path strokeLinecap="round" strokeLinejoin="round"

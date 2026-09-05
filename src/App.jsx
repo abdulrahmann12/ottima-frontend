@@ -21,10 +21,12 @@ import ProjectsPage from '@/pages/projects/ProjectsPage'
 
 // Engineer shell + page
 import EngineerLayout from '@/pages/engineer/EngineerLayout'
+import EngineerProjectDetailsPage from '@/pages/engineer/EngineerProjectDetailsPage'
 import EngineerProjectsPage from '@/pages/engineer/EngineerProjectsPage'
 
 // Client shell + page
 import ClientLayout from '@/pages/client/ClientLayout'
+import ClientProjectDetailsPage from '@/pages/client/ClientProjectDetailsPage'
 import ClientProjectsPage from '@/pages/client/ClientProjectsPage'
 
 /**
@@ -65,6 +67,8 @@ export default function App() {
         <Route path="/engineer" element={<EngineerLayout />}>
           <Route index element={<Navigate to="/engineer/projects" replace />} />
           <Route path="projects"  element={<EngineerProjectsPage />} />
+          <Route path="projects/:projectId" element={<EngineerProjectDetailsPage />} />
+          <Route path="profile" element={<ProfilePage />} />
           <Route path="dashboard" element={<Navigate to="/engineer/projects" replace />} />
         </Route>
 
@@ -72,6 +76,8 @@ export default function App() {
         <Route path="/client" element={<ClientLayout />}>
           <Route index element={<Navigate to="/client/projects" replace />} />
           <Route path="projects"  element={<ClientProjectsPage />} />
+          <Route path="projects/:projectId" element={<ClientProjectDetailsPage />} />
+          <Route path="profile" element={<ProfilePage />} />
           <Route path="dashboard" element={<Navigate to="/client/projects" replace />} />
         </Route>
 

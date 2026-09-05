@@ -42,8 +42,8 @@ export default function ProjectDetailContent({
     setError(null)
     try {
       await fn()
+      await Promise.resolve(onRefresh?.())
       setSuccess(msg)
-      onRefresh?.()
     } catch (err) {
       setError(responseError(err, t('errors.generic')))
     } finally {
