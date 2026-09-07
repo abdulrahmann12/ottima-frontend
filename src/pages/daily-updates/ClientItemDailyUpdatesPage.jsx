@@ -1,4 +1,5 @@
 import { getClientDailyUpdates } from '@/api/clientDailyUpdateApi'
+import CommentsSection from '@/components/daily-updates/CommentsSection'
 import Alert from '@/components/ui/Alert'
 import { useCallback, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -176,6 +177,15 @@ export default function ClientItemDailyUpdatesPage() {
                         ))}
                       </div>
                     )}
+
+                    {/* ── Comments thread ── */}
+                    <div className="mt-6">
+                      <CommentsSection
+                        dailyUpdateId={update.dailyUpdateId}
+                        userRole="CLIENT"
+                        updateStatus={update.status}
+                      />
+                    </div>
                   </div>
                 </article>
               ))}

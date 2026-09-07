@@ -2,6 +2,7 @@ import { getAdminDailyUpdates } from '@/api/adminDailyUpdateApi'
 import { getAdminProject } from '@/api/projectsApi'
 import { getAllEngineers } from '@/api/usersApi'
 import AdminDailyUpdateEvaluationModal from '@/components/daily-updates/AdminDailyUpdateEvaluationModal'
+import CommentsSection from '@/components/daily-updates/CommentsSection'
 import ProjectDetailsPageFrame from '@/components/projects/ProjectDetailsPageFrame'
 import Alert from '@/components/ui/Alert'
 import Button from '@/components/ui/Button'
@@ -337,6 +338,15 @@ function AdminDailyUpdateCard({ update, language, t, onEvaluate }) {
             {t('daily_updates.no_images')}
           </div>
         )}
+
+        {/* ── Comments thread ── */}
+        <div className="mt-2">
+          <CommentsSection
+            dailyUpdateId={update.dailyUpdateId}
+            userRole="ADMIN"
+            updateStatus={update.status}
+          />
+        </div>
       </div>
     </article>
   )
