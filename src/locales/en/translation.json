@@ -124,6 +124,7 @@
     "engineers": "Engineers",
     "clients": "Clients",
     "activity_logs": "Activity Logs",
+    "comments": "Comments",
     "logout": "Logout",
     "logging_out": "Logging out..."
   },
@@ -458,6 +459,48 @@
       "no_old_values": "No previous state recorded",
       "no_new_values": "No updated state recorded"
     }
+  },
+  "notifications": {
+    "title": "Notifications",
+    "unread_count": "{{count}} unread",
+    "mark_all_read": "Mark all read",
+    "empty": "No notifications yet",
+    "view_all": "View All",
+    "new_notification": "New Notification",
+    "ref_types": {
+      "daily_update": "Daily Update",
+      "comment": "Comment",
+      "ticket": "Ticket",
+      "project": "Project",
+      "finance": "Finance"
+    }
+  },
+  "comments": {
+    "title": "Comments Management",
+    "subtitle": "Manage and reply to client comments on project daily updates",
+    "select_project": "Select Project",
+    "select_project_placeholder": "-- Choose a Project --",
+    "select_update": "Select Daily Update",
+    "select_update_placeholder": "-- Choose a Daily Update --",
+    "no_projects": "No active projects found.",
+    "no_updates": "No daily updates recorded for this project.",
+    "select_prompt": "Please select a Project and Daily Update to view comments.",
+    "empty": "No comments recorded for this daily update.",
+    "author": "Client / Author",
+    "comment_text": "Comment",
+    "date": "Date & Time",
+    "admin_reply": "Admin Reply",
+    "no_reply_yet": "No reply submitted yet.",
+    "reply_button": "Reply",
+    "edit_reply": "Edit Reply",
+    "delete_button": "Delete",
+    "reply_modal_title": "Reply to Client Comment",
+    "reply_label": "Your Official Reply",
+    "reply_placeholder": "Type your official response to the client...",
+    "submitting_reply": "Saving Reply...",
+    "confirm_delete_title": "Delete Comment",
+    "confirm_delete_message": "Are you sure you want to delete this comment? This action cannot be undone.",
+    "deleting": "Deleting..."
   },
   "table": {
     "previous": "Previous",
