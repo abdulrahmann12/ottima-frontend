@@ -1,12 +1,13 @@
-import { deleteAdminComment, getAdminComments, replyToComment } from '@/api/adminCommentApi'
+import { deleteAdminComment, getAdminComments, replyToComment, resolveCommentContext } from '@/api/adminCommentApi'
 import { getAdminDailyUpdates } from '@/api/adminDailyUpdateApi'
 import { getAdminProjects } from '@/api/projectsApi'
 import ConfirmDialog from '@/components/admin/ConfirmDialog'
 import Modal from '@/components/admin/Modal'
 import Alert from '@/components/ui/Alert'
 import Button from '@/components/ui/Button'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useSearchParams } from 'react-router-dom'
 
 const PAGE_SIZE = 10
 
@@ -42,6 +43,93 @@ export default function AdminCommentsPage() {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [commentToDelete, setCommentToDelete] = useState(null)
   const [deleting, setDeleting] = useState(false)
+
+  // URL Search Parameters & Deep-Linking Resolution
+  const [searchParams] = useSearchParams()
+  const targetCommentId = searchParams.get('targetCommentId') || searchParams.get('autoSelectId')
+  const [highlightedCommentId, setHighlightedCommentId] = useState(null)
+  const commentRefs = useRef({})
+
+  // Resolve targetCommentId -> parent { projectId, dailyUpdateId } on mount
+  useEffect(() => {
+    if (!targetCommentId || selectedDailyUpdateId) return
+
+    let active = true
+
+    const resolveContext = async () => {
+      try {
+        // Attempt 1: Call API service to resolve parent IDs directly
+        const res = await resolveCommentContext(targetCommentId)
+        const contextData = res.data?.data || res.data || {}
+        if (contextData.projectId && contextData.dailyUpdateId && active) {
+          setSelectedProjectId(String(contextData.projectId))
+          setSelectedDailyUpdateId(String(contextData.dailyUpdateId))
+          return
+        }
+      } catch {
+        // Fallback Strategy: Search across projects & updates if backend endpoint is unavailable
+      }
+
+      if (projects.length === 0) return
+      for (const proj of projects) {
+        const pId = proj.projectId || proj.id
+        try {
+          const updateRes = await getAdminDailyUpdates(pId, 0, 50)
+          const updatesList = updateRes.data?.data?.content || updateRes.data?.content || []
+          for (const upd of updatesList) {
+            const uId = upd.dailyUpdateId || upd.id
+            const commentRes = await getAdminComments(uId, 0, 50)
+            const commentsList = commentRes.data?.data?.content || commentRes.data?.content || []
+            const found = commentsList.find(
+              (c) => String(c.commentId || c.id) === String(targetCommentId)
+            )
+            if (found && active) {
+              setSelectedProjectId(String(pId))
+              setSelectedDailyUpdateId(String(uId))
+              return
+            }
+          }
+        } catch {
+          // Ignore and check next
+        }
+      }
+    }
+
+    resolveContext()
+
+    return () => {
+      active = false
+    }
+  }, [targetCommentId, projects, selectedDailyUpdateId])
+
+  // Auto-scroll and visual highlight effect when comments finish loading
+  useEffect(() => {
+    if (!targetCommentId || comments.length === 0) return
+
+    const matchedComment = comments.find(
+      (c) => String(c.commentId || c.id) === String(targetCommentId)
+    )
+
+    if (matchedComment) {
+      const cId = String(matchedComment.commentId || matchedComment.id)
+      setHighlightedCommentId(cId)
+
+      // Smooth scroll target comment card into view
+      setTimeout(() => {
+        const targetElement = commentRefs.current[cId]
+        if (targetElement) {
+          targetElement.scrollIntoView({ behavior: 'smooth', block: 'center' })
+        }
+      }, 150)
+
+      // Remove glowing highlight after 4 seconds
+      const timer = setTimeout(() => {
+        setHighlightedCommentId(null)
+      }, 4000)
+
+      return () => clearTimeout(timer)
+    }
+  }, [comments, targetCommentId])
 
   // Step 1: Fetch Admin Projects on Mount
   useEffect(() => {
@@ -333,11 +421,19 @@ export default function AdminCommentsPage() {
                 const commentId = comment.commentId || comment.id
                 const authorName = comment.clientName || comment.username || comment.client?.fullNameEn || comment.client?.fullNameAr || 'Client'
                 const hasReply = Boolean(comment.adminReply || comment.reply)
+                const isHighlighted = String(commentId) === String(highlightedCommentId)
 
                 return (
                   <div
                     key={commentId}
-                    className="bg-surface-card border border-surface-border rounded-2xl p-5 space-y-4 shadow-sm hover:border-slate-700 transition-all"
+                    ref={(el) => {
+                      if (el) commentRefs.current[String(commentId)] = el
+                    }}
+                    className={`bg-surface-card border rounded-2xl p-5 space-y-4 shadow-sm transition-all duration-500 ${
+                      isHighlighted
+                        ? 'border-brand-500 ring-2 ring-brand-500/60 bg-brand-950/40 shadow-glow-indigo animate-pulse'
+                        : 'border-surface-border hover:border-slate-700'
+                    }`}
                   >
                     {/* Header: Author + Date + Actions */}
                     <div className="flex items-start justify-between gap-4 border-b border-surface-border/60 pb-3">

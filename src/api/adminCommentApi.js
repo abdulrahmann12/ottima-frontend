@@ -27,3 +27,11 @@ export const replyToComment = (commentId, adminReply) =>
  */
 export const deleteAdminComment = (commentId) =>
   axiosClient.delete(`${adminBase}/comments/${commentId}`)
+
+/**
+ * Resolve parent projectId and dailyUpdateId context for a specific commentId.
+ * @param {number|string} commentId
+ */
+export const resolveCommentContext = (commentId) =>
+  axiosClient.get(`${adminBase}/comments/${commentId}/context`)
+
