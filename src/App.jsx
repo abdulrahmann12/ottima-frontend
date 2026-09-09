@@ -35,8 +35,9 @@ import ClientFinancePage from '@/pages/client/ClientFinancePage'
 import ClientProjectDetailsPage from '@/pages/client/ClientProjectDetailsPage'
 import ClientProjectsPage from '@/pages/client/ClientProjectsPage'
 
-// Admin finance
+// Admin finance & logs
 import AdminFinancePage from '@/pages/admin/finance/AdminFinancePage'
+import AdminActivityLogsPage from '@/pages/admin/activity-logs/AdminActivityLogsPage'
 
 /**
  * App - root router
@@ -73,6 +74,7 @@ export default function App() {
           <Route path="projects/:projectId" element={<AdminProjectDetailsPage />} />
           <Route path="projects/:projectId/daily-updates" element={<AdminProjectDailyUpdatesPage />} />
           <Route path="finance" element={<AdminFinancePage />} />
+          <Route path="activity-logs" element={<AdminActivityLogsPage />} />
         </Route>
 
         {/* Engineer */}

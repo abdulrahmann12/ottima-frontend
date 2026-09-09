@@ -24,6 +24,8 @@ const PAGE_TITLES = {
   '/admin/roles':          'nav.roles',
   '/admin/standard-items': 'nav.standard_items',
   '/admin/projects':       'nav.projects',
+  '/admin/finance':        'nav.finance',
+  '/admin/activity-logs':  'nav.activity_logs',
 }
 
 export default function AdminLayout() {

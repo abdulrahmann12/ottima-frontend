@@ -411,6 +411,54 @@
     "return_to_project": "Back to project",
     "return_to_projects": "Back to projects"
   },
+  "activity_logs": {
+    "title": "System Activity Logs",
+    "subtitle": "Audit trail and security event logs",
+    "filters": "Filter Logs",
+    "filter_user": "User",
+    "all_users": "All Users",
+    "filter_action": "Action",
+    "all_actions": "All Actions",
+    "filter_status": "Status",
+    "all_statuses": "All Statuses",
+    "filter_entity": "Entity Name",
+    "filter_entity_placeholder": "e.g. USER, PROJECT",
+    "empty": "No activity logs found.",
+    "copy_json": "Copy JSON",
+    "copied": "Copied!",
+    "table": {
+      "date": "Date & Time",
+      "user": "User",
+      "action": "Action",
+      "entity": "Entity",
+      "status": "Status",
+      "ip": "IP Address",
+      "actions": "Actions",
+      "view_changes": "View Details"
+    },
+    "diff": {
+      "field": "Field Name",
+      "change_type": "Change",
+      "old_val": "Old Value (Before)",
+      "new_val": "New Value (After)",
+      "search_fields": "Search changed fields..."
+    },
+    "modal": {
+      "title": "Activity Log Details",
+      "details": "Audit Log Description",
+      "state_comparison": "Data Changes Inspector",
+      "view_simple": "Visual Summary",
+      "view_side_by_side": "Side-by-Side",
+      "view_raw": "Raw JSON",
+      "changed_fields_count": "{{count}} field(s) changed",
+      "show_unchanged": "Show unchanged fields",
+      "no_changes_recorded": "No specific data field changes recorded for this activity.",
+      "old_values": "Old Values (Before)",
+      "new_values": "New Values (After)",
+      "no_old_values": "No previous state recorded",
+      "no_new_values": "No updated state recorded"
+    }
+  },
   "table": {
     "previous": "Previous",
     "next": "Next",

@@ -411,6 +411,50 @@
     "return_to_project": "العودة إلى المشروع",
     "return_to_projects": "العودة إلى المشاريع"
   },
+  "activity_logs": {
+    "title": "سجلات نشاط النظام",
+    "subtitle": "سجل التدقيق وأحداث الأمان للنظام",
+    "filters": "تصفية السجلات",
+    "filter_user": "المستخدم",
+    "all_users": "جميع المستخدمين",
+    "filter_action": "الإجراء",
+    "all_actions": "جميع الإجراءات",
+    "filter_status": "الحالة",
+    "all_statuses": "جميع الحالات",
+    "filter_entity": "اسم الكيان",
+    "filter_entity_placeholder": "مثل: USER, PROJECT",
+    "empty": "لم يتم العثور على سجلات نشاط.",
+    "table": {
+      "date": "التاريخ والوقت",
+      "user": "المستخدم",
+      "action": "الإجراء",
+      "entity": "الكيان",
+      "status": "الحالة",
+      "ip": "عنوان IP",
+      "actions": "الإجراءات",
+      "view_changes": "عرض التغييرات"
+    },
+    "diff": {
+      "field": "اسم الحقل",
+      "change_type": "التغيير",
+      "old_val": "القيمة القديمة (قبل)",
+      "new_val": "القيمة الجديدة (بعد)"
+    },
+    "modal": {
+      "title": "تفاصيل سجل النشاط",
+      "details": "التفاصيل / الوصف",
+      "state_comparison": "ملخص تغييرات البيانات",
+      "view_simple": "عرض مبسط",
+      "view_raw": "نص JSON",
+      "changed_fields_count": "تم تعديل {{count}} حقل/حقول",
+      "show_unchanged": "إظهار الحقول غير المتغيرة",
+      "no_changes_recorded": "لم يتم تسجيل تغييرات في حقول البيانات لهذا النشاط.",
+      "old_values": "القيم القديمة (قبل)",
+      "new_values": "القيم الجديدة (بعد)",
+      "no_old_values": "لا توجد حالة سابقة مسجلة",
+      "no_new_values": "لا توجد حالة محدثة مسجلة"
+    }
+  },
   "table": {
     "previous": "السابق",
     "next": "التالي",
