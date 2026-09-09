@@ -25,6 +25,7 @@ export default function ProfilePage() {
   const { t, i18n } = useTranslation()
   const { isAuthenticated, role } = useAuthStore()
   const navigate = useNavigate()
+  const location = useLocation()
 
   // Profile data
   const [profile, setProfile]       = useState(null)
@@ -52,12 +53,19 @@ export default function ProfilePage() {
   const [pwdSuccess, setPwdSuccess]           = useState(false)
   const [pwdErrorMsg, setPwdErrorMsg]         = useState(null)
 
-  // Redirect if not authenticated
+  // Redirect if not authenticated or if accessing un-nested /profile route
   useEffect(() => {
     if (!isAuthenticated) {
       navigate('/', { replace: true })
+      return
     }
-  }, [isAuthenticated, navigate])
+
+    if (location.pathname === '/profile') {
+      if (role === 'CLIENT') navigate('/client/profile', { replace: true })
+      else if (role === 'ENGINEER') navigate('/engineer/profile', { replace: true })
+      else if (role === 'ADMIN') navigate('/admin/profile', { replace: true })
+    }
+  }, [isAuthenticated, location.pathname, role, navigate])
 
   // Load user profile
   useEffect(() => {
@@ -165,25 +173,7 @@ export default function ProfilePage() {
   if (!isAuthenticated) return null
 
   return (
-    <div className="min-h-dvh bg-auth-pattern flex flex-col">
-      {/* Header Bar */}
-      <header className="px-6 py-4 border-b border-surface-border bg-surface-card/60 backdrop-blur-md flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <Link
-            to={dashboardPath}
-            className="inline-flex items-center gap-1.5 text-xs text-slate-400 hover:text-white transition-colors"
-          >
-            <span className="rtl:rotate-180">←</span>
-            {t('common.back')}
-          </Link>
-          <span className="text-slate-600">|</span>
-          <h1 className="text-white font-bold text-lg">{t('profile.title')}</h1>
-        </div>
-        <LanguageSwitcher />
-      </header>
-
-      {/* Main Container */}
-      <main className="flex-1 max-w-6xl w-full mx-auto p-4 sm:p-6 lg:p-8 space-y-6 animate-slide-up">
+    <div className="space-y-6 animate-slide-up">
         {/* Profile Banner */}
         <div className="glass-card p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div className="flex items-center gap-4">
@@ -337,7 +327,6 @@ export default function ProfilePage() {
             </div>
           </div>
         </div>
-      </main>
     </div>
   )
 }

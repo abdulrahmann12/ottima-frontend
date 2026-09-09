@@ -1,5 +1,6 @@
 import AdminHeader from '@/components/admin/AdminHeader'
 import AdminSidebar from '@/components/admin/AdminSidebar'
+import ErrorBoundary from '@/components/ui/ErrorBoundary'
 import useAuthStore from '@/store/authStore'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -40,7 +41,9 @@ export default function RolePortalLayout({
         />
 
         <main className="flex-1 overflow-y-auto scrollbar-thin p-4 lg:p-6">
-          <Outlet />
+          <ErrorBoundary>
+            <Outlet />
+          </ErrorBoundary>
         </main>
       </div>
     </div>

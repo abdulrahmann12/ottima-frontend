@@ -1,4 +1,4 @@
-import { ProfileIcon, ProjectsIcon } from '@/components/admin/AdminSidebar'
+import { FinanceIcon, ProfileIcon, ProjectsIcon } from '@/components/admin/AdminSidebar'
 import RolePortalLayout from '@/pages/shared/RolePortalLayout'
 import { useTranslation } from 'react-i18next'
 
@@ -7,6 +7,11 @@ const NAV_ITEMS = [
     key: 'projects',
     to: '/client/projects',
     icon: ProjectsIcon,
+  },
+  {
+    key: 'finance',
+    to: '/client/finance',
+    icon: FinanceIcon,
   },
   {
     key: 'profile',
@@ -26,6 +31,7 @@ export default function ClientLayout() {
       panelSubtitle={t('portal.client')}
       pageTitleResolver={(pathname) => {
         if (pathname.includes('/daily-updates')) return 'nav.daily_updates'
+        if (pathname.startsWith('/client/finance')) return 'nav.finance'
         if (pathname.startsWith('/client/projects')) return 'nav.projects'
         if (pathname.startsWith('/client/profile')) return 'nav.profile'
         return 'nav.projects'

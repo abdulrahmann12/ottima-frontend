@@ -31,8 +31,12 @@ import EngineerProjectsPage from '@/pages/engineer/EngineerProjectsPage'
 
 // Client shell + page
 import ClientLayout from '@/pages/client/ClientLayout'
+import ClientFinancePage from '@/pages/client/ClientFinancePage'
 import ClientProjectDetailsPage from '@/pages/client/ClientProjectDetailsPage'
 import ClientProjectsPage from '@/pages/client/ClientProjectsPage'
+
+// Admin finance
+import AdminFinancePage from '@/pages/admin/finance/AdminFinancePage'
 
 /**
  * App - root router
@@ -68,6 +72,7 @@ export default function App() {
           <Route path="projects"       element={<ProjectsPage />} />
           <Route path="projects/:projectId" element={<AdminProjectDetailsPage />} />
           <Route path="projects/:projectId/daily-updates" element={<AdminProjectDailyUpdatesPage />} />
+          <Route path="finance" element={<AdminFinancePage />} />
         </Route>
 
         {/* Engineer */}
@@ -87,6 +92,7 @@ export default function App() {
           <Route path="projects"  element={<ClientProjectsPage />} />
           <Route path="projects/:projectId" element={<ClientProjectDetailsPage />} />
           <Route path="items/:projectItemId/daily-updates" element={<ClientItemDailyUpdatesPage />} />
+          <Route path="finance" element={<ClientFinancePage />} />
           <Route path="profile" element={<ProfilePage />} />
           <Route path="dashboard" element={<Navigate to="/client/projects" replace />} />
         </Route>

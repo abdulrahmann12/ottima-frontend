@@ -51,9 +51,9 @@ export default function ProjectDetailsPageFrame({
         </div>
       )}
 
-      {!loading && !project && !error && (
+      {!loading && !project && (
         <div className="rounded-2xl border border-surface-border bg-surface-card p-8 text-center shadow-xl">
-          <p className="text-sm text-slate-400">{emptyMessage}</p>
+          <p className="text-sm text-slate-400">{error || emptyMessage}</p>
         </div>
       )}
 

@@ -49,7 +49,7 @@ export default function LoginEngineer() {
       const { accessToken, refreshToken } = res.data
       setTokens(accessToken, refreshToken)
       setRole('ENGINEER')
-      navigate('/profile', { replace: true })
+      navigate('/engineer/projects', { replace: true })
     } catch (err) {
       const msg =
         err.response?.data?.message ||

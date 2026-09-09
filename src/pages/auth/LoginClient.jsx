@@ -49,7 +49,7 @@ export default function LoginClient() {
       const { accessToken, refreshToken } = res.data
       setTokens(accessToken, refreshToken)
       setRole('CLIENT')
-      navigate('/profile', { replace: true })
+      navigate('/client/projects', { replace: true })
     } catch (err) {
       const msg =
         err.response?.data?.message ||

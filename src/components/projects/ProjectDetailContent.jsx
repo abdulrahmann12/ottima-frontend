@@ -7,10 +7,13 @@ import {
     updateProjectItem,
 } from '@/api/projectsApi'
 import { getAllEngineers } from '@/api/usersApi'
+import { getAdminFinancialSummary } from '@/api/adminFinancialApi'
+import { getClientFinancialSummary } from '@/api/clientFinancialApi'
+import FinancialSummaryCards from '@/components/finance/FinancialSummaryCards'
 import Alert from '@/components/ui/Alert'
 import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { ProgressBar, StatusBadge } from './ProjectTable'
 
@@ -35,6 +38,31 @@ export default function ProjectDetailContent({
   const [editMode, setEditMode] = useState(false)
   const [engineers, setEngineers] = useState([])
   const [editForm, setEditForm] = useState({})
+  const [finSummary, setFinSummary] = useState(null)
+  const [finLoading, setFinLoading] = useState(false)
+
+  useEffect(() => {
+    if (!project?.projectId || isEngineer) return
+    let cancelled = false
+    setFinLoading(true)
+
+    const fetchSummary = role === 'CLIENT'
+      ? getClientFinancialSummary(project.projectId)
+      : getAdminFinancialSummary(project.projectId)
+
+    fetchSummary
+      .then(({ data }) => {
+        if (!cancelled) setFinSummary(data.data)
+      })
+      .catch(() => {
+        if (!cancelled) setFinSummary(null)
+      })
+      .finally(() => {
+        if (!cancelled) setFinLoading(false)
+      })
+
+    return () => { cancelled = true }
+  }, [project?.projectId, role, isEngineer])
 
   if (!project) return null
 
@@ -108,24 +136,13 @@ export default function ProjectDetailContent({
         )}
       </div>
 
-      {role === 'CLIENT' && (
-        <div className="space-y-3 rounded-xl border border-surface-border bg-slate-800/30 p-4">
-          <h4 className="text-xs font-semibold uppercase tracking-wider text-slate-400">
-            {t('projects.financial_summary')}
-          </h4>
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-            <FinancialRow label={t('projects.budget')} value={fmt(project.estimatedBudget)} />
-            <FinancialRow label={t('projects.spent')} value={fmt(project.totalCalculatedSpent)} highlight />
-            <FinancialRow
-              label={t('projects.remaining_budget')}
-              value={fmt((project.estimatedBudget ?? 0) - (project.totalCalculatedSpent ?? 0))}
-            />
-          </div>
-          <div className="pt-1">
-            <p className="mb-1.5 text-[11px] text-slate-500">{t('projects.progress')}</p>
-            <ProgressBar value={project.overallProgressPercentage} />
-          </div>
-        </div>
+      {/* ── Modern Financial Summary Cards (Client & Admin) ── */}
+      {!isEngineer && (
+        <FinancialSummaryCards
+          summary={finSummary}
+          loading={finLoading}
+          className="pt-1"
+        />
       )}
 
       {isAdmin && (
@@ -355,16 +372,6 @@ function MetricCard({ label, value }) {
   )
 }
 
-function FinancialRow({ label, value, highlight = false }) {
-  return (
-    <div>
-      <p className="text-[11px] text-slate-500">{label}</p>
-      <p className={`mt-0.5 text-base font-bold ${highlight ? 'text-amber-400' : 'text-white'}`}>
-        {value}
-      </p>
-    </div>
-  )
-}
 
 function MiniInput({ label, ...props }) {
   return (
