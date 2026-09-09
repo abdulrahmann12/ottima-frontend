@@ -64,7 +64,7 @@ const NAV_ITEMS = [
   },
   {
     key: 'profile',
-    to: '/profile',
+    to: '/admin/profile',
     icon: ProfileIcon,
   },
 ]

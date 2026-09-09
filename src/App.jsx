@@ -77,6 +77,7 @@ export default function App() {
           <Route path="finance" element={<AdminFinancePage />} />
           <Route path="activity-logs" element={<AdminActivityLogsPage />} />
           <Route path="comments" element={<AdminCommentsPage />} />
+          <Route path="profile" element={<ProfilePage />} />
         </Route>
 
         {/* Engineer */}
