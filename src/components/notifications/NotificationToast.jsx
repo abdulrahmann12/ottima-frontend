@@ -1,6 +1,6 @@
 import { setNotificationToastCallback } from '@/services/websocketService'
 import useAuthStore from '@/store/authStore'
-import { getNotificationRoute } from '@/utils/notificationNavigation'
+import { getNotificationRoute } from '@/utils/NotificationNavigator'
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
