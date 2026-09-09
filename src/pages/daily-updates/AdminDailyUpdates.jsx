@@ -14,6 +14,7 @@ import Alert from '@/components/ui/Alert'
 import Button from '@/components/ui/Button'
 import { useCallback, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useSearchParams } from 'react-router-dom'
 
 const PAGE_SIZE = 10
 const PROJECT_PAGE_SIZE = 200
@@ -121,6 +122,9 @@ export default function AdminDailyUpdates() {
     }
   }, [filters.engineerId, filters.projectItemId, filters.status, page, selectedProjectId, t])
 
+  const [searchParams] = useSearchParams()
+  const targetUpdateId = searchParams.get('targetUpdateId') || searchParams.get('autoSelectId')
+
   useEffect(() => {
     fetchProjects()
   }, [fetchProjects])
@@ -128,6 +132,48 @@ export default function AdminDailyUpdates() {
   useEffect(() => {
     fetchEngineers()
   }, [fetchEngineers])
+
+  // Auto-find project when deep-linked via targetUpdateId query param
+  useEffect(() => {
+    if (!targetUpdateId || projects.length === 0 || selectedProjectId) return
+
+    let active = true
+    const resolveTargetProject = async () => {
+      for (const proj of projects) {
+        try {
+          const { data } = await getAdminDailyUpdates(proj.projectId, 0, 50)
+          const found = data.data?.content?.find(
+            (item) => String(item.dailyUpdateId) === String(targetUpdateId) || String(item.id) === String(targetUpdateId)
+          )
+          if (found && active) {
+            setSelectedProjectId(String(proj.projectId))
+            setSelectedUpdate(found)
+            break
+          }
+        } catch {
+          // Check next project if error
+        }
+      }
+    }
+
+    resolveTargetProject()
+
+    return () => {
+      active = false
+    }
+  }, [projects, targetUpdateId, selectedProjectId])
+
+  // Auto-open modal when update list loads if targetUpdateId is present
+  useEffect(() => {
+    if (!targetUpdateId || updates.length === 0) return
+
+    const match = updates.find(
+      (item) => String(item.dailyUpdateId) === String(targetUpdateId) || String(item.id) === String(targetUpdateId)
+    )
+    if (match) {
+      setSelectedUpdate(match)
+    }
+  }, [updates, targetUpdateId])
 
   useEffect(() => {
     if (!selectedProjectId) {
