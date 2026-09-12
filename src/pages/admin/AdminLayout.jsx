@@ -25,6 +25,7 @@ const PAGE_TITLES = {
   '/admin/standard-items': 'nav.standard_items',
   '/admin/projects':       'nav.projects',
   '/admin/daily-updates':  'nav.daily_updates',
+  '/admin/tickets':        'nav.tickets',
   '/admin/comments':       'nav.comments',
   '/admin/finance':        'nav.finance',
   '/admin/activity-logs':  'nav.activity_logs',

@@ -10,7 +10,8 @@ import Alert from '@/components/ui/Alert'
 import Button from '@/components/ui/Button'
 import SearchableSelect from '@/components/ui/SearchableSelect'
 import { Spinner } from '@/components/ui/icons/Globe'
-import { compressImageFile, optimizeCloudinaryUrl } from '@/utils/imageUtils'
+import { compressImageFile, optimizeCloudinaryUrl, getPdfPreviewUrl, isPdfDocument } from '@/utils/imageUtils'
+import DocumentViewerModal from '@/components/ui/DocumentViewerModal'
 import { useEffect, useRef, useState } from 'react'
 
 // ─── Cloudinary config (same preset / cloud as Daily Updates) ─
@@ -64,6 +65,7 @@ export default function FinancialRecordModal({
   const [uploading, setUploading] = useState(false)
   const [dragActive, setDragActive] = useState(false)
   const [docPreview, setDocPreview] = useState(record?.documentUrl ?? null)
+  const [viewerOpen, setViewerOpen] = useState(false)
   const fileRef = useRef(null)
 
   // Reset when modal opens / record changes
@@ -193,6 +195,7 @@ export default function FinancialRecordModal({
   const isDocImage = docPreview && !docPreview.toLowerCase().endsWith('.pdf')
 
   return (
+    <>
     <Modal
       isOpen={isOpen}
       onClose={() => { if (!saving && !uploading) onClose?.() }}
@@ -296,25 +299,41 @@ export default function FinancialRecordModal({
           {docPreview ? (
             <div className="relative overflow-hidden rounded-2xl border border-gray-200 bg-gray-50/70 p-3 shadow-sm transition-all">
               {isDocImage ? (
-                <div className="rounded-xl overflow-hidden bg-white border border-gray-200 flex items-center justify-center p-1">
+                <div
+                  onClick={() => setViewerOpen(true)}
+                  className="rounded-xl overflow-hidden bg-white border border-gray-200 flex items-center justify-center p-1 cursor-pointer group"
+                >
                   <img
                     src={optimizeCloudinaryUrl(docPreview, { width: 800, quality: 'auto' })}
                     alt="Document preview"
-                    className="w-full max-h-56 object-contain rounded-lg"
+                    className="w-full max-h-56 object-contain rounded-lg group-hover:scale-102 transition-transform"
                     loading="lazy"
                   />
                 </div>
               ) : (
-                <div className="flex items-center gap-3 px-4 py-4 bg-white rounded-xl border border-gray-200">
-                  <PdfIcon className="w-8 h-8 flex-shrink-0 text-red-500" />
-                  <a
-                    href={docPreview}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="text-sm text-warm-brown hover:text-[#6B4A33] font-semibold truncate underline"
-                  >
-                    View PDF document
-                  </a>
+                <div
+                  onClick={() => setViewerOpen(true)}
+                  className="flex items-center gap-3 p-3 bg-white rounded-xl border border-gray-200 cursor-pointer hover:border-warm-brown/50 hover:bg-warm-brown/5 transition-all group"
+                >
+                  <div className="relative w-14 h-14 rounded-lg overflow-hidden border border-red-200 bg-red-50 flex items-center justify-center shrink-0">
+                    <img
+                      src={getPdfPreviewUrl(docPreview, { page: 1, width: 150 })}
+                      alt="PDF Preview"
+                      className="w-full h-full object-cover"
+                      loading="lazy"
+                    />
+                    <span className="absolute bottom-0 right-0 left-0 bg-red-600 text-white font-bold text-[8px] text-center leading-tight">
+                      PDF
+                    </span>
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-xs font-bold text-gray-800 truncate group-hover:text-warm-brown">
+                      Document.pdf
+                    </p>
+                    <span className="text-[11px] text-warm-brown font-semibold flex items-center gap-1 mt-0.5">
+                      View Document →
+                    </span>
+                  </div>
                 </div>
               )}
               <button
@@ -415,6 +434,16 @@ export default function FinancialRecordModal({
         </div>
       </form>
     </Modal>
+
+    {/* ── Document Viewer Modal ── */}
+    <DocumentViewerModal
+      isOpen={viewerOpen}
+      onClose={() => setViewerOpen(false)}
+      url={docPreview}
+      title="Financial Document Receipt"
+      fileType={form.documentType}
+    />
+    </>
   )
 }
 

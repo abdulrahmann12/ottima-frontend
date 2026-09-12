@@ -10,6 +10,7 @@ import Alert from '@/components/ui/Alert'
 import SearchableSelect from '@/components/ui/SearchableSelect'
 import { getAdminProjects, getAdminProject } from '@/api/projectsApi'
 import FinancialSummaryCards from '@/components/finance/FinancialSummaryCards'
+import DocumentViewerModal from '@/components/ui/DocumentViewerModal'
 import { useCallback, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
@@ -77,6 +78,7 @@ export default function AdminFinancePage() {
   const [deleteTarget,   setDeleteTarget]   = useState(null)
   const [deleting,       setDeleting]       = useState(false)
   const [deleteError,    setDeleteError]    = useState(null)
+  const [activeDoc,      setActiveDoc]      = useState(null)
 
   // ── Fetch projects once ──
   useEffect(() => {
@@ -220,17 +222,22 @@ export default function AdminFinancePage() {
     {
       key: 'documentUrl',
       header: 'Doc',
-      render: (v) =>
+      render: (v, row) =>
         v ? (
-          <a
-            href={v}
-            target="_blank"
-            rel="noreferrer"
-            onClick={(e) => e.stopPropagation()}
-            className="inline-flex items-center gap-1 rounded-lg border border-brand-500/30 bg-brand-500/10 px-2 py-0.5 text-[11px] font-medium text-brand-300 hover:text-brand-200 transition-colors"
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation()
+              setActiveDoc({
+                url: v,
+                title: `${row.recordType} Receipt`,
+                fileType: row.documentType,
+              })
+            }}
+            className="inline-flex items-center gap-1 rounded-lg border border-warm-brown/30 bg-warm-brown/10 px-2 py-0.5 text-[11px] font-medium text-warm-brown hover:bg-warm-brown/20 transition-colors cursor-pointer"
           >
             <DocIcon className="w-3 h-3" /> View
-          </a>
+          </button>
         ) : (
           <span className="text-slate-600 text-xs">—</span>
         ),
@@ -397,6 +404,15 @@ export default function AdminFinancePage() {
         title="Delete Financial Record"
         message={`Are you sure you want to permanently delete this ${deleteTarget?.recordType?.toLowerCase()} record of ${formatMoney(deleteTarget?.amount)}? This action cannot be undone.`}
         confirmLabel="Delete Record"
+      />
+
+      {/* ── Document / PDF Viewer Modal ── */}
+      <DocumentViewerModal
+        isOpen={Boolean(activeDoc)}
+        onClose={() => setActiveDoc(null)}
+        url={activeDoc?.url}
+        title={activeDoc?.title}
+        fileType={activeDoc?.fileType}
       />
     </div>
   )

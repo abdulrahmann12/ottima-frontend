@@ -3,7 +3,7 @@ import { getMyProfile } from '@/api/usersApi'
 import { connectWebSocket, disconnectWebSocket } from '@/services/websocketService'
 import useAuthStore from '@/store/authStore'
 import useNotificationStore from '@/store/useNotificationStore'
-import { getNotificationRoute } from '@/utils/NotificationNavigator'
+import { resolveAndNavigateNotification } from '@/utils/NotificationNavigator'
 import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
@@ -118,9 +118,6 @@ export default function NotificationBell() {
    */
   const handleNotificationClick = async (notification) => {
     const notificationId = notification.notificationId || notification.id
-    const refType = (notification.referenceType || '').toUpperCase()
-    const refId = notification.referenceId
-    const currentRole = (role || 'ADMIN').toUpperCase()
 
     // 1. Mark as read in the background (if not already read)
     if (!notification.isRead && !notification.read) {
@@ -129,56 +126,8 @@ export default function NotificationBell() {
 
     setIsOpen(false) // Close the popover
 
-    // 2. Context-aware navigation for nested entities (Client and Engineer)
-    if (currentRole === 'CLIENT' && (refType === 'COMMENT' || refType === 'DAILY_UPDATE')) {
-      try {
-        const res = await resolveNotificationContext(refType, refId)
-        const ctx = res.data?.data || res.data || {}
-        if (ctx.projectItemId) {
-          navigate(`/client/items/${ctx.projectItemId}/daily-updates`, {
-            state: {
-              projectId: ctx.projectId,
-              itemNameAr: ctx.itemNameAr,
-              itemNameEn: ctx.itemNameEn,
-              projectNameAr: ctx.projectNameAr,
-              projectNameEn: ctx.projectNameEn,
-              targetCommentId: refType === 'COMMENT' ? refId : undefined,
-              targetUpdateId: ctx.dailyUpdateId || (refType === 'DAILY_UPDATE' ? refId : undefined),
-            },
-          })
-          return
-        }
-      } catch (err) {
-        console.warn('Failed to resolve client notification context:', err)
-      }
-    } else if (currentRole === 'ENGINEER' && (refType === 'COMMENT' || refType === 'DAILY_UPDATE')) {
-      try {
-        const res = await resolveNotificationContext(refType, refId)
-        const ctx = res.data?.data || res.data || {}
-        if (ctx.projectId) {
-          navigate(`/engineer/projects/${ctx.projectId}/daily-updates`, {
-            state: {
-              projectSummary: {
-                projectId: ctx.projectId,
-                nameAr: ctx.projectNameAr,
-                nameEn: ctx.projectNameEn,
-              },
-            },
-          })
-          return
-        }
-      } catch (err) {
-        console.warn('Failed to resolve engineer notification context:', err)
-      }
-    }
-
-    // 3. Fallback to standard route mapping
-    const targetPath = getNotificationRoute(refType, refId, currentRole)
-    if (targetPath) {
-      navigate(targetPath)
-    } else {
-      console.warn('No route mapped for referenceType:', notification.referenceType)
-    }
+    // 2. Resolve context and navigate to target entity
+    await resolveAndNavigateNotification(notification, role, navigate)
   }
 
   const displayBadge = unreadCount > 99 ? '99+' : unreadCount

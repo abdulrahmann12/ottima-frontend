@@ -39,6 +39,7 @@ import ClientProjectsPage from '@/pages/client/ClientProjectsPage'
 import AdminFinancePage from '@/pages/admin/finance/AdminFinancePage'
 import AdminActivityLogsPage from '@/pages/admin/activity-logs/AdminActivityLogsPage'
 import AdminCommentsPage from '@/pages/admin/comments/AdminCommentsPage'
+import InternalTicketsDashboard from '@/pages/tickets/InternalTicketsDashboard'
 
 /**
  * App - root router
@@ -71,6 +72,8 @@ export default function App() {
           <Route path="roles"          element={<RolesPage />} />
           <Route path="standard-items" element={<StandardItemsPage />} />
           <Route path="daily-updates"  element={<AdminDailyUpdates />} />
+          <Route path="tickets"        element={<InternalTicketsDashboard />} />
+          <Route path="internal-requests" element={<Navigate to="/admin/tickets" replace />} />
           <Route path="projects"       element={<ProjectsPage />} />
           <Route path="projects/:projectId" element={<AdminProjectDetailsPage />} />
           <Route path="projects/:projectId/daily-updates" element={<AdminProjectDailyUpdatesPage />} />
@@ -84,6 +87,8 @@ export default function App() {
         <Route path="/engineer" element={<EngineerLayout />}>
           <Route index element={<Navigate to="/engineer/projects" replace />} />
           <Route path="daily-updates" element={<EngineerDailyUpdates />} />
+          <Route path="tickets"       element={<InternalTicketsDashboard />} />
+          <Route path="internal-requests" element={<Navigate to="/engineer/tickets" replace />} />
           <Route path="projects"  element={<EngineerProjectsPage />} />
           <Route path="projects/:projectId" element={<EngineerProjectDetailsPage />} />
           <Route path="projects/:projectId/daily-updates" element={<EngineerProjectDailyUpdatesPage />} />

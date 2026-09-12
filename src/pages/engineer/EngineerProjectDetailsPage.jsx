@@ -1,10 +1,11 @@
 import { getEngineerProject } from '@/api/projectsApi'
 import ProjectDetailContent from '@/components/projects/ProjectDetailContent'
 import ProjectDetailsPageFrame from '@/components/projects/ProjectDetailsPageFrame'
+import ProjectTicketsChat from '@/components/tickets/ProjectTicketsChat'
 import Button from '@/components/ui/Button'
 import { useCallback, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useLocation, useNavigate, useParams } from 'react-router-dom'
+import { useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 
 const responseError = (err, fallback) => err?.response?.data?.message ?? fallback
 
@@ -12,11 +13,33 @@ export default function EngineerProjectDetailsPage() {
   const { projectId } = useParams()
   const navigate = useNavigate()
   const location = useLocation()
+  const [searchParams, setSearchParams] = useSearchParams()
   const { t, i18n } = useTranslation()
 
   const [project, setProject] = useState(location.state?.projectSummary ?? null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  
+  const initialTab = searchParams.get('tab') === 'tickets' ? 'TICKETS' : 'OVERVIEW'
+  const [activeViewTab, setActiveViewTab] = useState(initialTab)
+
+  useEffect(() => {
+    const tabParam = searchParams.get('tab')
+    if (tabParam === 'tickets') {
+      setActiveViewTab('TICKETS')
+    } else if (tabParam === 'overview') {
+      setActiveViewTab('OVERVIEW')
+    }
+  }, [searchParams])
+
+  const handleTabChange = (tab) => {
+    setActiveViewTab(tab)
+    if (tab === 'TICKETS') {
+      setSearchParams({ tab: 'tickets' }, { replace: true })
+    } else {
+      setSearchParams({}, { replace: true })
+    }
+  }
 
   const fetchProject = useCallback(async () => {
     if (!projectId) return
@@ -58,19 +81,54 @@ export default function EngineerProjectDetailsPage() {
       emptyMessage={t('projects.not_found')}
     >
       <div className="space-y-5">
-        <div className="flex justify-end">
-          <Button
-            type="button"
-            className="w-auto"
-            onClick={() => navigate(`/engineer/projects/${projectId}/daily-updates`, {
-              state: { projectSummary: project },
-            })}
-          >
-            {t('nav.daily_updates', { defaultValue: 'Daily Updates' })}
-          </Button>
+        {/* Navigation Bar: Tabs + Actions */}
+        <div className="flex flex-wrap items-center justify-between gap-3 bg-white p-2 rounded-2xl border border-gray-200 shadow-xs">
+          {/* View switcher tabs */}
+          <div className="flex items-center gap-1.5">
+            <button
+              type="button"
+              onClick={() => handleTabChange('OVERVIEW')}
+              className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all ${
+                activeViewTab === 'OVERVIEW'
+                  ? 'bg-warm-brown text-white shadow-xs'
+                  : 'text-gray-700 hover:bg-light-blue/40'
+              }`}
+            >
+              📋 {t('projects.tab_overview', { defaultValue: 'Items & Progress' })}
+            </button>
+
+            <button
+              type="button"
+              onClick={() => handleTabChange('TICKETS')}
+              className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all flex items-center gap-1.5 ${
+                activeViewTab === 'TICKETS'
+                  ? 'bg-warm-brown text-white shadow-xs'
+                  : 'text-gray-700 hover:bg-light-blue/40'
+              }`}
+            >
+              💬 {t('projects.tab_tickets', { defaultValue: 'Internal Requests (Chat)' })}
+            </button>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <Button
+              type="button"
+              className="w-auto py-2 px-4 text-xs"
+              onClick={() => navigate(`/engineer/projects/${projectId}/daily-updates`, {
+                state: { projectSummary: project },
+              })}
+            >
+              📷 {t('nav.daily_updates', { defaultValue: 'Daily Updates' })}
+            </Button>
+          </div>
         </div>
 
-        <ProjectDetailContent project={project} role="ENGINEER" onRefresh={fetchProject} />
+        {/* Active Tab View */}
+        {activeViewTab === 'OVERVIEW' ? (
+          <ProjectDetailContent project={project} role="ENGINEER" onRefresh={fetchProject} />
+        ) : (
+          <ProjectTicketsChat projectId={projectId} project={project} />
+        )}
       </div>
     </ProjectDetailsPageFrame>
   )

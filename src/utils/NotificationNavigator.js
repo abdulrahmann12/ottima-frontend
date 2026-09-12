@@ -1,5 +1,6 @@
 import { resolveCommentContext } from '@/api/clientCommentApi'
 import { resolveDailyUpdateContext } from '@/api/clientDailyUpdateApi'
+import { getTicketById } from '@/api/internalTicketApi'
 
 /**
  * NotificationNavigator.js — Intelligent Notification Routing Resolver
@@ -39,7 +40,7 @@ export function getNotificationRoute(referenceType, referenceId, userRole) {
           return refId ? `/admin/finance?targetRecordId=${refId}` : '/admin/finance'
 
         case 'TICKET':
-          return refId ? `/admin/projects?targetTicketId=${refId}` : '/admin/projects'
+          return '/admin/tickets'
 
         case 'USER':
           return refId ? `/admin/users?targetUserId=${refId}` : '/admin/users'
@@ -65,7 +66,7 @@ export function getNotificationRoute(referenceType, referenceId, userRole) {
           return '/engineer/projects'
 
         case 'TICKET':
-          return refId ? `/engineer/projects?targetTicketId=${refId}` : '/engineer/projects'
+          return '/engineer/tickets'
 
         case 'USER':
           return '/engineer/profile'
@@ -91,7 +92,7 @@ export function getNotificationRoute(referenceType, referenceId, userRole) {
           return refId ? `/client/finance?targetRecordId=${refId}` : '/client/finance'
 
         case 'TICKET':
-          return refId ? `/client/projects?targetTicketId=${refId}` : '/client/projects'
+          return '/client/projects'
 
         case 'USER':
           return '/client/profile'
@@ -162,6 +163,24 @@ export async function resolveAndNavigateNotification(notification, userRole, nav
       navigate('/client/projects')
       return
     }
+  }
+
+  // Handle Internal Ticket routing for Admin & Engineer
+  if (refType === 'TICKET' && refId) {
+    try {
+      const res = await getTicketById(refId)
+      const ticket = res.data?.data || res.data || {}
+      if (ticket.projectId) {
+        const basePath = role === 'ADMIN' ? '/admin/projects' : '/engineer/projects'
+        navigate(`${basePath}/${ticket.projectId}?tab=tickets&targetTicketId=${refId}`)
+        return
+      }
+    } catch (err) {
+      console.warn('Could not resolve ticket context for navigation:', err)
+    }
+    const fallbackPath = role === 'ADMIN' ? '/admin/tickets' : '/engineer/tickets'
+    navigate(fallbackPath)
+    return
   }
 
   // Fallback to standard synchronous route computation

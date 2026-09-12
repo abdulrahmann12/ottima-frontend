@@ -5,7 +5,8 @@ import {
 } from '@/api/clientFinancialApi'
 import Alert from '@/components/ui/Alert'
 import FinancialSummaryCards from '@/components/finance/FinancialSummaryCards'
-import { optimizeCloudinaryUrl } from '@/utils/imageUtils'
+import { optimizeCloudinaryUrl, getPdfThumbnailUrl, isPdfDocument } from '@/utils/imageUtils'
+import DocumentViewerModal from '@/components/ui/DocumentViewerModal'
 import { useCallback, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
@@ -99,7 +100,7 @@ function GallerySection({ projectId, language }) {
       ) : (
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
           {items.map((record) => {
-            const isPdf = record.documentUrl?.toLowerCase().endsWith('.pdf')
+            const isPdf = isPdfDocument(record.documentUrl)
             const date = formatDate(record.transactionDate, language)
             const itemLabel = (language === 'ar' ? record.itemNameAr : record.itemNameEn) || null
             const isDeposit = record.recordType === 'DEPOSIT'
@@ -109,15 +110,23 @@ function GallerySection({ projectId, language }) {
                 key={record.financialRecordId}
                 type="button"
                 onClick={() => setActive(record)}
-                className="group relative overflow-hidden rounded-2xl border border-gray-200 bg-white text-start shadow-xs transition-all hover:border-warm-brown/50 hover:shadow-card-hover focus:outline-none focus:ring-2 focus:ring-warm-brown/30"
+                className="group relative overflow-hidden rounded-2xl border border-gray-200 bg-white text-start shadow-xs transition-all hover:border-warm-brown/50 hover:shadow-card-hover focus:outline-none focus:ring-2 focus:ring-warm-brown/30 cursor-pointer"
               >
-                {isPdf ? (
-                  <div className="aspect-[4/3] flex flex-col items-center justify-center bg-gray-50 border-b border-gray-100">
-                    <PdfBigIcon className="w-10 h-10 text-red-500" />
-                    <p className="mt-1 text-[10px] font-semibold text-gray-500">PDF Document</p>
-                  </div>
-                ) : (
-                  <div className="aspect-[4/3] overflow-hidden bg-gray-100 border-b border-gray-100">
+                <div className="relative aspect-[4/3] overflow-hidden bg-gray-100 border-b border-gray-100 flex items-center justify-center">
+                  {isPdf ? (
+                    <>
+                      <img
+                        src={getPdfThumbnailUrl(record.documentUrl, { width: 400 })}
+                        alt={`Receipt ${date}`}
+                        loading="lazy"
+                        decoding="async"
+                        className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                      />
+                      <span className="absolute top-2 left-2 px-1.5 py-0.5 rounded bg-red-600 text-white font-bold text-[9px] shadow-xs">
+                        PDF
+                      </span>
+                    </>
+                  ) : (
                     <img
                       src={optimizeCloudinaryUrl(record.documentUrl, { width: 400, quality: 'auto' })}
                       alt={`Receipt ${date}`}
@@ -125,8 +134,13 @@ function GallerySection({ projectId, language }) {
                       decoding="async"
                       className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
                     />
+                  )}
+                  <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white">
+                    <span className="text-[11px] font-bold bg-black/60 px-2 py-1 rounded-lg backdrop-blur-xs">
+                      {t('common.view', { defaultValue: 'View' })}
+                    </span>
                   </div>
-                )}
+                </div>
                 <div className="p-3 space-y-1">
                   <div className="flex items-center justify-between gap-1">
                     <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded border uppercase ${
@@ -151,66 +165,14 @@ function GallerySection({ projectId, language }) {
         </div>
       )}
 
-      {/* Lightbox Modal */}
-      {active && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-fade-in"
-          onClick={() => setActive(null)}
-        >
-          <div
-            className="relative w-full max-w-2xl overflow-hidden rounded-3xl border border-gray-200 bg-white shadow-2xl animate-slide-up"
-            onClick={(e) => e.stopPropagation()}
-          >
-            {/* Header */}
-            <div className="flex items-center justify-between border-b border-gray-200 px-5 py-3.5 bg-gray-50">
-              <div>
-                <p className={`text-sm font-bold ${active.recordType === 'DEPOSIT' ? 'text-emerald-700' : 'text-rose-700'}`}>
-                  {active.recordType} · {formatMoney(active.amount)}
-                </p>
-                <p className="text-xs text-gray-500 mt-0.5">{formatDate(active.transactionDate, language)}</p>
-              </div>
-              <button
-                type="button"
-                onClick={() => setActive(null)}
-                className="flex h-8 w-8 items-center justify-center rounded-lg text-gray-400 hover:bg-gray-200 hover:text-gray-700 transition-colors"
-              >
-                ✕
-              </button>
-            </div>
-
-            {/* Content */}
-            <div className="p-4 bg-gray-50 flex items-center justify-center min-h-[300px]">
-              {active.documentUrl?.toLowerCase().endsWith('.pdf') ? (
-                <div className="flex flex-col items-center justify-center py-10 gap-3">
-                  <PdfBigIcon className="w-16 h-16 text-red-500" />
-                  <a
-                    href={active.documentUrl}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="rounded-xl bg-warm-brown px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#6B4A33] shadow-sm transition-all"
-                  >
-                    Open PDF Document
-                  </a>
-                </div>
-              ) : (
-                <img
-                  src={optimizeCloudinaryUrl(active.documentUrl, { width: 1200, quality: 'auto' })}
-                  alt="Receipt"
-                  loading="lazy"
-                  decoding="async"
-                  className="max-h-[65dvh] w-auto rounded-xl object-contain shadow-sm border border-gray-200"
-                />
-              )}
-            </div>
-
-            {active.notes && (
-              <div className="border-t border-gray-200 px-5 py-3 bg-white">
-                <p className="text-xs text-gray-600">{active.notes}</p>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
+      {/* Document Viewer Modal */}
+      <DocumentViewerModal
+        isOpen={Boolean(active)}
+        onClose={() => setActive(null)}
+        url={active?.documentUrl}
+        title={active ? `${active.recordType} Receipt - ${formatDate(active.transactionDate, language)}` : 'Receipt'}
+        fileType={active?.documentType}
+      />
     </div>
   )
 }
