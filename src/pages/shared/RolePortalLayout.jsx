@@ -1,5 +1,6 @@
 import AdminHeader from '@/components/admin/AdminHeader'
 import AdminSidebar from '@/components/admin/AdminSidebar'
+import MobileBottomNav from '@/components/navigation/MobileBottomNav'
 import ErrorBoundary from '@/components/ui/ErrorBoundary'
 import useAuthStore from '@/store/authStore'
 import { useState } from 'react'
@@ -40,12 +41,15 @@ export default function RolePortalLayout({
           onMenuToggle={() => setMobileOpen(true)}
         />
 
-        <main className="flex-1 overflow-y-auto scrollbar-thin p-4 lg:p-6">
+        <main className="flex-1 overflow-y-auto scrollbar-thin p-3.5 sm:p-5 lg:p-6 pb-24 lg:pb-6">
           <ErrorBoundary>
             <Outlet />
           </ErrorBoundary>
         </main>
+
+        {/* Native Mobile Bottom Navigation Bar */}
+        <MobileBottomNav navItems={navItems} />
       </div>
     </div>
   )
-}
+}

@@ -242,117 +242,201 @@ export default function InternalTicketsDashboard() {
             <p className="text-sm font-semibold">{t('tickets.no_records', { defaultValue: 'No requests found in this view.' })}</p>
           </div>
         ) : (
-          <div className="overflow-x-auto scrollbar-thin">
-            <table className="w-full text-left rtl:text-right border-collapse text-xs">
-              <thead>
-                <tr className="border-b border-gray-200 bg-gray-50/80 text-[11px] font-bold text-gray-600 uppercase tracking-wider">
-                  <th className="py-3 px-4">{t('tickets.subject', { defaultValue: 'Subject' })}</th>
-                  <th className="py-3 px-4">{t('tickets.type', { defaultValue: 'Type' })}</th>
-                  <th className="py-3 px-4">
-                    {activeTab === 'INBOX'
-                      ? t('tickets.sender', { defaultValue: 'Sender' })
-                      : t('tickets.receiver', { defaultValue: 'Receiver' })
-                    }
-                  </th>
-                  <th className="py-3 px-4">{t('tickets.amount', { defaultValue: 'Amount' })}</th>
-                  <th className="py-3 px-4">{t('tickets.status', { defaultValue: 'Status' })}</th>
-                  <th className="py-3 px-4">{t('tickets.date', { defaultValue: 'Date & Time' })}</th>
-                  <th className="py-3 px-4 text-center">{t('common.actions', { defaultValue: 'Actions' })}</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-100">
-                {filteredTickets.map((tk) => {
-                  const partyName = activeTab === 'INBOX'
-                    ? (i18n.language === 'ar' ? tk.senderNameAr || tk.senderNameEn : tk.senderNameEn || tk.senderNameAr)
-                    : (i18n.language === 'ar' ? tk.receiverNameAr || tk.receiverNameEn : tk.receiverNameEn || tk.receiverNameAr)
-                  const partyRole = activeTab === 'INBOX' ? tk.senderRole : tk.receiverRole
+          <>
+            {/* ── Desktop View (md+): Standard Table ───────────────── */}
+            <div className="hidden md:block overflow-x-auto scrollbar-thin">
+              <table className="w-full text-left rtl:text-right border-collapse text-xs">
+                <thead>
+                  <tr className="border-b border-gray-200 bg-gray-50/80 text-[11px] font-bold text-gray-600 uppercase tracking-wider">
+                    <th className="py-3 px-4">{t('tickets.subject', { defaultValue: 'Subject' })}</th>
+                    <th className="py-3 px-4">{t('tickets.type', { defaultValue: 'Type' })}</th>
+                    <th className="py-3 px-4">
+                      {activeTab === 'INBOX'
+                        ? t('tickets.sender', { defaultValue: 'Sender' })
+                        : t('tickets.receiver', { defaultValue: 'Receiver' })
+                      }
+                    </th>
+                    <th className="py-3 px-4">{t('tickets.amount', { defaultValue: 'Amount' })}</th>
+                    <th className="py-3 px-4">{t('tickets.status', { defaultValue: 'Status' })}</th>
+                    <th className="py-3 px-4">{t('tickets.date', { defaultValue: 'Date & Time' })}</th>
+                    <th className="py-3 px-4 text-center">{t('common.actions', { defaultValue: 'Actions' })}</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-100">
+                  {filteredTickets.map((tk) => {
+                    const partyName = activeTab === 'INBOX'
+                      ? (i18n.language === 'ar' ? tk.senderNameAr || tk.senderNameEn : tk.senderNameEn || tk.senderNameAr)
+                      : (i18n.language === 'ar' ? tk.receiverNameAr || tk.receiverNameEn : tk.receiverNameEn || tk.receiverNameAr)
+                    const partyRole = activeTab === 'INBOX' ? tk.senderRole : tk.receiverRole
 
-                  return (
-                    <tr key={tk.ticketId} className="hover:bg-warm-brown/5 transition-colors">
-                      <td className="py-3 px-4 max-w-xs">
-                        <div className="flex flex-col">
-                          {tk.projectId ? (
-                            <button
-                              type="button"
-                              onClick={() => navigateToProjectChat(tk.projectId)}
-                              className="font-bold text-gray-900 hover:text-warm-brown text-left rtl:text-right transition-colors truncate"
-                            >
-                              {tk.title}
-                            </button>
-                          ) : (
-                            <p className="font-bold text-gray-900 truncate">{tk.title}</p>
-                          )}
-                          {tk.description && (
-                            <p className="text-gray-500 text-[11px] truncate mt-0.5">{tk.description}</p>
-                          )}
-                          {(tk.projectNameEn || tk.projectNameAr) && (
-                            <div className="mt-1 flex items-center gap-1">
-                              <span className="text-[10px] text-gray-400 font-medium">📁</span>
+                    return (
+                      <tr key={tk.ticketId} className="hover:bg-warm-brown/5 transition-colors">
+                        <td className="py-3 px-4 max-w-xs">
+                          <div className="flex flex-col">
+                            {tk.projectId ? (
                               <button
                                 type="button"
                                 onClick={() => navigateToProjectChat(tk.projectId)}
-                                className="text-[10px] text-warm-brown font-semibold hover:underline truncate"
+                                className="font-bold text-gray-900 hover:text-warm-brown text-left rtl:text-right transition-colors truncate"
                               >
-                                {i18n.language === 'ar' ? tk.projectNameAr || tk.projectNameEn : tk.projectNameEn || tk.projectNameAr}
+                                {tk.title}
                               </button>
-                            </div>
+                            ) : (
+                              <p className="font-bold text-gray-900 truncate">{tk.title}</p>
+                            )}
+                            {tk.description && (
+                              <p className="text-gray-500 text-[11px] truncate mt-0.5">{tk.description}</p>
+                            )}
+                            {(tk.projectNameEn || tk.projectNameAr) && (
+                              <div className="mt-1 flex items-center gap-1">
+                                <span className="text-[10px] text-gray-400 font-medium">📁</span>
+                                <button
+                                  type="button"
+                                  onClick={() => navigateToProjectChat(tk.projectId)}
+                                  className="text-[10px] text-warm-brown font-semibold hover:underline truncate"
+                                >
+                                  {i18n.language === 'ar' ? tk.projectNameAr || tk.projectNameEn : tk.projectNameEn || tk.projectNameAr}
+                                </button>
+                              </div>
+                            )}
+                          </div>
+                        </td>
+                        <td className="py-3 px-4 whitespace-nowrap">
+                          <TicketTypeBadge type={tk.ticketType} />
+                        </td>
+                        <td className="py-3 px-4 whitespace-nowrap">
+                          <div className="flex items-center gap-1.5">
+                            <span className="font-medium text-gray-800">{partyName || '—'}</span>
+                            {partyRole && (
+                              <span className="text-[10px] px-1 py-0.2 rounded bg-gray-200 text-gray-700 uppercase">
+                                {partyRole}
+                              </span>
+                            )}
+                          </div>
+                        </td>
+                        <td className="py-3 px-4 whitespace-nowrap font-mono font-bold text-gray-900">
+                          {tk.ticketType === 'EXPENSE' && tk.amount != null ? (
+                            <span>{fmtAmount(tk.amount)} EGP</span>
+                          ) : (
+                            <span className="text-gray-400 font-normal">—</span>
                           )}
-                        </div>
-                      </td>
-                      <td className="py-3 px-4 whitespace-nowrap">
-                        <TicketTypeBadge type={tk.ticketType} />
-                      </td>
-                      <td className="py-3 px-4 whitespace-nowrap">
-                        <div className="flex items-center gap-1.5">
-                          <span className="font-medium text-gray-800">{partyName || '—'}</span>
-                          {partyRole && (
-                            <span className="text-[10px] px-1 py-0.2 rounded bg-gray-200 text-gray-700 uppercase">
-                              {partyRole}
-                            </span>
-                          )}
-                        </div>
-                      </td>
-                      <td className="py-3 px-4 whitespace-nowrap font-mono font-bold text-gray-900">
-                        {tk.ticketType === 'EXPENSE' && tk.amount != null ? (
-                          <span>{fmtAmount(tk.amount)} EGP</span>
-                        ) : (
-                          <span className="text-gray-400 font-normal">—</span>
-                        )}
-                      </td>
-                      <td className="py-3 px-4 whitespace-nowrap">
-                        <TicketStatusBadge status={tk.status} />
-                      </td>
-                      <td className="py-3 px-4 whitespace-nowrap text-gray-500">
-                        {formatDateTime(tk.createdAt, i18n.language)}
-                      </td>
-                      <td className="py-3 px-4 whitespace-nowrap text-center">
-                        <div className="flex items-center justify-center gap-2">
-                          <button
-                            type="button"
-                            onClick={() => setSelectedTicket(tk)}
-                            className="px-2.5 py-1 rounded-lg bg-gray-100 hover:bg-warm-brown/10 text-warm-brown font-semibold transition-colors"
-                          >
-                            {t('tickets.view_details', { defaultValue: 'View Details' })}
-                          </button>
-                          {tk.projectId && (
+                        </td>
+                        <td className="py-3 px-4 whitespace-nowrap">
+                          <TicketStatusBadge status={tk.status} />
+                        </td>
+                        <td className="py-3 px-4 whitespace-nowrap text-gray-500">
+                          {formatDateTime(tk.createdAt, i18n.language)}
+                        </td>
+                        <td className="py-3 px-4 whitespace-nowrap text-center">
+                          <div className="flex items-center justify-center gap-2">
                             <button
                               type="button"
-                              onClick={() => navigateToProjectChat(tk.projectId)}
-                              className="px-3 py-1 rounded-lg bg-warm-brown text-white hover:bg-warm-brown/90 text-xs font-bold transition-all shadow-xs flex items-center gap-1"
-                              title={t('tickets.open_project_chat', { defaultValue: 'Open in Project Chat' })}
+                              onClick={() => setSelectedTicket(tk)}
+                              className="px-2.5 py-1.5 rounded-lg bg-gray-100 hover:bg-warm-brown/10 text-warm-brown font-semibold transition-colors cursor-pointer"
                             >
-                              <span>💬</span>
-                              <span>{t('tickets.chat', { defaultValue: 'Chat Feed' })}</span>
+                              {t('tickets.view_details', { defaultValue: 'View Details' })}
                             </button>
-                          )}
-                        </div>
-                      </td>
-                    </tr>
-                  )
-                })}
-              </tbody>
-            </table>
-          </div>
+                            {tk.projectId && (
+                              <button
+                                type="button"
+                                onClick={() => navigateToProjectChat(tk.projectId)}
+                                className="px-3 py-1.5 rounded-lg bg-warm-brown text-white hover:bg-warm-brown/90 text-xs font-bold transition-all shadow-xs flex items-center gap-1 cursor-pointer"
+                                title={t('tickets.open_project_chat', { defaultValue: 'Open in Project Chat' })}
+                              >
+                                <span>💬</span>
+                                <span>{t('tickets.chat', { defaultValue: 'Chat Feed' })}</span>
+                              </button>
+                            )}
+                          </div>
+                        </td>
+                      </tr>
+                    )
+                  })}
+                </tbody>
+              </table>
+            </div>
+
+            {/* ── Mobile View (<md): Native Touch Cards ───────────── */}
+            <div className="block md:hidden p-3.5 space-y-3">
+              {filteredTickets.map((tk) => {
+                const partyName = activeTab === 'INBOX'
+                  ? (i18n.language === 'ar' ? tk.senderNameAr || tk.senderNameEn : tk.senderNameEn || tk.senderNameAr)
+                  : (i18n.language === 'ar' ? tk.receiverNameAr || tk.receiverNameEn : tk.receiverNameEn || tk.receiverNameAr)
+                const partyRole = activeTab === 'INBOX' ? tk.senderRole : tk.receiverRole
+
+                return (
+                  <div
+                    key={tk.ticketId}
+                    className="bg-white rounded-2xl border border-[#D9C7B8] p-4 shadow-xs space-y-3 transition-all active:scale-[0.99]"
+                  >
+                    {/* Top Row: Title + Status */}
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="min-w-0 flex-1">
+                        <h3 className="text-sm font-bold text-gray-900 leading-snug">
+                          {tk.title}
+                        </h3>
+                        {(tk.projectNameEn || tk.projectNameAr) && (
+                          <p className="text-[11px] text-warm-brown font-semibold truncate mt-0.5">
+                            📁 {i18n.language === 'ar' ? tk.projectNameAr || tk.projectNameEn : tk.projectNameEn || tk.projectNameAr}
+                          </p>
+                        )}
+                      </div>
+                      <TicketStatusBadge status={tk.status} />
+                    </div>
+
+                    {tk.description && (
+                      <p className="text-xs text-gray-600 line-clamp-2 leading-relaxed">
+                        {tk.description}
+                      </p>
+                    )}
+
+                    {/* Metadata Badges & Values */}
+                    <div className="flex flex-wrap items-center justify-between gap-2 py-2 border-y border-gray-100 text-xs">
+                      <div className="flex items-center gap-1.5">
+                        <TicketTypeBadge type={tk.ticketType} />
+                        {tk.ticketType === 'EXPENSE' && tk.amount != null && (
+                          <span className="font-mono font-extrabold text-gray-950 bg-warm-brown/10 px-2 py-0.5 rounded-md border border-warm-brown/20 text-[11px]">
+                            {fmtAmount(tk.amount)} EGP
+                          </span>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-1 text-gray-500 text-[11px]">
+                        <span>{partyName || '—'}</span>
+                        {partyRole && <span className="text-[9px] px-1 py-0.2 rounded bg-gray-200 uppercase">{partyRole}</span>}
+                      </div>
+                    </div>
+
+                    {/* Footer Actions */}
+                    <div className="flex items-center justify-between gap-2 pt-1">
+                      <span className="text-[10px] text-gray-400">
+                        {formatDateTime(tk.createdAt, i18n.language)}
+                      </span>
+
+                      <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() => setSelectedTicket(tk)}
+                          className="min-h-[40px] px-3.5 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-800 text-xs font-semibold cursor-pointer transition-colors"
+                        >
+                          {t('tickets.view_details', { defaultValue: 'Details' })}
+                        </button>
+                        {tk.projectId && (
+                          <button
+                            type="button"
+                            onClick={() => navigateToProjectChat(tk.projectId)}
+                            className="min-h-[40px] px-4 py-2 rounded-xl bg-warm-brown hover:bg-warm-brown/90 text-white text-xs font-bold shadow-xs cursor-pointer flex items-center gap-1.5 transition-all"
+                          >
+                            <span>💬</span>
+                            <span>{t('tickets.chat', { defaultValue: 'Chat' })}</span>
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          </>
         )}
 
         {/* Pagination controls */}

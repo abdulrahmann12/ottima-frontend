@@ -1,5 +1,6 @@
 import AdminHeader from '@/components/admin/AdminHeader'
 import AdminSidebar from '@/components/admin/AdminSidebar'
+import MobileBottomNav from '@/components/navigation/MobileBottomNav'
 import useAuthStore from '@/store/authStore'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -7,15 +8,6 @@ import { Navigate, Outlet, useLocation } from 'react-router-dom'
 
 /**
  * AdminLayout — protected shell for all /admin/* routes
- *
- * Route guard:
- *   - Not authenticated            → /login/admin
- *   - Authenticated but wrong role → /login/admin
- *
- * Layout:
- *   [Sidebar] | [Header + Outlet]
- *
- * The page title shown in the header is derived from the current route pathname.
  */
 
 const PAGE_TITLES = {
@@ -54,7 +46,7 @@ export default function AdminLayout() {
 
   return (
     <div className="flex h-dvh overflow-hidden bg-cream">
-      {/* Sidebar */}
+      {/* Sidebar (Desktop persistent, Mobile drawer on toggle) */}
       <AdminSidebar
         mobileOpen={mobileOpen}
         onClose={() => setMobileOpen(false)}
@@ -68,13 +60,16 @@ export default function AdminLayout() {
           onMenuToggle={() => setMobileOpen(true)}
         />
 
-        {/* Page content */}
+        {/* Page content with safe area padding for bottom nav */}
         <main
           id="admin-main-content"
-          className="flex-1 overflow-y-auto scrollbar-thin p-4 lg:p-6"
+          className="flex-1 overflow-y-auto scrollbar-thin p-3.5 sm:p-5 lg:p-6 pb-24 lg:pb-6"
         >
           <Outlet />
         </main>
+
+        {/* Mobile Bottom Navigation */}
+        <MobileBottomNav />
       </div>
     </div>
   )
