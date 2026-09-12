@@ -1,3 +1,6 @@
+import { resolveCommentContext } from '@/api/clientCommentApi'
+import { resolveDailyUpdateContext } from '@/api/clientDailyUpdateApi'
+
 /**
  * NotificationNavigator.js — Intelligent Notification Routing Resolver
  *
@@ -6,7 +9,7 @@
  */
 
 /**
- * Computes the target URL for a notification click
+ * Computes synchronous target URL for a notification click
  *
  * @param {string} referenceType Backend ReferenceType enum
  * @param {string|number} referenceId Target entity UUID / ID
@@ -77,10 +80,10 @@ export function getNotificationRoute(referenceType, referenceId, userRole) {
           return refId ? `/client/projects/${refId}` : '/client/projects'
 
         case 'DAILY_UPDATE':
-          return refId ? `/client/items/${refId}/daily-updates` : '/client/projects'
+          return '/client/projects'
 
         case 'COMMENT':
-          return refId ? `/client/items/${refId}/daily-updates` : '/client/projects'
+          return '/client/projects'
 
         case 'FINANCIAL':
         case 'FINANCIAL_RECORD':
@@ -99,5 +102,71 @@ export function getNotificationRoute(referenceType, referenceId, userRole) {
 
     default:
       return '/'
+  }
+}
+
+/**
+ * High-precision async routing resolver with context discovery
+ * Resolves accurate parent project/item hierarchy for nested Client views
+ */
+export async function resolveAndNavigateNotification(notification, userRole, navigate) {
+  if (!notification || !navigate) return
+
+  const role = (userRole || 'ADMIN').toUpperCase()
+  const refType = (notification.referenceType || '').toUpperCase()
+  const refId = notification.referenceId != null ? String(notification.referenceId).trim() : ''
+
+  if (role === 'CLIENT') {
+    if (refType === 'COMMENT' && refId) {
+      try {
+        const res = await resolveCommentContext(refId)
+        const ctx = res.data?.data || res.data || {}
+        if (ctx.projectItemId) {
+          navigate(`/client/items/${ctx.projectItemId}/daily-updates?targetCommentId=${refId}`, {
+            state: {
+              projectId: ctx.projectId,
+              projectNameAr: ctx.projectNameAr,
+              projectNameEn: ctx.projectNameEn,
+              itemNameAr: ctx.itemNameAr,
+              itemNameEn: ctx.itemNameEn,
+            },
+          })
+          return
+        }
+      } catch (err) {
+        console.warn('Could not resolve comment context for client navigation:', err)
+      }
+      navigate('/client/projects')
+      return
+    }
+
+    if (refType === 'DAILY_UPDATE' && refId) {
+      try {
+        const res = await resolveDailyUpdateContext(refId)
+        const ctx = res.data?.data || res.data || {}
+        if (ctx.projectItemId) {
+          navigate(`/client/items/${ctx.projectItemId}/daily-updates?targetUpdateId=${refId}`, {
+            state: {
+              projectId: ctx.projectId,
+              projectNameAr: ctx.projectNameAr,
+              projectNameEn: ctx.projectNameEn,
+              itemNameAr: ctx.itemNameAr,
+              itemNameEn: ctx.itemNameEn,
+            },
+          })
+          return
+        }
+      } catch (err) {
+        console.warn('Could not resolve daily update context for client navigation:', err)
+      }
+      navigate('/client/projects')
+      return
+    }
+  }
+
+  // Fallback to standard synchronous route computation
+  const directRoute = getNotificationRoute(refType, refId, role)
+  if (directRoute) {
+    navigate(directRoute)
   }
 }

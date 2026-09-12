@@ -7,59 +7,75 @@ export default {
   theme: {
     extend: {
       colors: {
-        // OTTIMA brand palette
-        brand: {
-          50:  '#eef2ff',
-          100: '#e0e7ff',
-          200: '#c7d2fe',
-          300: '#a5b4fc',
-          400: '#818cf8',
-          500: '#6366f1',  // primary indigo
-          600: '#4f46e5',
-          700: '#4338ca',
-          800: '#3730a3',
-          900: '#312e81',
-          950: '#1e1b4b',
-        },
-        surface: {
-          DEFAULT: '#0f172a',   // slate-900
-          card:    '#1e293b',   // slate-800
-          border:  '#334155',   // slate-700
-          muted:   '#475569',   // slate-600
-        },
-        accent: {
-          DEFAULT: '#10b981',  // emerald-500
-          light:   '#34d399',
-          dark:    '#059669',
-        },
+        // ── Core Luxury Palette ─────────────────────────────────
+        cream:        '#F4EDE4',   // Main app background (60%)
+        beige:        '#D9C7B8',   // Sidebar, navbar, subtle borders (30%)
+        'warm-brown': '#7D583F',   // Primary CTAs, active links, brand accents (10%)
+        'light-blue': '#C4DAE8',   // Hover effects & subtle active states
+
+        // ── Semantic aliases (light-theme) ──────────────────────
+        // Cards, modals, table backgrounds → pure white
+        'surface-card':   '#FFFFFF',
+        // Dividers, table borders, card borders → crisp light gray
+        'surface-border': '#E5E7EB', // = gray-200
+
+        // ── Brand shades (used by older component code) ─────────
+        // Mapped to warm-brown scale so existing brand-* classes render correctly
+        'brand-300': '#C49A78',  // light warm-brown tint
+        'brand-400': '#A57550',  // medium warm-brown
+        'brand-500': '#7D583F',  // = warm-brown
+        'brand-600': '#6B4A33',  // warm-brown dark (button hover)
+        'brand-700': '#5A3D2B',  // deeper shade
+        'brand-900': '#2D1E15',  // deepest shade
+        'brand-950': '#1A110D',  // near-black brown
+
+        // Semantic alias for direct use
+        'brand-bg':        '#F4EDE4',
+        'brand-secondary': '#D9C7B8',
+        'brand-primary':   '#7D583F',
+        'brand-accent':    '#C4DAE8',
+        'brand-dark':      '#111827',
+
+        // ── Accent color (used in AuthLayout decorative elements) ─
+        accent: '#C4DAE8',  // = light-blue
       },
+
       fontFamily: {
-        sans: ['Inter', 'system-ui', 'sans-serif'],
+        sans:   ['Inter', 'system-ui', 'sans-serif'],
         arabic: ['Cairo', 'system-ui', 'sans-serif'],
       },
+
       backgroundImage: {
-        'gradient-brand': 'linear-gradient(135deg, #1e1b4b 0%, #312e81 40%, #1e293b 100%)',
-        'gradient-card': 'linear-gradient(145deg, rgba(99,102,241,0.08) 0%, rgba(30,41,59,0) 100%)',
+        // Luxury dark gradient for Auth/Login brand panel
+        'gradient-brand': 'linear-gradient(145deg, #1C1510 0%, #2D2018 50%, #15100C 100%)',
+        'gradient-card':  'linear-gradient(145deg, rgba(140,109,83,0.15) 0%, rgba(22,18,14,0) 100%)',
       },
+
       boxShadow: {
-        'glow-indigo': '0 0 30px rgba(99, 102, 241, 0.25)',
+        // Glow shadows for auth brand panel and luxury cards
+        'glow-bronze':  '0 0 30px rgba(212, 163, 115, 0.25)',
         'glow-emerald': '0 0 20px rgba(16, 185, 129, 0.20)',
-        'card': '0 4px 24px rgba(0, 0, 0, 0.4)',
+        'glow-sage':    '0 0 25px rgba(107, 112, 92, 0.25)',
+        // Upgraded card shadow for light theme (softer, cream-aware)
+        'card':  '0 1px 3px rgba(0,0,0,0.07), 0 4px 12px rgba(0,0,0,0.05)',
+        'card-hover': '0 4px 16px rgba(0,0,0,0.10)',
       },
+
       animation: {
-        'fade-in': 'fadeIn 0.4s ease-out',
-        'slide-up': 'slideUp 0.5s ease-out',
-        'float': 'float 6s ease-in-out infinite',
+        'fade-in':    'fadeIn 0.15s ease-out',
+        'slide-up':   'slideUp 0.2s ease-out',
+        'float':      'float 6s ease-in-out infinite',
         'pulse-soft': 'pulseSoft 3s ease-in-out infinite',
-        'spin-slow': 'spin 8s linear infinite',
+        'spin-slow':  'spin 8s linear infinite',
       },
+
       keyframes: {
         fadeIn: {
           '0%':   { opacity: '0' },
           '100%': { opacity: '1' },
         },
         slideUp: {
-          '0%':   { opacity: '0', transform: 'translateY(20px)' },
+          '0%':   { opacity: '0', transform: 'translateY(12px)' },
           '100%': { opacity: '1', transform: 'translateY(0)' },
         },
         float: {

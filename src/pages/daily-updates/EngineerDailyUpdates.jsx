@@ -11,6 +11,7 @@ import {
 import EngineerDailyUpdateFormModal from '@/components/daily-updates/EngineerDailyUpdateFormModal'
 import Alert from '@/components/ui/Alert'
 import Button from '@/components/ui/Button'
+import SearchableSelect from '@/components/ui/SearchableSelect'
 import { useCallback, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
@@ -162,8 +163,8 @@ export default function EngineerDailyUpdates() {
       className: 'min-w-[280px]',
       render: (_, update) => (
         <div className="min-w-0">
-          <p className="font-semibold text-white">{update.title}</p>
-          <p className="mt-1 truncate text-xs text-slate-400">
+          <p className="font-semibold text-gray-900">{update.title}</p>
+          <p className="mt-1 truncate text-xs text-gray-500">
             {summarizeText(update.notes, t('daily_updates.no_notes'))}
           </p>
         </div>
@@ -256,42 +257,35 @@ export default function EngineerDailyUpdates() {
                 </Button>
               )}
             >
-              <label className="text-xs font-semibold uppercase tracking-wider text-slate-500">
-                {t('daily_updates.filter_item')}
-                <select
-                  className="input-base mt-2 text-sm"
-                  value={filters.projectItemId}
-                  onChange={updateFilter('projectItemId')}
-                  disabled={filterDisabled}
-                >
-                  <option value="">{t('daily_updates.all_items')}</option>
-                  {projectItems.map((item) => (
-                    <option key={item.projectItemId} value={item.projectItemId}>
-                      {localizedValue(i18n.language, item.itemNameAr, item.itemNameEn)}
-                    </option>
-                  ))}
-                </select>
-              </label>
+              <SearchableSelect
+                id="filter-engineer-updates-item"
+                label={t('daily_updates.filter_item')}
+                value={filters.projectItemId}
+                onChange={updateFilter('projectItemId')}
+                disabled={filterDisabled}
+                placeholder={t('daily_updates.all_items')}
+                options={projectItems.map((item) => ({
+                  value: item.projectItemId,
+                  label: localizedValue(i18n.language, item.itemNameAr, item.itemNameEn),
+                }))}
+              />
 
-              <label className="text-xs font-semibold uppercase tracking-wider text-slate-500">
-                {t('daily_updates.filter_status')}
-                <select
-                  className="input-base mt-2 text-sm"
-                  value={filters.status}
-                  onChange={updateFilter('status')}
-                  disabled={filterDisabled}
-                >
-                  <option value="">{t('daily_updates.all_statuses')}</option>
-                  {['PENDING', 'APPROVED', 'REJECTED'].map((status) => (
-                    <option key={status} value={status}>
-                      {status}
-                    </option>
-                  ))}
-                </select>
-              </label>
+              <SearchableSelect
+                id="filter-engineer-updates-status"
+                label={t('daily_updates.filter_status')}
+                value={filters.status}
+                onChange={updateFilter('status')}
+                disabled={filterDisabled}
+                placeholder={t('daily_updates.all_statuses')}
+                options={[
+                  { value: 'PENDING', label: 'PENDING' },
+                  { value: 'APPROVED', label: 'APPROVED' },
+                  { value: 'REJECTED', label: 'REJECTED' },
+                ]}
+              />
             </DailyUpdatesFilterPanel>
 
-            <div className="rounded-3xl border border-surface-border bg-surface-card p-5 shadow-xl sm:p-6">
+            <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-card sm:p-6">
               <DataTable
                 columns={columns}
                 data={updates}

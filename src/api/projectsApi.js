@@ -19,6 +19,7 @@ export const getAdminProject = (projectId) => axiosClient.get(`${adminBase}/${pr
 export const createProject = (payload) => axiosClient.post(adminBase, payload)
 export const updateProject = (projectId, payload) => axiosClient.put(`${adminBase}/${projectId}`, payload)
 export const deleteProject = (projectId) => axiosClient.delete(`${adminBase}/${projectId}`)
+export const restoreProject = (projectId) => axiosClient.patch(`${adminBase}/${projectId}/restore`)
 export const changeProjectStatus = (projectId, status) =>
   axiosClient.patch(`${adminBase}/${projectId}/status`, null, { params: { status } })
 export const assignProjectItems = (projectId, items) =>

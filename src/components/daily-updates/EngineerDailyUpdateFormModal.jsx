@@ -3,7 +3,9 @@ import Modal from '@/components/admin/Modal'
 import Alert from '@/components/ui/Alert'
 import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
+import SearchableSelect from '@/components/ui/SearchableSelect'
 import { Spinner } from '@/components/ui/icons/Globe'
+import { compressImageFile, optimizeCloudinaryUrl } from '@/utils/imageUtils'
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
@@ -94,7 +96,8 @@ export default function EngineerDailyUpdateFormModal({
 
     try {
       const results = await Promise.allSettled(
-        imageFiles.map(async (file) => {
+        imageFiles.map(async (rawFile) => {
+          const file = await compressImageFile(rawFile)
           const formData = new FormData()
           formData.append('file', file)
           formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET)
@@ -209,25 +212,20 @@ export default function EngineerDailyUpdateFormModal({
         <Alert message={error} variant="error" onClose={() => setError(null)} />
 
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-          <label className="text-sm font-medium text-slate-300">
-            {t('daily_updates.project_item', { defaultValue: 'Project item' })}
-            <select
-              className={`input-base mt-1.5 text-sm ${errors.projectItemId ? 'input-error' : ''}`}
-              value={form.projectItemId}
-              onChange={updateField('projectItemId')}
-              disabled={saving || uploading}
-            >
-              <option value="">{t('daily_updates.select_project_item', { defaultValue: 'Select an item' })}</option>
-              {sortedProjectItems.map((item) => (
-                <option key={item.projectItemId} value={item.projectItemId}>
-                  {(i18n.language === 'ar' ? item.itemNameAr : item.itemNameEn) || item.itemNameEn || item.itemNameAr}
-                </option>
-              ))}
-            </select>
-            {errors.projectItemId && (
-              <p className="mt-1.5 text-xs text-red-400">{errors.projectItemId}</p>
-            )}
-          </label>
+          <SearchableSelect
+            id="engineer-daily-update-project-item"
+            label={t('daily_updates.project_item', { defaultValue: 'Project item' })}
+            required
+            value={form.projectItemId}
+            onChange={updateField('projectItemId')}
+            disabled={saving || uploading}
+            placeholder={t('daily_updates.select_project_item', { defaultValue: 'Select an item' })}
+            error={errors.projectItemId}
+            options={sortedProjectItems.map((item) => ({
+              value: item.projectItemId,
+              label: (i18n.language === 'ar' ? item.itemNameAr : item.itemNameEn) || item.itemNameEn || item.itemNameAr,
+            }))}
+          />
 
           <Input
             id="daily-update-title"
@@ -241,7 +239,7 @@ export default function EngineerDailyUpdateFormModal({
           />
         </div>
 
-        <label className="block text-sm font-medium text-slate-300">
+        <label className="block text-sm font-medium text-gray-700">
           {t('daily_updates.notes', { defaultValue: 'Notes' })}
           <textarea
             className="input-base mt-1.5 min-h-[120px] resize-y"
@@ -255,10 +253,10 @@ export default function EngineerDailyUpdateFormModal({
 
         <div className="space-y-3">
           <div>
-            <p className="text-sm font-medium text-slate-300">
+            <p className="text-sm font-medium text-gray-700">
               {t('daily_updates.attach_images', { defaultValue: 'Attach progress images' })}
             </p>
-            <p className="mt-1 text-xs text-slate-500">
+            <p className="mt-1 text-xs text-gray-500">
               {t('daily_updates.cloudinary_hint', { defaultValue: 'Images upload directly to Cloudinary and only secure URLs are sent to the backend.' })}
             </p>
           </div>
@@ -272,10 +270,10 @@ export default function EngineerDailyUpdateFormModal({
               setDragActive(true)
             }}
             onDrop={handleDrop}
-            className={`block rounded-3xl border border-dashed px-5 py-8 text-center transition-all ${
+            className={`block rounded-2xl border-2 border-dashed px-5 py-8 text-center transition-all ${
               dragActive
-                ? 'border-brand-400 bg-brand-500/10 shadow-[0_0_0_1px_rgba(96,165,250,0.35)]'
-                : 'border-surface-border bg-slate-900/40 hover:border-brand-500/40 hover:bg-slate-900/70'
+                ? 'border-warm-brown bg-warm-brown/10 ring-2 ring-warm-brown/20'
+                : 'border-gray-200 bg-gray-50 hover:border-warm-brown/40 hover:bg-cream/30'
             } ${saving || uploading ? 'cursor-wait opacity-80' : 'cursor-pointer'}`}
           >
             <input
@@ -289,16 +287,16 @@ export default function EngineerDailyUpdateFormModal({
             />
 
             <div className="mx-auto flex max-w-md flex-col items-center gap-3">
-              <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-brand-500/20 bg-brand-500/10 text-brand-300">
+              <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-warm-brown/20 bg-warm-brown/10 text-warm-brown">
                 {uploading ? <Spinner className="h-6 w-6" /> : <UploadIcon className="h-6 w-6" />}
               </div>
               <div>
-                <p className="text-sm font-semibold text-white">
+                <p className="text-sm font-semibold text-gray-900">
                   {uploading
                     ? t('daily_updates.uploading_images', { defaultValue: 'Uploading images...' })
                     : t('daily_updates.dropzone_title', { defaultValue: 'Drop images here or click to browse' })}
                 </p>
-                <p className="mt-1 text-xs text-slate-500">
+                <p className="mt-1 text-xs text-gray-500">
                   {t('daily_updates.dropzone_subtitle', { defaultValue: 'PNG, JPG, and WEBP are supported. Multiple files are allowed.' })}
                 </p>
               </div>
@@ -306,32 +304,34 @@ export default function EngineerDailyUpdateFormModal({
           </label>
 
           {uploadQueue.length > 0 && (
-            <div className="rounded-2xl border border-surface-border bg-slate-900/40 p-3 text-xs text-slate-400">
-              <p className="font-medium text-slate-200">
+            <div className="rounded-xl border border-gray-200 bg-gray-50 p-3 text-xs text-gray-600">
+              <p className="font-semibold text-gray-900">
                 {t('daily_updates.upload_queue', { defaultValue: 'Uploading now' })}
               </p>
-              <p className="mt-1">{uploadQueue.join(' - ')}</p>
+              <p className="mt-1 text-gray-500">{uploadQueue.join(' · ')}</p>
             </div>
           )}
 
           {form.uploadedImages.length > 0 && (
             <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
               {form.uploadedImages.map((image) => (
-                <div key={image.imageUrl} className="overflow-hidden rounded-2xl border border-surface-border bg-slate-900/50">
-                  <div className="aspect-[4/3] overflow-hidden bg-slate-950/50">
+                <div key={image.imageUrl} className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
+                  <div className="aspect-[4/3] overflow-hidden bg-gray-100">
                     <img
-                      src={image.imageUrl}
+                      src={optimizeCloudinaryUrl(image.imageUrl, { width: 400 })}
                       alt={image.fileName}
+                      loading="lazy"
+                      decoding="async"
                       className="h-full w-full object-cover"
                     />
                   </div>
-                  <div className="flex items-center justify-between gap-2 px-3 py-2">
-                    <p className="line-clamp-1 text-xs text-slate-400">{image.fileName}</p>
+                  <div className="flex items-center justify-between gap-2 border-t border-gray-200 bg-gray-50 px-3 py-2">
+                    <p className="line-clamp-1 text-xs text-gray-600">{image.fileName}</p>
                     <button
                       type="button"
                       onClick={() => removeImage(image.imageUrl)}
                       disabled={saving || uploading}
-                      className="text-xs font-medium text-red-300 transition-colors hover:text-red-200 disabled:opacity-40"
+                      className="text-xs font-semibold text-rose-600 transition-colors hover:text-rose-800 disabled:opacity-40"
                     >
                       {t('daily_updates.remove_image', { defaultValue: 'Remove' })}
                     </button>
@@ -342,7 +342,7 @@ export default function EngineerDailyUpdateFormModal({
           )}
         </div>
 
-        <div className="flex flex-wrap justify-end gap-3 border-t border-surface-border pt-4">
+        <div className="flex flex-wrap justify-end gap-3 border-t border-gray-200 pt-4">
           <Button type="button" variant="ghost" className="w-auto" onClick={closeModal} disabled={saving || uploading}>
             {t('common.cancel')}
           </Button>

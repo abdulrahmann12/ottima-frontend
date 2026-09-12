@@ -74,21 +74,21 @@ export default function ChangePassword() {
       {/* Back */}
       <Link
         to="/"
-        className="inline-flex items-center gap-1.5 text-xs text-slate-500
-          hover:text-slate-300 transition-colors duration-200 mb-6 group"
+        className="inline-flex items-center gap-1.5 text-xs text-gray-500
+          hover:text-warm-brown transition-colors duration-200 mb-5 group font-medium"
       >
         <span className="group-hover:-translate-x-0.5 rtl:group-hover:translate-x-0.5 transition-transform duration-200">←</span>
         {t('common.back')}
       </Link>
 
       {/* Header */}
-      <div className="mb-8">
-        <div className="w-12 h-12 rounded-xl bg-brand-900/60 border border-brand-700/40
-          flex items-center justify-center mb-4">
-          <ShieldIcon className="w-6 h-6 text-brand-400" />
+      <div className="mb-7">
+        <div className="w-11 h-11 rounded-xl bg-warm-brown/10 border border-warm-brown/25
+          flex items-center justify-center mb-3 shadow-sm text-warm-brown">
+          <ShieldIcon className="w-5 h-5" />
         </div>
-        <h2 className="text-2xl font-bold text-white">{t('change_password.title')}</h2>
-        <p className="mt-1 text-slate-400 text-sm">{t('change_password.subtitle')}</p>
+        <h2 className="text-2xl font-extrabold text-gray-900 tracking-tight">{t('change_password.title')}</h2>
+        <p className="mt-1 text-gray-600 text-sm">{t('change_password.subtitle')}</p>
       </div>
 
       {/* Alerts */}
@@ -101,7 +101,7 @@ export default function ChangePassword() {
       />
 
       {/* Form */}
-      <form id="change-password-form" onSubmit={handleSubmit} noValidate className="space-y-5">
+      <form id="change-password-form" onSubmit={handleSubmit} noValidate className="space-y-4 sm:space-y-5">
         <Input
           id="current-password"
           label={t('change_password.current_password')}
@@ -138,7 +138,7 @@ export default function ChangePassword() {
           autoComplete="new-password"
         />
 
-        <Button id="change-password-btn" type="submit" loading={loading}>
+        <Button id="change-password-btn" type="submit" loading={loading} className="w-full shadow-sm">
           {loading ? t('change_password.changing') : t('change_password.change')}
         </Button>
       </form>
@@ -154,3 +154,4 @@ function ShieldIcon({ className }) {
     </svg>
   )
 }
+

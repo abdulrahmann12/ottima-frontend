@@ -36,17 +36,17 @@ export default function DataTable({
   return (
     <div className="flex flex-col gap-4">
       {/* Table wrapper */}
-      <div className="overflow-x-auto rounded-xl border border-surface-border">
+      <div className="overflow-x-auto rounded-xl border border-gray-200 shadow-sm bg-white">
         <table className="w-full text-sm text-left rtl:text-right">
           {/* Head */}
-          <thead className="bg-slate-800/80">
+          <thead className="bg-gray-50 border-b border-gray-200">
             <tr>
               {columns.map((col) => (
                 <th
                   key={col.key}
                   scope="col"
-                  className={`px-4 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500
-                    border-b border-surface-border whitespace-nowrap ${col.headerClass ?? ''}`}
+                  className={`px-4 py-3 text-xs font-semibold uppercase tracking-wider text-gray-500
+                    whitespace-nowrap ${col.headerClass ?? ''}`}
                 >
                   {col.header}
                 </th>
@@ -55,14 +55,14 @@ export default function DataTable({
           </thead>
 
           {/* Body */}
-          <tbody className="divide-y divide-surface-border">
+          <tbody className="divide-y divide-gray-100">
             {loading ? (
               // Skeleton rows
               Array.from({ length: pageSize > 5 ? 5 : pageSize }).map((_, i) => (
-                <tr key={`skel-${i}`} className="bg-surface-card/40">
+                <tr key={`skel-${i}`} className="bg-white">
                   {columns.map((col) => (
                     <td key={col.key} className="px-4 py-3">
-                      <div className="h-4 bg-slate-700/50 rounded animate-pulse w-3/4" />
+                      <div className="h-4 bg-gray-200 rounded animate-pulse w-3/4" />
                     </td>
                   ))}
                 </tr>
@@ -71,7 +71,7 @@ export default function DataTable({
               <tr>
                 <td
                   colSpan={columns.length}
-                  className="px-4 py-14 text-center text-slate-500 text-sm"
+                  className="px-4 py-14 text-center text-gray-400 text-sm"
                 >
                   {emptyMessage ?? t('table.empty')}
                 </td>
@@ -83,12 +83,12 @@ export default function DataTable({
                   <tr
                     key={key}
                     onClick={() => onRowClick && onRowClick(row)}
-                    className={`bg-surface-card/20 hover:bg-slate-800/40 transition-colors duration-100 ${onRowClick ? 'cursor-pointer' : ''}`}
+                    className={`bg-white hover:bg-light-blue/20 transition-colors duration-100 ${onRowClick ? 'cursor-pointer' : ''}`}
                   >
                     {columns.map((col) => (
                       <td
                         key={col.key}
-                        className={`px-4 py-3 text-slate-300 align-middle ${col.className ?? ''}`}
+                        className={`px-4 py-3 text-gray-700 align-middle ${col.className ?? ''}`}
                       >
                         {col.render
                           ? col.render(row[col.key], row)
@@ -107,7 +107,7 @@ export default function DataTable({
       {totalPages > 1 && (
         <div className="flex flex-col sm:flex-row items-center justify-between gap-3 px-1">
           {/* Range info */}
-          <p className="text-xs text-slate-500 order-2 sm:order-1">
+          <p className="text-xs text-gray-500 order-2 sm:order-1">
             {!loading && totalElements > 0
               ? t('standard_items.showing', { from, to, total: totalElements })
               : null}
@@ -138,17 +138,17 @@ export default function DataTable({
               }, [])
               .map((p, i) =>
                 p === '...' ? (
-                  <span key={`ellipsis-${i}`} className="px-2 text-slate-600 text-sm select-none">…</span>
+                  <span key={`ellipsis-${i}`} className="px-2 text-gray-400 text-sm select-none">…</span>
                 ) : (
                   <button
                     key={p}
                     onClick={() => onPageChange(p)}
                     disabled={loading}
                     className={`w-8 h-8 rounded-lg text-xs font-medium transition-all duration-150
-                      focus:outline-none focus:ring-2 focus:ring-brand-500/40
+                      focus:outline-none focus:ring-2 focus:ring-warm-brown/30
                       ${p === currentPage
-                        ? 'bg-brand-600 text-white shadow-glow-indigo'
-                        : 'text-slate-400 hover:bg-slate-700/60 hover:text-slate-200'
+                        ? 'bg-warm-brown text-white shadow-sm'
+                        : 'text-gray-600 hover:bg-light-blue/40 hover:text-gray-900'
                       }`}
                   >
                     {p + 1}
@@ -178,9 +178,9 @@ function PageBtn({ onClick, disabled, label, icon }) {
       disabled={disabled}
       aria-label={label}
       className="w-8 h-8 rounded-lg flex items-center justify-center
-        text-slate-400 hover:text-slate-200 hover:bg-slate-700/60
+        text-gray-500 hover:text-gray-900 hover:bg-light-blue/40
         disabled:opacity-40 disabled:cursor-not-allowed
-        transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-brand-500/40"
+        transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-warm-brown/30"
     >
       {icon}
     </button>

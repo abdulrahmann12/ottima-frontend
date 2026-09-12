@@ -49,23 +49,25 @@ export default function ClientProjectsPage() {
   const handleRowClick = (project) => navigate(`/client/projects/${project.projectId}`, { state: { projectSummary: project } })
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-5 animate-slide-up">
       {/* ── Page header ─────────────────────────────── */}
       <div>
-        <h1 className="text-2xl font-bold text-white">{t('projects.title')}</h1>
-        <p className="mt-1 text-sm text-slate-500">{t('projects.client_subtitle')}</p>
+        <h1 className="text-2xl font-bold text-gray-900">{t('projects.title')}</h1>
+        <p className="mt-1 text-sm text-gray-600">{t('projects.client_subtitle')}</p>
       </div>
 
       <Alert message={error} variant="error" onClose={() => setError(null)} />
 
       {/* ── Card container ──────────────────────────── */}
-      <div className="overflow-hidden rounded-2xl border border-surface-border bg-surface-card shadow-xl">
+      <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-card">
         {/* Header bar */}
-        <div className="flex items-center justify-between border-b border-surface-border px-5 py-4">
+        <div className="flex items-center justify-between border-b border-gray-200 px-5 py-4 bg-gray-50/50">
           <div>
-            <p className="text-sm font-semibold text-white">{t('projects.title')}</p>
+            <p className="text-sm font-bold text-gray-900">{t('projects.title')}</p>
             {totalElements > 0 && (
-              <p className="mt-0.5 text-xs text-slate-500">{totalElements} {t('projects.total', { defaultValue: 'projects' })}</p>
+              <p className="mt-0.5 text-xs text-gray-500">
+                {totalElements} {t('projects.total', { defaultValue: 'projects' })}
+              </p>
             )}
           </div>
         </div>

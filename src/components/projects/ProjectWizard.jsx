@@ -6,6 +6,7 @@ import ProjectItemAssignmentFields from '@/components/projects/ProjectItemAssign
 import Alert from '@/components/ui/Alert'
 import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
+import SearchableSelect from '@/components/ui/SearchableSelect'
 import useProjectsStore from '@/store/projectsStore'
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -30,7 +31,7 @@ const EMPTY_PROJECT_FORM = {
  *   onSuccess — () => void  (called when wizard finishes successfully)
  */
 export default function ProjectWizard({ onSuccess }) {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const { wizardOpen, wizardStep, createdProjectId, selectedItems, openWizard, closeWizard, advanceToStep2, addSelectedItem, removeSelectedItem } = useProjectsStore()
 
   const [error, setError] = useState(null)
@@ -105,7 +106,10 @@ export default function ProjectWizard({ onSuccess }) {
     }
   }
 
-  const fieldP = (k) => (e) => setProjectForm((p) => ({ ...p, [k]: e.target.value }))
+  const fieldP = (k) => (val) => {
+    const value = typeof val === 'object' && val !== null && 'target' in val ? val.target.value : val
+    setProjectForm((p) => ({ ...p, [k]: value }))
+  }
 
   return (
     <>
@@ -114,7 +118,7 @@ export default function ProjectWizard({ onSuccess }) {
         type="button"
         id="btn-create-project"
         onClick={handleOpen}
-        className="inline-flex items-center gap-2 rounded-xl bg-brand-600 px-4 py-2.5 text-sm font-semibold text-white shadow-glow-indigo transition-all hover:bg-brand-500 hover:shadow-glow-indigo/80 active:scale-95"
+        className="inline-flex items-center gap-2 rounded-xl bg-warm-brown hover:bg-[#6B4A33] px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-warm-brown/50 active:scale-[0.98]"
       >
         <PlusIcon />
         {t('projects.create')}
@@ -132,7 +136,7 @@ export default function ProjectWizard({ onSuccess }) {
         <Alert message={error} variant="error" onClose={() => setError(null)} />
 
         {loadingLists && (
-          <p className="py-4 text-center text-sm text-slate-500">{t('common.loading')}</p>
+          <p className="py-4 text-center text-sm text-gray-500">{t('common.loading')}</p>
         )}
 
         {/* ════════════════ STEP 1 ════════════════════ */}
@@ -140,26 +144,34 @@ export default function ProjectWizard({ onSuccess }) {
           <form id="wizard-step1-form" onSubmit={handleStep1Submit} className="space-y-4">
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               {/* Client */}
-              <label className="form-label">
-                {t('projects.client')} *
-                <select id="step1-client" className="input-base mt-1.5 text-sm" value={projectForm.clientId} onChange={fieldP('clientId')} required>
-                  <option value="">{t('projects.select_client')}</option>
-                  {clients.map((u) => (
-                    <option key={u.userId} value={u.userId}>{u.fullNameEn} ({u.username})</option>
-                  ))}
-                </select>
-              </label>
+              <SearchableSelect
+                id="step1-client"
+                label={t('projects.client')}
+                required
+                value={projectForm.clientId}
+                onChange={fieldP('clientId')}
+                placeholder={t('projects.select_client')}
+                options={clients.map((u) => ({
+                  value: u.userId,
+                  label: (i18n.language === 'ar' ? (u.fullNameAr || u.fullNameEn) : (u.fullNameEn || u.fullNameAr)) || u.username,
+                  sublabel: u.username ? `@${u.username}` : undefined,
+                }))}
+              />
 
               {/* Engineer */}
-              <label className="form-label">
-                {t('projects.engineer')} *
-                <select id="step1-engineer" className="input-base mt-1.5 text-sm" value={projectForm.engineerId} onChange={fieldP('engineerId')} required>
-                  <option value="">{t('projects.select_engineer')}</option>
-                  {engineers.map((u) => (
-                    <option key={u.userId} value={u.userId}>{u.fullNameEn} ({u.username})</option>
-                  ))}
-                </select>
-              </label>
+              <SearchableSelect
+                id="step1-engineer"
+                label={t('projects.engineer')}
+                required
+                value={projectForm.engineerId}
+                onChange={fieldP('engineerId')}
+                placeholder={t('projects.select_engineer')}
+                options={engineers.map((u) => ({
+                  value: u.userId,
+                  label: (i18n.language === 'ar' ? (u.fullNameAr || u.fullNameEn) : (u.fullNameEn || u.fullNameAr)) || u.username,
+                  sublabel: u.username ? `@${u.username}` : undefined,
+                }))}
+              />
 
               <Input id="step1-name-ar" label={`${t('projects.name_ar')} *`} value={projectForm.nameAr} onChange={fieldP('nameAr')} required dir="rtl" />
               <Input id="step1-name-en" label={`${t('projects.name_en')} *`} value={projectForm.nameEn} onChange={fieldP('nameEn')} required />
@@ -169,7 +181,7 @@ export default function ProjectWizard({ onSuccess }) {
               <Input id="step1-start" label={`${t('projects.start_date')} *`} type="date" value={projectForm.startDate} onChange={fieldP('startDate')} required />
               <Input id="step1-target" label={`${t('projects.target_date')} *`} type="date" value={projectForm.targetCompletionDate} onChange={fieldP('targetCompletionDate')} required />
             </div>
-            <div className="flex justify-end border-t border-surface-border pt-4">
+            <div className="flex justify-end border-t border-gray-200 pt-4">
               <Button id="step1-submit" type="submit" loading={saving}>
                 {t('projects.continue')} →
               </Button>
@@ -178,41 +190,23 @@ export default function ProjectWizard({ onSuccess }) {
         )}
 
         {/* ════════════════ STEP 2 ════════════════════ */}
-        {wizardStep === 2 && !loadingLists && (
-          <form id="wizard-step2-form" onSubmit={handleStep2Submit} className="space-y-4">
-            <div className="rounded-xl bg-emerald-900/20 border border-emerald-700/30 px-4 py-3 text-xs text-emerald-400">
-              ✓ {t('projects.step1_complete', { defaultValue: 'Project created. Now assign finishing items.' })}
-            </div>
-
-            <p className="text-sm text-slate-400">{t('projects.assign_items_help')}</p>
-
+        {wizardStep === 2 && (
+          <div className="space-y-4">
             <ProjectItemAssignmentFields
               catalogItems={catalogItems}
               selectedItems={selectedItems}
               onAddItem={addSelectedItem}
               onRemoveItem={removeSelectedItem}
-              disabled={saving}
-              ids={{
-                catalogItem: 'step2-catalog-item',
-                budget: 'step2-item-budget',
-                weight: 'step2-item-weight',
-                sequence: 'step2-item-sequence',
-                notes: 'step2-item-notes',
-                addButton: 'step2-add-item',
-              }}
             />
-
-            <div className="flex justify-end border-t border-surface-border pt-4">
-              <Button
-                id="step2-submit"
-                type="submit"
-                loading={saving}
-                disabled={selectedItems.length === 0}
-              >
-                {t('projects.assign_and_finish')}
+            <div className="flex justify-between border-t border-gray-200 pt-4">
+              <Button variant="ghost" onClick={closeWizard} disabled={saving}>
+                {t('projects.skip_assignment')}
+              </Button>
+              <Button id="step2-submit" onClick={handleStep2Submit} loading={saving}>
+                {t('common.finish')} ✓
               </Button>
             </div>
-          </form>
+          </div>
         )}
       </Modal>
     </>
@@ -236,15 +230,15 @@ function WizardStepIndicator({ step, t }) {
                 step > s.n
                   ? 'bg-emerald-600 text-white'
                   : step === s.n
-                  ? 'bg-brand-600 text-white ring-2 ring-brand-400/30'
-                  : 'bg-slate-700 text-slate-400'
+                  ? 'bg-warm-brown text-white ring-2 ring-warm-brown/30'
+                  : 'bg-gray-200 text-gray-500'
               }`}
             >
               {step > s.n ? '✓' : s.n}
             </span>
             <span
               className={`text-xs font-medium ${
-                step >= s.n ? 'text-slate-200' : 'text-slate-500'
+                step >= s.n ? 'text-gray-900' : 'text-gray-400'
               }`}
             >
               {s.label}
@@ -252,7 +246,7 @@ function WizardStepIndicator({ step, t }) {
           </div>
           {/* Connector */}
           {i < steps.length - 1 && (
-            <div className={`mx-3 h-px flex-1 w-12 transition-all ${step > 1 ? 'bg-emerald-600/60' : 'bg-surface-border'}`} />
+            <div className={`mx-3 h-px flex-1 w-12 transition-all ${step > 1 ? 'bg-emerald-600' : 'bg-gray-200'}`} />
           )}
         </div>
       ))}

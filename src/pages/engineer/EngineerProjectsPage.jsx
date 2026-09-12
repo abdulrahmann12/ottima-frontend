@@ -62,19 +62,19 @@ export default function EngineerProjectsPage() {
   }
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-5 animate-slide-up">
       {/* ── Page header ─────────────────────────────── */}
       <div>
-        <h1 className="text-2xl font-bold text-white">{t('projects.title')}</h1>
-        <p className="mt-1 text-sm text-slate-500">{t('projects.engineer_subtitle')}</p>
+        <h1 className="text-2xl font-bold text-gray-900">{t('projects.title')}</h1>
+        <p className="mt-1 text-sm text-gray-600">{t('projects.engineer_subtitle')}</p>
       </div>
 
       <Alert message={error} variant="error" onClose={() => setError(null)} />
 
       {/* ── Card container ──────────────────────────── */}
-      <div className="overflow-hidden rounded-2xl border border-surface-border bg-surface-card shadow-xl">
+      <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-card">
         {/* ── Tabs ─────────────────────────────────── */}
-        <div className="flex border-b border-surface-border">
+        <div className="flex border-b border-gray-200 bg-gray-50/50 px-2 pt-1.5">
           <TabBtn
             id="tab-assigned"
             active={engineerTab === 'assigned'}
@@ -113,15 +113,19 @@ function TabBtn({ id, active, onClick, label, count }) {
       id={id}
       type="button"
       onClick={onClick}
-      className={`relative flex items-center gap-2 px-5 py-3.5 text-sm font-medium transition-colors ${
+      className={`relative flex items-center gap-2 px-5 py-3 text-sm font-semibold transition-all ${
         active
-          ? 'border-b-2 border-brand-500 text-white'
-          : 'text-slate-500 hover:text-slate-300'
+          ? 'border-b-2 border-warm-brown text-warm-brown bg-white rounded-t-xl shadow-sm'
+          : 'text-gray-600 hover:text-gray-900 hover:bg-white/60 rounded-t-xl'
       }`}
     >
-      {label}
+      <span>{label}</span>
       {count != null && count > 0 && (
-        <span className={`rounded-full px-1.5 py-0.5 text-[10px] font-bold tabular-nums ${active ? 'bg-brand-600/40 text-brand-300' : 'bg-slate-700 text-slate-400'}`}>
+        <span
+          className={`rounded-full px-2 py-0.5 text-xs font-bold tabular-nums transition-colors ${
+            active ? 'bg-warm-brown/10 text-warm-brown' : 'bg-gray-200 text-gray-700'
+          }`}
+        >
           {count}
         </span>
       )}

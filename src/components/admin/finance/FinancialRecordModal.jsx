@@ -8,7 +8,9 @@ import {
 import Modal from '@/components/admin/Modal'
 import Alert from '@/components/ui/Alert'
 import Button from '@/components/ui/Button'
+import SearchableSelect from '@/components/ui/SearchableSelect'
 import { Spinner } from '@/components/ui/icons/Globe'
+import { compressImageFile, optimizeCloudinaryUrl } from '@/utils/imageUtils'
 import { useEffect, useRef, useState } from 'react'
 
 // ─── Cloudinary config (same preset / cloud as Daily Updates) ─
@@ -55,10 +57,10 @@ export default function FinancialRecordModal({
 }) {
   const isEdit = Boolean(record)
 
-  const [form,     setForm]     = useState(() => emptyForm(record))
-  const [errors,   setErrors]   = useState({})
-  const [error,    setError]    = useState(null)
-  const [saving,   setSaving]   = useState(false)
+  const [form, setForm]           = useState(() => emptyForm(record))
+  const [errors, setErrors]       = useState({})
+  const [error, setError]         = useState(null)
+  const [saving, setSaving]       = useState(false)
   const [uploading, setUploading] = useState(false)
   const [dragActive, setDragActive] = useState(false)
   const [docPreview, setDocPreview] = useState(record?.documentUrl ?? null)
@@ -104,11 +106,14 @@ export default function FinancialRecordModal({
     return Object.keys(e).length === 0
   }
 
-  // ── Cloudinary upload (single file — doc/receipt/image) ──────
-  const uploadDocument = async (file) => {
+  // ── Fast Cloudinary upload with client-side compression ──────
+  const uploadDocument = async (rawFile) => {
     setUploading(true)
     setError(null)
     try {
+      // Compress image client-side to make upload blazing fast (under 1s) and prevent browser UI freeze
+      const file = await compressImageFile(rawFile)
+
       const fd = new FormData()
       fd.append('file', file)
       fd.append('upload_preset', CLOUDINARY_UPLOAD_PRESET)
@@ -256,52 +261,57 @@ export default function FinancialRecordModal({
 
         {/* Row 3 — project item: REQUIRED for EXPENSE, hidden for DEPOSIT */}
         {form.recordType === 'EXPENSE' && (
-          <Field
-            label="Project Item"
-            error={errors.projectItemId}
-            required
-          >
+          <div>
             {projectItems.length === 0 ? (
-              <p className="mt-1 rounded-xl border border-amber-500/30 bg-amber-500/10 px-3 py-2.5 text-xs text-amber-300">
+              <p className="mt-1 rounded-xl border border-amber-300 bg-amber-50 px-3.5 py-2.5 text-xs text-amber-800 font-medium">
                 ⚠ No items found for this project. Please add project items first.
               </p>
             ) : (
-              <select
+              <SearchableSelect
                 id="fin-project-item"
-                className={`input-base text-sm ${errors.projectItemId ? 'input-error' : ''}`}
+                label="Project Item"
+                required
+                error={errors.projectItemId}
                 value={form.projectItemId}
                 onChange={set('projectItemId')}
                 disabled={saving}
-              >
-                <option value="">— Select the item this expense belongs to —</option>
-                {[...projectItems]
+                placeholder="— Select the item this expense belongs to —"
+                options={[...projectItems]
                   .sort((a, b) => (a.sequenceOrder ?? 0) - (b.sequenceOrder ?? 0))
-                  .map((item) => (
-                    <option key={item.projectItemId} value={item.projectItemId}>
-                      {(language === 'ar' ? item.itemNameAr : item.itemNameEn) || item.itemNameEn || item.itemNameAr}
-                    </option>
-                  ))}
-              </select>
+                  .map((item) => ({
+                    value: item.projectItemId,
+                    label: (language === 'ar' ? item.itemNameAr : item.itemNameEn) || item.itemNameEn || item.itemNameAr,
+                  }))}
+              />
             )}
-          </Field>
+          </div>
         )}
 
         {/* Document upload (drag & drop) */}
-        <div className="space-y-3">
-          <p className="text-sm font-medium text-slate-300">Receipt / Document <span className="text-slate-500 font-normal">(optional)</span></p>
+        <div className="space-y-2">
+          <label className="block text-sm font-medium text-gray-700">
+            Receipt / Document <span className="text-gray-400 font-normal">(optional)</span>
+          </label>
 
           {docPreview ? (
-            <div className="relative overflow-hidden rounded-2xl border border-surface-border bg-slate-900/50">
+            <div className="relative overflow-hidden rounded-2xl border border-gray-200 bg-gray-50/70 p-3 shadow-sm transition-all">
               {isDocImage ? (
-                <img src={docPreview} alt="Document preview" className="w-full max-h-52 object-contain" />
+                <div className="rounded-xl overflow-hidden bg-white border border-gray-200 flex items-center justify-center p-1">
+                  <img
+                    src={optimizeCloudinaryUrl(docPreview, { width: 800, quality: 'auto' })}
+                    alt="Document preview"
+                    className="w-full max-h-56 object-contain rounded-lg"
+                    loading="lazy"
+                  />
+                </div>
               ) : (
-                <div className="flex items-center gap-3 px-4 py-4">
-                  <PdfIcon className="w-8 h-8 flex-shrink-0 text-red-400" />
+                <div className="flex items-center gap-3 px-4 py-4 bg-white rounded-xl border border-gray-200">
+                  <PdfIcon className="w-8 h-8 flex-shrink-0 text-red-500" />
                   <a
                     href={docPreview}
                     target="_blank"
                     rel="noreferrer"
-                    className="text-sm text-brand-300 hover:text-brand-200 truncate underline"
+                    className="text-sm text-warm-brown hover:text-[#6B4A33] font-semibold truncate underline"
                   >
                     View PDF document
                   </a>
@@ -311,18 +321,18 @@ export default function FinancialRecordModal({
                 type="button"
                 onClick={clearDocument}
                 disabled={saving}
-                className="absolute top-2 right-2 h-7 w-7 rounded-full bg-slate-900/80 border border-surface-border
-                  flex items-center justify-center text-slate-400 hover:text-red-400 transition-colors"
+                className="absolute top-5 right-5 h-8 w-8 rounded-full bg-white/95 border border-gray-300 shadow-sm
+                  flex items-center justify-center text-gray-500 hover:text-red-600 hover:border-red-300 transition-colors"
                 aria-label="Remove document"
               >
                 ✕
               </button>
 
               {/* docType override */}
-              <div className="border-t border-surface-border px-4 py-2.5 flex items-center gap-3">
-                <p className="text-xs text-slate-500">Type:</p>
+              <div className="mt-3 pt-2.5 border-t border-gray-200 flex items-center justify-between gap-3 text-xs">
+                <span className="text-gray-600 font-medium">Document Type:</span>
                 <select
-                  className="input-base py-1 text-xs"
+                  className="input-base py-1 px-3 text-xs w-auto bg-white border-gray-200"
                   value={form.documentType}
                   onChange={set('documentType')}
                   disabled={saving}
@@ -339,12 +349,11 @@ export default function FinancialRecordModal({
               onDragLeave={() => setDragActive(false)}
               onDragOver={(e) => { e.preventDefault(); setDragActive(true) }}
               onDrop={handleDrop}
-              className={`block rounded-2xl border border-dashed px-5 py-7 text-center transition-all
-                ${dragActive
-                  ? 'border-brand-400 bg-brand-500/10'
-                  : 'border-surface-border bg-slate-900/40 hover:border-brand-500/40'
-                }
-                ${saving || uploading ? 'cursor-wait opacity-70' : 'cursor-pointer'}`}
+              className={`block rounded-2xl border-2 border-dashed px-5 py-7 text-center transition-all ${
+                dragActive
+                  ? 'border-warm-brown bg-warm-brown/5 shadow-inner'
+                  : 'border-gray-300 bg-gray-50/70 hover:bg-light-blue/10 hover:border-warm-brown/60'
+              } ${saving || uploading ? 'cursor-wait opacity-70' : 'cursor-pointer'}`}
             >
               <input
                 ref={fileRef}
@@ -356,14 +365,17 @@ export default function FinancialRecordModal({
                 onChange={handleFileChange}
               />
               <div className="flex flex-col items-center gap-2">
-                {uploading
-                  ? <Spinner className="w-7 h-7 text-brand-300" />
-                  : <UploadIcon className="w-7 h-7 text-slate-500" />
-                }
-                <p className="text-sm font-medium text-slate-300">
-                  {uploading ? 'Uploading...' : 'Drop receipt here or click to browse'}
+                {uploading ? (
+                  <Spinner className="w-8 h-8 text-warm-brown" />
+                ) : (
+                  <div className="w-12 h-12 rounded-2xl bg-warm-brown/10 text-warm-brown flex items-center justify-center mb-1">
+                    <UploadIcon className="w-6 h-6" />
+                  </div>
+                )}
+                <p className="text-sm font-semibold text-gray-800">
+                  {uploading ? 'Compressing & uploading...' : 'Drop receipt here or click to browse'}
                 </p>
-                <p className="text-xs text-slate-500">Images (JPG, PNG, WEBP) or PDF</p>
+                <p className="text-xs text-gray-500">Supports images (JPG, PNG, WEBP) & PDF documents</p>
               </div>
             </label>
           )}
@@ -372,7 +384,7 @@ export default function FinancialRecordModal({
         {/* Notes */}
         <Field label="Notes (optional)">
           <textarea
-            className="input-base resize-none min-h-[80px]"
+            className="input-base resize-none min-h-[80px] text-sm"
             value={form.notes}
             onChange={set('notes')}
             maxLength={500}
@@ -382,7 +394,7 @@ export default function FinancialRecordModal({
         </Field>
 
         {/* Footer */}
-        <div className="flex flex-wrap justify-end gap-3 border-t border-surface-border pt-4">
+        <div className="flex flex-wrap justify-end gap-3 border-t border-gray-200 pt-4">
           <Button
             type="button"
             variant="ghost"
@@ -392,7 +404,12 @@ export default function FinancialRecordModal({
           >
             Cancel
           </Button>
-          <Button type="submit" className="w-auto" loading={saving} disabled={uploading}>
+          <Button
+            type="submit"
+            className="w-auto px-6"
+            loading={saving}
+            disabled={uploading}
+          >
             {isEdit ? 'Save Changes' : 'Create Record'}
           </Button>
         </div>
@@ -401,19 +418,19 @@ export default function FinancialRecordModal({
   )
 }
 
-// ─── Tiny helpers ─────────────────────────────────────────────
+// ─── Field component ──────────────────────────────────────────
 
 function Field({ label, error, required, children }) {
   return (
-    <label className="block text-sm font-medium text-slate-300">
-      {label}{required && <span className="ml-1 text-red-400">*</span>}
+    <label className="block text-sm font-medium text-gray-700">
+      {label}{required && <span className="ml-1 text-red-500 font-semibold">*</span>}
       <div className="mt-1.5">{children}</div>
-      {error && <p className="mt-1.5 text-xs text-red-400">{error}</p>}
+      {error && <p className="mt-1.5 text-xs text-red-500 animate-fade-in">{error}</p>}
     </label>
   )
 }
 
-function UploadIcon({ className }) {
+function UploadIcon({ className = 'w-6 h-6' }) {
   return (
     <svg className={className} fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" aria-hidden="true">
       <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M7.5 9 12 4.5M12 4.5 16.5 9M12 4.5V16.5" />
@@ -421,7 +438,7 @@ function UploadIcon({ className }) {
   )
 }
 
-function PdfIcon({ className }) {
+function PdfIcon({ className = 'w-6 h-6' }) {
   return (
     <svg className={className} fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" aria-hidden="true">
       <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />

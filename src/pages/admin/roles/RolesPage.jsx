@@ -143,16 +143,16 @@ export default function RolesPage() {
     {
       key: 'roleId',
       header: t('roles.role_id'),
-      className: 'font-mono text-xs text-slate-500 w-16',
+      className: 'font-mono text-xs text-gray-500 w-16',
     },
     {
       key: 'roleName',
       header: t('roles.role_name'),
       render: (val) => (
         <span className={`inline-flex items-center gap-1.5 font-semibold
-          ${SYSTEM_ROLES.includes(val) ? 'text-brand-300' : 'text-slate-200'}`}>
+          ${SYSTEM_ROLES.includes(val) ? 'text-warm-brown' : 'text-gray-900'}`}>
           {SYSTEM_ROLES.includes(val) && (
-            <span className="w-1.5 h-1.5 rounded-full bg-brand-400 inline-block" />
+            <span className="w-1.5 h-1.5 rounded-full bg-warm-brown inline-block" />
           )}
           {val}
         </span>
@@ -161,12 +161,12 @@ export default function RolesPage() {
     {
       key: 'createdAt',
       header: t('roles.created_at'),
-      render: (val) => <span className="text-slate-500 text-xs">{formatDate(val)}</span>,
+      render: (val) => <span className="text-gray-500 text-xs">{formatDate(val)}</span>,
     },
     {
       key: 'updatedAt',
       header: t('roles.updated_at'),
-      render: (val) => <span className="text-slate-500 text-xs">{formatDate(val)}</span>,
+      render: (val) => <span className="text-gray-500 text-xs">{formatDate(val)}</span>,
     },
     {
       key: '_actions',
@@ -197,17 +197,17 @@ export default function RolesPage() {
       {/* Page heading + actions */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h2 className="text-xl font-bold text-white">{t('roles.title')}</h2>
-          <p className="text-slate-500 text-sm mt-0.5">{t('roles.subtitle')}</p>
+          <h2 className="text-xl font-bold text-gray-900">{t('roles.title')}</h2>
+          <p className="text-gray-500 text-sm mt-0.5">{t('roles.subtitle')}</p>
         </div>
         <button
           id="create-role-btn"
           type="button"
           onClick={openCreate}
           className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl
-            bg-brand-600 hover:bg-brand-500 text-white font-semibold text-sm
-            transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-brand-500/50
-            active:scale-[0.98] shadow-glow-indigo self-start"
+            bg-warm-brown hover:bg-[#6B4A33] text-white font-semibold text-sm
+            transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-warm-brown/50
+            active:scale-[0.98] shadow-sm self-start"
         >
           <PlusIcon />
           {t('roles.create')}
@@ -220,8 +220,8 @@ export default function RolesPage() {
 
       {/* System roles info banner */}
       <div className="flex items-start gap-3 px-4 py-3 rounded-xl
-        bg-brand-900/30 border border-brand-700/30 text-xs text-brand-300">
-        <InfoIcon className="w-4 h-4 mt-0.5 flex-shrink-0" />
+        bg-amber-50 border border-amber-200 text-xs text-amber-900 font-medium">
+        <InfoIcon className="w-4 h-4 mt-0.5 text-amber-700 flex-shrink-0" />
         <span>{t('roles.system_role_warning')}</span>
       </div>
 
@@ -289,8 +289,8 @@ export default function RolesPage() {
 /* ── Small helpers ─────────────────────────────────────── */
 function ActionBtn({ onClick, title, icon, color }) {
   const cls = color === 'red'
-    ? 'text-slate-500 hover:text-red-400 hover:bg-red-900/30'
-    : 'text-slate-500 hover:text-brand-300 hover:bg-brand-900/30'
+    ? 'text-gray-500 hover:text-red-600 hover:bg-red-50'
+    : 'text-gray-500 hover:text-warm-brown hover:bg-light-blue/40'
   return (
     <button
       type="button"
@@ -298,7 +298,7 @@ function ActionBtn({ onClick, title, icon, color }) {
       title={title}
       aria-label={title}
       className={`w-8 h-8 rounded-lg flex items-center justify-center
-        transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-brand-500/40
+        transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-warm-brown/40
         ${cls}`}
     >
       {icon}

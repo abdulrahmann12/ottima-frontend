@@ -28,6 +28,7 @@ const PAGE_TITLES = {
   '/admin/comments':       'nav.comments',
   '/admin/finance':        'nav.finance',
   '/admin/activity-logs':  'nav.activity_logs',
+  '/admin/profile':        'nav.profile',
 }
 
 export default function AdminLayout() {
@@ -45,11 +46,13 @@ export default function AdminLayout() {
     ? 'nav.daily_updates'
     : location.pathname.startsWith('/admin/projects/')
     ? 'nav.projects'
+    : location.pathname.startsWith('/admin/profile')
+    ? 'nav.profile'
     : PAGE_TITLES[location.pathname] ?? 'nav.dashboard'
   const pageTitle = t(titleKey)
 
   return (
-    <div className="flex h-dvh overflow-hidden bg-auth-pattern">
+    <div className="flex h-dvh overflow-hidden bg-cream">
       {/* Sidebar */}
       <AdminSidebar
         mobileOpen={mobileOpen}

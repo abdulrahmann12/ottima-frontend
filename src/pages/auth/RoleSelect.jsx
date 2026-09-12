@@ -7,28 +7,22 @@ const roles = [
     key: 'admin',
     path: '/login/admin',
     icon: AdminIcon,
-    gradient: 'from-brand-600 to-brand-800',
-    borderColor: 'border-brand-500/40',
-    hoverBorder: 'hover:border-brand-500',
-    glowClass: 'hover:shadow-glow-indigo',
+    bgIcon: 'bg-warm-brown text-white',
+    hoverBorder: 'hover:border-warm-brown',
   },
   {
     key: 'engineer',
     path: '/login/engineer',
     icon: EngineerIcon,
-    gradient: 'from-cyan-600 to-cyan-900',
-    borderColor: 'border-cyan-700/40',
-    hoverBorder: 'hover:border-cyan-500',
-    glowClass: 'hover:shadow-[0_0_20px_rgba(6,182,212,0.25)]',
+    bgIcon: 'bg-[#4A5D4E] text-white',
+    hoverBorder: 'hover:border-[#4A5D4E]',
   },
   {
     key: 'client',
     path: '/login/client',
     icon: ClientIcon,
-    gradient: 'from-emerald-600 to-emerald-900',
-    borderColor: 'border-emerald-700/40',
-    hoverBorder: 'hover:border-emerald-500',
-    glowClass: 'hover:shadow-glow-emerald',
+    bgIcon: 'bg-[#8C6D53] text-white',
+    hoverBorder: 'hover:border-[#8C6D53]',
   },
 ]
 
@@ -39,48 +33,49 @@ export default function RoleSelect() {
   return (
     <AuthLayout>
       {/* Header */}
-      <div className="text-center mb-10">
-        <h2 className="text-3xl font-bold text-white mb-2">
+      <div className="text-center mb-8">
+        <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-900 mb-2 tracking-tight">
           {t('role.select_title')}
         </h2>
-        <p className="text-slate-400 text-sm">
+        <p className="text-gray-600 text-sm">
           {t('role.select_subtitle')}
         </p>
       </div>
 
       {/* Role cards */}
-      <div className="flex flex-col gap-4">
-        {roles.map(({ key, path, icon: Icon, gradient, borderColor, hoverBorder, glowClass }) => (
+      <div className="flex flex-col gap-3.5">
+        {roles.map(({ key, path, icon: Icon, bgIcon, hoverBorder }) => (
           <button
             key={key}
             id={`role-card-${key}`}
             onClick={() => navigate(path)}
-            className={`group w-full glass-card p-5
-              flex items-center gap-5 text-left
-              border ${borderColor} ${hoverBorder} ${glowClass}
-              transition-all duration-300 cursor-pointer
-              hover:translate-y-[-2px] active:translate-y-0`}
+            className={`group w-full p-4 sm:p-5 rounded-2xl
+              bg-cream/40 hover:bg-light-blue/20 border border-gray-200
+              flex items-center gap-4 sm:gap-5 text-left rtl:text-right
+              ${hoverBorder}
+              transition-all duration-200 cursor-pointer
+              hover:shadow-sm hover:translate-y-[-1px] active:translate-y-0`}
           >
             {/* Icon container */}
-            <div className={`flex-shrink-0 w-14 h-14 rounded-xl
-              bg-gradient-to-br ${gradient}
+            <div className={`flex-shrink-0 w-12 h-12 sm:w-13 sm:h-13 rounded-xl
+              ${bgIcon}
               flex items-center justify-center
-              shadow-md transition-transform duration-300 group-hover:scale-105`}>
-              <Icon className="w-7 h-7 text-white" />
+              shadow-sm transition-transform duration-200 group-hover:scale-105`}>
+              <Icon className="w-6 h-6" />
             </div>
 
             {/* Text */}
             <div className="flex-1 min-w-0">
-              <p className="text-white font-semibold text-base">
+              <p className="text-gray-900 font-bold text-base group-hover:text-warm-brown transition-colors">
                 {t(`role.${key}`)}
               </p>
-              <p className="text-slate-500 text-sm mt-0.5 truncate">
+              <p className="text-gray-500 text-xs sm:text-sm mt-0.5 truncate">
                 {t(`role.${key}_desc`)}
               </p>
             </div>
 
             {/* Arrow */}
-            <div className="flex-shrink-0 text-slate-600 group-hover:text-slate-300
+            <div className="flex-shrink-0 text-gray-400 group-hover:text-warm-brown
               transition-all duration-200 group-hover:translate-x-1 rtl:group-hover:translate-x-[-4px]">
               <ChevronRight className="w-5 h-5 rtl:rotate-180" />
             </div>
@@ -127,3 +122,4 @@ function ChevronRight({ className }) {
     </svg>
   )
 }
+

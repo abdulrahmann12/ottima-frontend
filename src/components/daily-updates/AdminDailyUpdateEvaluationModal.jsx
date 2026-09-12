@@ -3,6 +3,7 @@ import Modal from '@/components/admin/Modal'
 import Alert from '@/components/ui/Alert'
 import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
+import { optimizeCloudinaryUrl } from '@/utils/imageUtils'
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
@@ -123,16 +124,16 @@ export default function AdminDailyUpdateEvaluationModal({
       <form className="space-y-5" onSubmit={handleSubmit}>
         <Alert message={error} variant="error" onClose={() => setError(null)} />
 
-        <div className="rounded-2xl border border-surface-border bg-slate-900/50 p-4">
-          <p className="text-[11px] uppercase tracking-wider text-slate-500">
+        <div className="rounded-xl border border-gray-200 bg-gray-50 p-4">
+          <p className="text-[11px] font-semibold uppercase tracking-wider text-gray-500">
             {t('daily_updates.engineer_name')}
           </p>
-          <p className="mt-1 text-sm font-semibold text-white">{engineerName || update.engineerUsername || '—'}</p>
-          <p className="mt-1 text-xs text-slate-500">{t('daily_updates.submitted_on', { date: formatDate(update.createdAt, i18n.language) })}</p>
+          <p className="mt-1 text-sm font-semibold text-gray-900">{engineerName || update.engineerUsername || '—'}</p>
+          <p className="mt-1 text-xs text-gray-500">{t('daily_updates.submitted_on', { date: formatDate(update.createdAt, i18n.language) })}</p>
         </div>
 
         <div className="space-y-3">
-          <p className="text-sm font-medium text-slate-300">{t('daily_updates.evaluation_status')}</p>
+          <p className="text-sm font-medium text-gray-700">{t('daily_updates.evaluation_status')}</p>
           <div className="flex flex-wrap gap-3">
             {['APPROVED', 'REJECTED'].map((status) => {
               const active = form.status === status
@@ -141,12 +142,12 @@ export default function AdminDailyUpdateEvaluationModal({
                   key={status}
                   type="button"
                   onClick={() => setDecision(status)}
-                  className={`rounded-2xl border px-4 py-2 text-sm font-semibold transition-colors ${
+                  className={`rounded-xl border px-4 py-2 text-sm font-semibold transition-all ${
                     active
                       ? status === 'APPROVED'
-                        ? 'border-emerald-400/40 bg-emerald-500/10 text-emerald-200'
-                        : 'border-rose-400/40 bg-rose-500/10 text-rose-200'
-                      : 'border-surface-border bg-slate-900/40 text-slate-400 hover:text-white'
+                        ? 'border-emerald-300 bg-emerald-50 text-emerald-700 ring-2 ring-emerald-500/20'
+                        : 'border-rose-300 bg-rose-50 text-rose-700 ring-2 ring-rose-500/20'
+                      : 'border-gray-200 bg-white text-gray-600 hover:bg-gray-50 hover:text-gray-900'
                   }`}
                 >
                   {status === 'APPROVED' ? t('daily_updates.approve') : t('daily_updates.reject')}
@@ -154,7 +155,7 @@ export default function AdminDailyUpdateEvaluationModal({
               )
             })}
           </div>
-          {errors.status && <p className="text-xs text-red-400">{errors.status}</p>}
+          {errors.status && <p className="text-xs text-red-500">{errors.status}</p>}
         </div>
 
         <Input
@@ -167,7 +168,7 @@ export default function AdminDailyUpdateEvaluationModal({
           disabled={saving}
         />
 
-        <label className="block text-sm font-medium text-slate-300">
+        <label className="block text-sm font-medium text-gray-700">
           {t('daily_updates.notes')}
           <textarea
             className="input-base mt-1.5 min-h-[120px] resize-y"
@@ -180,9 +181,9 @@ export default function AdminDailyUpdateEvaluationModal({
 
         <div className="space-y-3">
           <div className="flex items-center justify-between">
-            <p className="text-sm font-medium text-slate-300">{t('daily_updates.attach_images')}</p>
+            <p className="text-sm font-medium text-gray-700">{t('daily_updates.attach_images')}</p>
             {update.images?.length > 0 && (
-              <p className="text-xs text-slate-500">{t('daily_updates.images_count', { count: update.images.length })}</p>
+              <p className="text-xs text-gray-500">{t('daily_updates.images_count', { count: update.images.length })}</p>
             )}
           </div>
 
@@ -192,20 +193,26 @@ export default function AdminDailyUpdateEvaluationModal({
                 const verdict = form.imageEvaluations.find((entry) => entry.updateImageId === image.updateImageId)
 
                 return (
-                  <div key={image.updateImageId} className="overflow-hidden rounded-3xl border border-surface-border bg-slate-900/40">
-                    <div className="aspect-[4/3] overflow-hidden bg-slate-950/50">
-                      <img src={image.imageUrl} alt={update.title} className="h-full w-full object-cover" />
+                  <div key={image.updateImageId} className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
+                    <div className="aspect-[4/3] overflow-hidden bg-gray-100">
+                      <img
+                        src={optimizeCloudinaryUrl(image.imageUrl, { width: 600 })}
+                        alt={update.title}
+                        loading="lazy"
+                        decoding="async"
+                        className="h-full w-full object-cover"
+                      />
                     </div>
-                    <div className="space-y-3 px-4 py-4">
-                      <p className="text-[11px] uppercase tracking-wider text-slate-500">{t('daily_updates.image_review')}</p>
+                    <div className="space-y-2.5 border-t border-gray-200 bg-gray-50 px-4 py-3">
+                      <p className="text-[11px] font-semibold uppercase tracking-wider text-gray-500">{t('daily_updates.image_review')}</p>
                       <div className="flex gap-2">
                         <button
                           type="button"
                           onClick={() => setImageDecision(image.updateImageId, true)}
-                          className={`rounded-xl border px-3 py-2 text-xs font-semibold transition-colors ${
+                          className={`flex-1 rounded-lg border px-3 py-2 text-xs font-semibold transition-colors ${
                             verdict?.approved
-                              ? 'border-emerald-400/40 bg-emerald-500/10 text-emerald-200'
-                              : 'border-surface-border bg-slate-950/40 text-slate-400 hover:text-white'
+                              ? 'border-emerald-300 bg-emerald-100 text-emerald-800 ring-1 ring-emerald-400'
+                              : 'border-gray-200 bg-white text-gray-600 hover:border-emerald-200 hover:bg-emerald-50/50 hover:text-emerald-700'
                           }`}
                         >
                           {t('daily_updates.mark_image_approved')}
@@ -213,10 +220,10 @@ export default function AdminDailyUpdateEvaluationModal({
                         <button
                           type="button"
                           onClick={() => setImageDecision(image.updateImageId, false)}
-                          className={`rounded-xl border px-3 py-2 text-xs font-semibold transition-colors ${
+                          className={`flex-1 rounded-lg border px-3 py-2 text-xs font-semibold transition-colors ${
                             verdict?.approved === false
-                              ? 'border-rose-400/40 bg-rose-500/10 text-rose-200'
-                              : 'border-surface-border bg-slate-950/40 text-slate-400 hover:text-white'
+                              ? 'border-rose-300 bg-rose-100 text-rose-800 ring-1 ring-rose-400'
+                              : 'border-gray-200 bg-white text-gray-600 hover:border-rose-200 hover:bg-rose-50/50 hover:text-rose-700'
                           }`}
                         >
                           {t('daily_updates.mark_image_rejected')}
@@ -228,13 +235,13 @@ export default function AdminDailyUpdateEvaluationModal({
               })}
             </div>
           ) : (
-            <div className="rounded-2xl border border-surface-border bg-slate-900/40 px-4 py-5 text-sm text-slate-400">
+            <div className="rounded-xl border border-dashed border-gray-200 bg-gray-50 px-4 py-5 text-sm text-gray-400 text-center">
               {t('daily_updates.no_images')}
             </div>
           )}
         </div>
 
-        <div className="flex flex-wrap justify-end gap-3 border-t border-surface-border pt-4">
+        <div className="flex flex-wrap justify-end gap-3 border-t border-gray-200 pt-4">
           <Button type="button" variant="ghost" className="w-auto" onClick={closeModal} disabled={saving}>
             {t('common.cancel')}
           </Button>

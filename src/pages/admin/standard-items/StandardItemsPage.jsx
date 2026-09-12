@@ -185,19 +185,19 @@ export default function StandardItemsPage() {
     {
       key: 'nameAr',
       header: t('standard_items.name_ar'),
-      render: (val) => <span className="text-white font-medium">{val}</span>,
+      render: (val) => <span className="text-gray-900 font-medium">{val}</span>,
     },
     {
       key: 'nameEn',
       header: t('standard_items.name_en'),
-      render: (val) => <span className="text-slate-300">{val}</span>,
+      render: (val) => <span className="text-gray-700 font-medium">{val}</span>,
     },
     {
       key: 'descriptionEn',
       header: t('standard_items.description_en'),
       className: 'max-w-[200px]',
       render: (val) => (
-        <span className="text-slate-500 text-xs truncate block" title={val}>
+        <span className="text-gray-500 text-xs truncate block" title={val}>
           {val || '—'}
         </span>
       ),
@@ -208,7 +208,7 @@ export default function StandardItemsPage() {
       className: 'text-center w-20',
       headerClass: 'text-center',
       render: (val) => (
-        <span className="text-slate-400 text-xs">
+        <span className="text-gray-600 text-xs font-mono">
           {val ?? '—'}
         </span>
       ),
@@ -216,7 +216,7 @@ export default function StandardItemsPage() {
     {
       key: 'createdAt',
       header: t('standard_items.created_at'),
-      render: (val) => <span className="text-slate-500 text-xs whitespace-nowrap">{formatDate(val)}</span>,
+      render: (val) => <span className="text-gray-500 text-xs whitespace-nowrap">{formatDate(val)}</span>,
     },
     {
       key: '_actions',
@@ -252,17 +252,17 @@ export default function StandardItemsPage() {
       {/* Page heading + actions */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h2 className="text-xl font-bold text-white">{t('standard_items.title')}</h2>
-          <p className="text-slate-500 text-sm mt-0.5">{t('standard_items.subtitle')}</p>
+          <h2 className="text-xl font-bold text-gray-900">{t('standard_items.title')}</h2>
+          <p className="text-gray-500 text-sm mt-0.5">{t('standard_items.subtitle')}</p>
         </div>
         <button
           id="create-standard-item-btn"
           type="button"
           onClick={openCreate}
           className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl
-            bg-brand-600 hover:bg-brand-500 text-white font-semibold text-sm
-            transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-brand-500/50
-            active:scale-[0.98] shadow-glow-indigo self-start"
+            bg-warm-brown hover:bg-[#6B4A33] text-white font-semibold text-sm
+            transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-warm-brown/50
+            active:scale-[0.98] shadow-sm self-start"
         >
           <PlusIcon />
           {t('standard_items.create')}
@@ -282,7 +282,7 @@ export default function StandardItemsPage() {
           className="flex-1 max-w-sm"
         />
         {totalElements > 0 && !tableLoading && (
-          <span className="text-slate-600 text-xs hidden sm:block">
+          <span className="text-gray-600 text-xs hidden sm:block">
             {t('standard_items.showing', {
               from: page * PAGE_SIZE + 1,
               to: Math.min((page + 1) * PAGE_SIZE, totalElements),
@@ -343,7 +343,7 @@ export default function StandardItemsPage() {
           {/* Description fields */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-medium text-slate-400 mb-1.5">
+              <label className="block text-xs font-semibold text-gray-700 mb-1.5">
                 {t('standard_items.description_ar')}
               </label>
               <textarea
@@ -358,7 +358,7 @@ export default function StandardItemsPage() {
               />
             </div>
             <div>
-              <label className="block text-xs font-medium text-slate-400 mb-1.5">
+              <label className="block text-xs font-semibold text-gray-700 mb-1.5">
                 {t('standard_items.description_en')}
               </label>
               <textarea
@@ -386,7 +386,7 @@ export default function StandardItemsPage() {
             />
           </div>
 
-          <div className="flex items-center justify-end gap-3 pt-2 border-t border-surface-border">
+          <div className="flex items-center justify-end gap-3 pt-2 border-t border-gray-200">
             <Button variant="ghost" type="button" onClick={closeModal} disabled={saving}>
               {t('common.cancel')}
             </Button>
@@ -413,15 +413,15 @@ export default function StandardItemsPage() {
   )
 }
 
-/* ── Helpers ─────────────────────────────────────────────── */
+/* ── Helpers ─────────────────────────────────────── */
 function ActionBtn({ onClick, title, icon, color }) {
   const cls = color === 'red'
-    ? 'text-slate-500 hover:text-red-400 hover:bg-red-900/30'
-    : 'text-slate-500 hover:text-brand-300 hover:bg-brand-900/30'
+    ? 'text-gray-500 hover:text-red-600 hover:bg-red-50'
+    : 'text-gray-500 hover:text-warm-brown hover:bg-light-blue/40'
   return (
     <button type="button" onClick={onClick} title={title} aria-label={title}
       className={`w-8 h-8 rounded-lg flex items-center justify-center
-        transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-brand-500/40 ${cls}`}>
+        transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-warm-brown/40 ${cls}`}>
       {icon}
     </button>
   )

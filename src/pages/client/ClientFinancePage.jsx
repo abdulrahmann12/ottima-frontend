@@ -1,6 +1,7 @@
 import { getClientProjects } from '@/api/projectsApi'
 import ClientFinanceDashboard from '@/components/client/finance/ClientFinanceDashboard'
 import Alert from '@/components/ui/Alert'
+import SearchableSelect from '@/components/ui/SearchableSelect'
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
@@ -11,15 +12,15 @@ import { useTranslation } from 'react-i18next'
  * Otherwise, a project selector dropdown is shown first.
  */
 export default function ClientFinancePage() {
-  const { i18n } = useTranslation()
+  const { t, i18n } = useTranslation()
   const lang = i18n.language
 
-  const [projects,        setProjects]        = useState([])
+  const [projects, setProjects] = useState([])
   const [projectsLoading, setProjectsLoading] = useState(true)
-  const [projectsError,   setProjectsError]   = useState(null)
-  const [selectedId,      setSelectedId]      = useState('')
+  const [projectsError, setProjectsError] = useState(null)
+  const [selectedId, setSelectedId] = useState('')
 
-  // Fetch client's own projects (small list expected)
+  // Fetch client's own projects
   useEffect(() => {
     ;(async () => {
       setProjectsLoading(true)
@@ -43,48 +44,42 @@ export default function ClientFinancePage() {
   return (
     <div className="space-y-6">
       {/* ── Page header ── */}
-      <section className="overflow-hidden rounded-3xl border border-surface-border bg-slate-900/40 shadow-xl">
-        <div className="bg-[radial-gradient(circle_at_top_left,rgba(16,185,129,0.16),transparent_40%),radial-gradient(circle_at_bottom_right,rgba(99,102,241,0.10),transparent_35%)] px-5 py-6 sm:px-6">
-          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-emerald-300/80">
-            Financial Transparency
+      <section className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-card">
+        <div className="border-b border-gray-200 bg-gradient-to-r from-cream/60 via-white to-gray-50/80 px-5 py-6 sm:px-6">
+          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-warm-brown">
+            {t('nav.finance', 'Financial Transparency')}
           </p>
-          <h1 className="mt-3 text-3xl font-bold text-white">Finance</h1>
-          <p className="mt-2 text-sm leading-6 text-slate-300">
-            Your project's financial overview — deposits, expenses, and receipt gallery.
+          <h1 className="mt-2 text-2xl sm:text-3xl font-bold text-gray-900">{t('finance.title', 'Finance')}</h1>
+          <p className="mt-1 text-sm leading-6 text-gray-600">
+            {t('finance.client_subtitle', "Your project's financial overview — deposits, expenses, and receipt gallery.")}
           </p>
         </div>
       </section>
 
       <Alert message={projectsError} variant="error" onClose={() => setProjectsError(null)} />
 
-      {/* ── Project selector (hidden if auto-selected) ── */}
+      {/* ── Project selector (hidden if only 1 project) ── */}
       {!projectsLoading && projects.length > 1 && (
-        <section className="overflow-hidden rounded-3xl border border-surface-border bg-slate-900/40 shadow-xl">
-          <div className="px-5 py-4 sm:px-6">
-            <label className="text-xs font-semibold uppercase tracking-wider text-slate-500">
-              Select Project
-              <select
-                className="input-base mt-2 text-sm"
-                value={selectedId}
-                onChange={(e) => setSelectedId(e.target.value)}
-              >
-                <option value="">— Choose a project —</option>
-                {projects.map((p) => (
-                  <option key={p.projectId} value={p.projectId}>
-                    {projectName(p)}
-                  </option>
-                ))}
-              </select>
-            </label>
-          </div>
+        <section className="rounded-2xl border border-gray-200 bg-white p-5 shadow-card">
+          <SearchableSelect
+            id="client-finance-project-select"
+            label={t('projects.select_project', 'Select Project')}
+            value={selectedId}
+            onChange={(e) => setSelectedId(e.target.value)}
+            placeholder={t('projects.select_project_placeholder', '— Choose a project —')}
+            options={projects.map((p) => ({
+              value: p.projectId,
+              label: projectName(p),
+            }))}
+          />
         </section>
       )}
 
       {/* ── Empty state when no project chosen ── */}
       {!projectsLoading && projects.length > 1 && !selectedId && (
         <div className="py-16 text-center">
-          <p className="text-base font-semibold text-slate-400">Select a project to view financials</p>
-          <p className="mt-1 text-sm text-slate-600">
+          <p className="text-base font-semibold text-gray-600">Select a project to view financials</p>
+          <p className="mt-1 text-sm text-gray-400">
             Choose one from the dropdown above.
           </p>
         </div>
@@ -95,7 +90,7 @@ export default function ClientFinancePage() {
         <div className="space-y-4">
           <div className="grid grid-cols-3 gap-4">
             {[0, 1, 2].map((i) => (
-              <div key={i} className="h-28 animate-pulse rounded-3xl border border-surface-border bg-slate-800/40" />
+              <div key={i} className="h-28 animate-pulse rounded-2xl border border-gray-200 bg-gray-100" />
             ))}
           </div>
         </div>

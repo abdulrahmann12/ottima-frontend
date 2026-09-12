@@ -39,3 +39,11 @@ export const updateClientComment = (dailyUpdateId, commentId, clientComment) =>
  */
 export const deleteClientComment = (dailyUpdateId, commentId) =>
   axiosClient.delete(`${clientBase}/${dailyUpdateId}/comments/${commentId}`)
+
+/**
+ * Resolve projectItemId and projectId context for a commentId (client view).
+ * @param {number|string} commentId
+ */
+export const resolveCommentContext = (commentId) =>
+  axiosClient.get(`/api/v1/client/comments/${commentId}/context`)
+

@@ -11,11 +11,12 @@ const BASE_URL = import.meta.env.VITE_API_BASE_URL || ''
  *   when an accessToken is present in the store.
  *
  * Response interceptor:
- *   On 401 Unauthorized:
+ *   On 401 Unauthorized for authenticated routes:
  *     1. Calls POST /api/v1/auth/refresh-token with the stored refreshToken.
  *     2. On success: stores new tokens and retries the original request once.
- *     3. On failure: clears the auth store and redirects to /.
- *   All other errors are passed through.
+ *     3. On failure: clears auth state and rejects the error.
+ *   Auth routes (login, forgot-password, etc.) pass 401 directly to the caller
+ *   so the UI can display error messages without unwanted page reloads/redirects.
  */
 
 let isRefreshing = false
@@ -58,8 +59,15 @@ axiosClient.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config
 
-    // Only handle 401 once per request (avoid infinite loop)
-    if (error.response?.status === 401 && !originalRequest._retry) {
+    // Auth endpoints (login, forgot password, reset password) should NEVER trigger refresh loops or auto-redirects
+    const isAuthEndpoint =
+      originalRequest?.url?.includes('/api/v1/auth/login') ||
+      originalRequest?.url?.includes('/api/v1/auth/forgot-password') ||
+      originalRequest?.url?.includes('/api/v1/auth/reset-password') ||
+      originalRequest?.url?.includes('/api/v1/auth/refresh-token')
+
+    // Only handle 401 for authenticated endpoints once per request
+    if (error.response?.status === 401 && !originalRequest?._retry && !isAuthEndpoint) {
       if (isRefreshing) {
         // Queue subsequent 401s while a refresh is in-flight
         return new Promise((resolve, reject) => {
@@ -79,12 +87,11 @@ axiosClient.interceptors.response.use(
 
       if (!refreshToken) {
         clearAuth()
-        window.location.href = '/'
         return Promise.reject(error)
       }
 
       try {
-        // Use a plain axios call to avoid interceptor recursion
+        // Use plain axios call to avoid interceptor recursion
         const { data } = await axios.post(
           `${BASE_URL}/api/v1/auth/refresh-token`,
           { refreshToken }
@@ -99,7 +106,6 @@ axiosClient.interceptors.response.use(
       } catch (refreshError) {
         processQueue(refreshError, null)
         clearAuth()
-        window.location.href = '/'
         return Promise.reject(refreshError)
       } finally {
         isRefreshing = false

@@ -13,6 +13,7 @@ import FinancialSummaryCards from '@/components/finance/FinancialSummaryCards'
 import Alert from '@/components/ui/Alert'
 import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
+import SearchableSelect from '@/components/ui/SearchableSelect'
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { ProgressBar, StatusBadge } from './ProjectTable'
@@ -136,7 +137,7 @@ export default function ProjectDetailContent({
         )}
       </div>
 
-      {/* ── Modern Financial Summary Cards (Client & Admin) ── */}
+      {/* ── Financial Summary Cards (Client & Admin) ── */}
       {!isEngineer && (
         <FinancialSummaryCards
           summary={finSummary}
@@ -156,7 +157,7 @@ export default function ProjectDetailContent({
               type="button"
               disabled={saving || status === project.overallStatus}
               onClick={() => mutate(() => changeProjectStatus(project.projectId, status), t('projects.status_updated'))}
-              className="rounded-lg border border-surface-border px-3 py-1.5 text-xs font-medium text-slate-400 transition-colors hover:border-brand-500/60 hover:text-white disabled:pointer-events-none disabled:opacity-30"
+              className="rounded-lg border border-gray-200 px-3 py-1.5 text-xs font-medium text-gray-600 transition-colors hover:border-warm-brown/60 hover:bg-warm-brown/5 hover:text-warm-brown disabled:pointer-events-none disabled:opacity-30"
             >
               {t(`projects.status_${status.toLowerCase()}`, { defaultValue: status })}
             </button>
@@ -165,26 +166,31 @@ export default function ProjectDetailContent({
       )}
 
       {isAdmin && editMode && (
-        <form className="grid grid-cols-1 gap-3 rounded-xl border border-surface-border bg-slate-800/20 p-4 sm:grid-cols-2" onSubmit={submitEdit}>
+        <form className="grid grid-cols-1 gap-3 rounded-xl border border-gray-200 bg-gray-50 p-4 sm:grid-cols-2" onSubmit={submitEdit}>
           <Input id="edit-name-ar" label={t('projects.name_ar')} value={editForm.nameAr} onChange={field('nameAr')} required dir="rtl" />
           <Input id="edit-name-en" label={t('projects.name_en')} value={editForm.nameEn} onChange={field('nameEn')} required />
           <Input id="edit-address-ar" label={t('projects.address_ar')} value={editForm.addressAr} onChange={field('addressAr')} dir="rtl" />
           <Input id="edit-address-en" label={t('projects.address_en')} value={editForm.addressEn} onChange={field('addressEn')} />
           <Input id="edit-budget" label={t('projects.budget')} type="number" min="0" step="0.01" value={editForm.estimatedBudget} onChange={field('estimatedBudget')} required />
-          <label className="form-label">
-            {t('projects.engineer')}
-            <select className="input-base mt-1.5 text-sm" value={editForm.engineerId} onChange={field('engineerId')} required>
-              <option value="">{project.engineerName}</option>
-              {engineers.map((engineer) => (
-                <option key={engineer.userId} value={engineer.userId}>
-                  {engineer.fullNameEn} ({engineer.username})
-                </option>
-              ))}
-            </select>
-          </label>
+          <SearchableSelect
+            id="edit-engineer"
+            label={t('projects.engineer')}
+            required
+            placeholder={project.engineerName || t('projects.select_engineer', 'Select Engineer')}
+            value={editForm.engineerId}
+            onChange={(val) => {
+              const value = typeof val === 'object' && val !== null && 'target' in val ? val.target.value : val
+              setEditForm((prev) => ({ ...prev, engineerId: value }))
+            }}
+            options={engineers.map((engineer) => ({
+              value: engineer.userId,
+              label: `${i18n.language === 'ar' ? (engineer.fullNameAr || engineer.fullNameEn) : (engineer.fullNameEn || engineer.fullNameAr)} (${engineer.username})`,
+              sublabel: engineer.phoneNumber || engineer.email,
+            }))}
+          />
           <Input id="edit-start" label={t('projects.start_date')} type="date" value={editForm.startDate} onChange={field('startDate')} required />
           <Input id="edit-target" label={t('projects.target_date')} type="date" value={editForm.targetCompletionDate} onChange={field('targetCompletionDate')} required />
-          <div className="col-span-full flex justify-end gap-2 border-t border-surface-border pt-3">
+          <div className="col-span-full flex justify-end gap-2 border-t border-gray-200 pt-3">
             <Button type="button" variant="ghost" onClick={() => setEditMode(false)}>
               {t('common.cancel')}
             </Button>
@@ -197,12 +203,12 @@ export default function ProjectDetailContent({
 
       <section>
         <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
-          <h3 className="text-sm font-semibold text-white">{t('projects.items')}</h3>
+          <h3 className="text-sm font-semibold text-gray-900">{t('projects.items')}</h3>
           {itemHeaderAction}
         </div>
         <div className="space-y-3">
           {sortedItems.length === 0 && (
-            <p className="py-4 text-center text-sm text-slate-500">{t('projects.no_items')}</p>
+            <p className="py-4 text-center text-sm text-gray-500">{t('projects.no_items')}</p>
           )}
           {sortedItems.map((item) => (
             <ProjectItemCard
@@ -255,11 +261,11 @@ function ProjectItemCard({ item, projectId, isAdmin, isEngineer, saving, t, i18n
   }
 
   return (
-    <article className="rounded-xl border border-surface-border bg-slate-800/30 p-4">
+    <article className="rounded-xl border border-gray-200 bg-gray-50 p-4">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0 flex-1">
-          <p className="truncate font-semibold text-slate-100">{name}</p>
-          <p className="mt-0.5 text-xs text-slate-500">
+          <p className="truncate font-semibold text-gray-900">{name}</p>
+          <p className="mt-0.5 text-xs text-gray-500">
             {t('projects.sequence')}: {item.sequenceOrder ?? '—'} · {t('projects.weight')}: {item.weightPercentage ?? 0}%
           </p>
         </div>
@@ -271,26 +277,36 @@ function ProjectItemCard({ item, projectId, isAdmin, isEngineer, saving, t, i18n
       </div>
 
       {!isEngineer && item.calculatedSpent != null && (
-        <p className="mt-2 text-xs text-slate-500">
-          {t('projects.spent')}: <span className="text-slate-400">{fmt(item.calculatedSpent)}</span>
+        <p className="mt-2 text-xs text-gray-500">
+          {t('projects.spent')}: <span className="font-medium text-gray-700">{fmt(item.calculatedSpent)}</span>
         </p>
       )}
 
+      {(isAdmin || isEngineer) && item.generalNotes && (
+        <div className="mt-3 rounded-xl border border-warm-brown/20 bg-warm-brown/5 p-3 text-xs text-gray-700">
+          <div className="flex items-center gap-1.5 font-semibold text-warm-brown mb-1">
+            <NotesIcon className="w-4 h-4 shrink-0" />
+            <span>{t('projects.notes', 'Engineer Notes')}</span>
+          </div>
+          <p className="whitespace-pre-wrap text-gray-800 leading-relaxed font-normal">{item.generalNotes}</p>
+        </div>
+      )}
+
       {itemActionRenderer && (
-        <div className="mt-3 flex border-t border-surface-border/50 pt-3">
+        <div className="mt-3 flex border-t border-gray-200 pt-3">
           {itemActionRenderer(item)}
         </div>
       )}
 
       {isAdmin && (
-        <div className="mt-3 flex flex-wrap gap-2 border-t border-surface-border/50 pt-3">
+        <div className="mt-3 flex flex-wrap gap-3 border-t border-gray-200 pt-3">
           <button
             type="button"
             onClick={() => {
               setShowItemEdit(!showItemEdit)
               setShowProgress(false)
             }}
-            className="text-xs text-brand-400 transition-colors hover:text-brand-300"
+            className="text-xs font-medium text-warm-brown transition-colors hover:text-brand-600"
           >
             {showItemEdit ? t('common.cancel') : t('projects.edit_item')}
           </button>
@@ -300,7 +316,7 @@ function ProjectItemCard({ item, projectId, isAdmin, isEngineer, saving, t, i18n
               setShowProgress(!showProgress)
               setShowItemEdit(false)
             }}
-            className="text-xs text-cyan-400 transition-colors hover:text-cyan-300"
+            className="text-xs font-medium text-teal-600 transition-colors hover:text-teal-700"
           >
             {showProgress ? t('common.cancel') : t('projects.update_progress')}
           </button>
@@ -308,7 +324,7 @@ function ProjectItemCard({ item, projectId, isAdmin, isEngineer, saving, t, i18n
             type="button"
             disabled={saving}
             onClick={() => onMutate(() => removeProjectItem(projectId, item.projectItemId), t('projects.item_removed'))}
-            className="text-xs text-red-400 transition-colors hover:text-red-300 disabled:opacity-30"
+            className="text-xs font-medium text-red-500 transition-colors hover:text-red-600 disabled:opacity-30"
           >
             {t('projects.remove')}
           </button>
@@ -316,7 +332,7 @@ function ProjectItemCard({ item, projectId, isAdmin, isEngineer, saving, t, i18n
       )}
 
       {isAdmin && showItemEdit && (
-        <form className="mt-3 grid grid-cols-2 gap-2 border-t border-surface-border/50 pt-3 sm:grid-cols-4" onSubmit={submitItemConfig}>
+        <form className="mt-3 grid grid-cols-2 gap-2 border-t border-gray-200 pt-3 sm:grid-cols-4" onSubmit={submitItemConfig}>
           <MiniInput name="budget" label={t('projects.item_budget')} type="number" min="0" step="0.01" defaultValue={item.budget} />
           <MiniInput name="weightPercentage" label={t('projects.weight')} type="number" min="0" max="100" step="0.01" defaultValue={item.weightPercentage} />
           <MiniInput name="sequenceOrder" label={t('projects.sequence')} type="number" min="1" defaultValue={item.sequenceOrder} />
@@ -330,9 +346,9 @@ function ProjectItemCard({ item, projectId, isAdmin, isEngineer, saving, t, i18n
       )}
 
       {(isAdmin || isEngineer) && showProgress && (
-        <form className="mt-3 flex flex-wrap items-end gap-3 border-t border-surface-border/50 pt-3" onSubmit={submitProgress}>
+        <form className="mt-3 flex flex-wrap items-end gap-3 border-t border-gray-200 pt-3" onSubmit={submitProgress}>
           <MiniInput name="completionPercentage" label={`${t('projects.progress')} %`} type="number" min="0" max="100" step="0.01" defaultValue={item.completionPercentage} />
-          <label className="text-xs text-slate-500">
+          <label className="text-xs text-gray-600">
             {t('projects.status')}
             <select name="status" defaultValue={item.status ?? 'PENDING'} className="input-base mt-1 block min-w-[130px] text-sm">
               {['PENDING', 'IN_PROGRESS', 'COMPLETED'].map((status) => (
@@ -349,11 +365,11 @@ function ProjectItemCard({ item, projectId, isAdmin, isEngineer, saving, t, i18n
       )}
 
       {isEngineer && !showProgress && (
-        <div className="mt-3 flex border-t border-surface-border/50 pt-3">
+        <div className="mt-3 flex border-t border-gray-200 pt-3">
           <button
             type="button"
             onClick={() => setShowProgress(true)}
-            className="text-xs font-medium text-brand-400 transition-colors hover:text-brand-300"
+            className="text-xs font-medium text-warm-brown transition-colors hover:text-brand-600"
           >
             {t('projects.update_progress')}
           </button>
@@ -365,9 +381,9 @@ function ProjectItemCard({ item, projectId, isAdmin, isEngineer, saving, t, i18n
 
 function MetricCard({ label, value }) {
   return (
-    <div className="rounded-xl border border-surface-border bg-slate-800/30 p-3">
-      <p className="text-[11px] uppercase tracking-wider text-slate-500">{label}</p>
-      <div className="mt-1 text-sm font-bold text-white">{value}</div>
+    <div className="rounded-xl border border-gray-200 bg-gray-50 p-3">
+      <p className="text-[11px] uppercase tracking-wider text-gray-500">{label}</p>
+      <div className="mt-1 text-sm font-bold text-gray-900">{value}</div>
     </div>
   )
 }
@@ -375,9 +391,17 @@ function MetricCard({ label, value }) {
 
 function MiniInput({ label, ...props }) {
   return (
-    <label className="text-xs text-slate-500">
+    <label className="text-xs text-gray-600">
       {label}
       <input className="input-base mt-1 block w-full text-sm" {...props} />
     </label>
+  )
+}
+
+function NotesIcon({ className = 'w-4 h-4' }) {
+  return (
+    <svg className={className} fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
+    </svg>
   )
 }

@@ -5,7 +5,8 @@ import ConfirmDialog from '@/components/admin/ConfirmDialog'
 import Modal from '@/components/admin/Modal'
 import Alert from '@/components/ui/Alert'
 import Button from '@/components/ui/Button'
-import { useCallback, useEffect, useRef, useState } from 'react'
+import SearchableSelect from '@/components/ui/SearchableSelect'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSearchParams } from 'react-router-dom'
 
@@ -58,7 +59,6 @@ export default function AdminCommentsPage() {
 
     const resolveContext = async () => {
       try {
-        // Attempt 1: Call API service to resolve parent IDs directly
         const res = await resolveCommentContext(targetCommentId)
         const contextData = res.data?.data || res.data || {}
         if (contextData.projectId && contextData.dailyUpdateId && active) {
@@ -114,7 +114,6 @@ export default function AdminCommentsPage() {
       const cId = String(matchedComment.commentId || matchedComment.id)
       setHighlightedCommentId(cId)
 
-      // Smooth scroll target comment card into view
       setTimeout(() => {
         const targetElement = commentRefs.current[cId]
         if (targetElement) {
@@ -122,7 +121,6 @@ export default function AdminCommentsPage() {
         }
       }, 150)
 
-      // Remove glowing highlight after 4 seconds
       const timer = setTimeout(() => {
         setHighlightedCommentId(null)
       }, 4000)
@@ -135,7 +133,7 @@ export default function AdminCommentsPage() {
   useEffect(() => {
     let isMounted = true
     setLoadingProjects(true)
-    getAdminProjects(0, 100)
+    getAdminProjects(0, 500)
       .then((res) => {
         if (!isMounted) return
         const list = res.data?.data?.content || res.data?.content || res.data?.data || []
@@ -168,7 +166,7 @@ export default function AdminCommentsPage() {
     setComments([])
     setError(null)
 
-    getAdminDailyUpdates(selectedProjectId, 0, 100)
+    getAdminDailyUpdates(selectedProjectId, 0, 500)
       .then((res) => {
         if (!isMounted) return
         const list = res.data?.data?.content || res.data?.content || res.data?.data || []
@@ -214,17 +212,40 @@ export default function AdminCommentsPage() {
     fetchComments()
   }, [fetchComments])
 
-  // Handle Project Change
-  const handleProjectChange = (e) => {
-    setSelectedProjectId(e.target.value)
-    setPage(0)
-  }
+  // Map projects to SearchableSelect options
+  const projectOptions = useMemo(() => {
+    return projects.map((p) => {
+      const id = String(p.projectId || p.id)
+      const name = (i18n.language === 'ar' ? p.nameAr || p.nameEn : p.nameEn || p.nameAr) || id
+      const clientName = p.clientName || (p.client ? (i18n.language === 'ar' ? p.client.fullNameAr || p.client.fullNameEn : p.client.fullNameEn || p.client.fullNameAr) || p.client.username : '')
+      return {
+        value: id,
+        label: name,
+        sublabel: clientName ? `${t('projects.client', 'Client')}: ${clientName}` : undefined,
+      }
+    })
+  }, [projects, i18n.language, t])
 
-  // Handle Daily Update Change
-  const handleDailyUpdateChange = (e) => {
-    setSelectedDailyUpdateId(e.target.value)
-    setPage(0)
-  }
+  // Map daily updates to SearchableSelect options
+  const updateOptions = useMemo(() => {
+    return dailyUpdates.map((u) => {
+      const id = String(u.dailyUpdateId || u.id)
+      const dateStr = u.createdAt
+        ? new Intl.DateTimeFormat(i18n.language === 'ar' ? 'ar-EG' : 'en-US', {
+            dateStyle: 'medium',
+            timeStyle: 'short',
+          }).format(new Date(u.createdAt))
+        : 'Update'
+      const itemName = (i18n.language === 'ar' ? u.itemNameAr || u.itemNameEn : u.itemNameEn || u.itemNameAr) || u.projectItem?.standardItem?.nameEn || ''
+      const title = u.title ? ` - ${u.title}` : ''
+      const statusLabel = u.status ? `[${u.status}]` : ''
+      return {
+        value: id,
+        label: `${dateStr} ${statusLabel} ${title}`.trim(),
+        sublabel: itemName ? `${t('daily_updates.item', 'Item')}: ${itemName}` : undefined,
+      }
+    })
+  }, [dailyUpdates, i18n.language, t])
 
   // Open Reply Modal
   const handleOpenReply = (comment) => {
@@ -284,12 +305,13 @@ export default function AdminCommentsPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-surface-card border border-surface-border p-5 rounded-2xl">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white border border-gray-200 shadow-card px-5 py-5 rounded-2xl">
         <div>
-          <h1 className="text-xl font-bold text-white tracking-tight">
+          <p className="text-xs font-semibold uppercase tracking-widest text-warm-brown">{t('nav.comments')}</p>
+          <h1 className="mt-1 text-2xl font-bold text-gray-900 tracking-tight">
             {t('comments.title', 'Comments Management')}
           </h1>
-          <p className="text-xs text-slate-400 mt-1">
+          <p className="text-xs text-gray-500 mt-1">
             {t('comments.subtitle', 'Manage and reply to client comments on project daily updates')}
           </p>
         </div>
@@ -307,121 +329,111 @@ export default function AdminCommentsPage() {
         </Alert>
       )}
 
-      {/* Cascading Selection Dropdowns */}
-      <div className="bg-surface-card border border-surface-border p-5 rounded-2xl space-y-4 shadow-sm">
-        <h2 className="text-xs font-semibold text-slate-300 uppercase tracking-wider flex items-center gap-2">
-          <svg className="w-4 h-4 text-brand-400" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+      {/* Cascading Selection Searchable Dropdowns */}
+      <div className="bg-white border border-gray-200 shadow-card px-5 py-5 rounded-2xl space-y-4">
+        <h2 className="text-xs font-bold text-gray-700 uppercase tracking-wider flex items-center gap-2">
+          <svg className="w-4 h-4 text-warm-brown" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6A2.25 2.25 0 0 1 6 3.75h2.25A2.25 2.25 0 0 1 10.5 6v2.25a2.25 2.25 0 0 1-2.25 2.25H6a2.25 2.25 0 0 1-2.25-2.25V6ZM3.75 15.75A2.25 2.25 0 0 1 6 13.5h2.25a2.25 2.25 0 0 1 2.25 2.25V18a2.25 2.25 0 0 1-2.25 2.25H6A2.25 2.25 0 0 1 3.75 18v-2.25ZM13.5 6a2.25 2.25 0 0 1 2.25-2.25H18A2.25 2.25 0 0 1 20.25 6v2.25A2.25 2.25 0 0 1 18 10.5h-2.25a2.25 2.25 0 0 1-2.25-2.25V6ZM13.5 15.75a2.25 2.25 0 0 1 2.25-2.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-2.25A2.25 2.25 0 0 1 13.5 18v-2.25Z" />
           </svg>
-          Cascading Selection
+          Filter by Project & Update
         </h2>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {/* Step 1: Select Project Dropdown */}
-          <div className="space-y-1.5">
-            <label htmlFor="project-select" className="text-xs font-semibold text-slate-300 block">
-              1. {t('comments.select_project', 'Select Project')} <span className="text-rose-400">*</span>
-            </label>
-            <select
-              id="project-select"
-              value={selectedProjectId}
-              onChange={handleProjectChange}
-              disabled={loadingProjects}
-              className="w-full bg-slate-900 border border-surface-border rounded-xl text-xs text-slate-200 px-3.5 py-2.5
-                focus:outline-none focus:ring-2 focus:ring-brand-500/40 cursor-pointer disabled:opacity-50"
-            >
-              <option value="">{t('comments.select_project_placeholder', '-- Choose a Project --')}</option>
-              {projects.map((p) => {
-                const id = p.projectId || p.id
-                const name = i18n.language === 'ar' ? p.nameAr || p.nameEn : p.nameEn || p.nameAr
-                const client = p.client?.fullNameEn || p.client?.username ? ` (${p.client.fullNameEn || p.client.username})` : ''
-                return (
-                  <option key={id} value={id}>
-                    {name}{client}
-                  </option>
-                )
-              })}
-            </select>
-          </div>
+          {/* Step 1: Select Project Searchable Dropdown */}
+          <SearchableSelect
+            id="project-select"
+            label={`1. ${t('comments.select_project', 'Select Project')}`}
+            required
+            value={selectedProjectId}
+            onChange={(e) => {
+              setSelectedProjectId(e.target.value)
+              setPage(0)
+            }}
+            options={projectOptions}
+            loading={loadingProjects}
+            placeholder={t('comments.select_project_placeholder', '-- Search & Choose a Project --')}
+            searchPlaceholder={i18n.language === 'ar' ? 'ابحث باسم المشروع أو العميل...' : 'Search by project name or client...'}
+          />
 
-          {/* Step 2: Select Daily Update Dropdown */}
-          <div className="space-y-1.5">
-            <label htmlFor="update-select" className="text-xs font-semibold text-slate-300 block">
-              2. {t('comments.select_update', 'Select Daily Update')} <span className="text-rose-400">*</span>
-            </label>
-            <select
-              id="update-select"
-              value={selectedDailyUpdateId}
-              onChange={handleDailyUpdateChange}
-              disabled={!selectedProjectId || loadingUpdates}
-              className="w-full bg-slate-900 border border-surface-border rounded-xl text-xs text-slate-200 px-3.5 py-2.5
-                focus:outline-none focus:ring-2 focus:ring-brand-500/40 cursor-pointer disabled:opacity-50"
-            >
-              <option value="">
-                {!selectedProjectId
-                  ? '-- Select Project First --'
-                  : loadingUpdates
-                  ? '-- Loading Updates... --'
-                  : t('comments.select_update_placeholder', '-- Choose a Daily Update --')}
-              </option>
-              {dailyUpdates.map((u) => {
-                const id = u.dailyUpdateId || u.id
-                const dateStr = u.createdAt ? new Date(u.createdAt).toLocaleDateString() : 'Update'
-                const statusStr = u.status ? ` [${u.status}]` : ''
-                const itemName = u.projectItem?.standardItem?.nameEn || u.projectItem?.standardItem?.nameAr ? ` - ${u.projectItem.standardItem.nameEn || u.projectItem.standardItem.nameAr}` : ''
-                return (
-                  <option key={id} value={id}>
-                    {dateStr}{itemName}{statusStr}
-                  </option>
-                )
-              })}
-            </select>
-          </div>
+          {/* Step 2: Select Daily Update Searchable Dropdown */}
+          <SearchableSelect
+            id="update-select"
+            label={`2. ${t('comments.select_update', 'Select Daily Update')}`}
+            required
+            value={selectedDailyUpdateId}
+            onChange={(e) => {
+              setSelectedDailyUpdateId(e.target.value)
+              setPage(0)
+            }}
+            options={updateOptions}
+            disabled={!selectedProjectId || loadingUpdates}
+            loading={loadingUpdates}
+            placeholder={
+              !selectedProjectId
+                ? t('comments.select_project_first', '-- Select Project First --')
+                : t('comments.select_update_placeholder', '-- Search & Choose a Daily Update --')
+            }
+            searchPlaceholder={i18n.language === 'ar' ? 'ابحث بالتاريخ أو العنصر أو الحالة...' : 'Search by date, item, or status...'}
+          />
         </div>
       </div>
 
       {/* Step 3: Comments Section */}
       {!selectedDailyUpdateId ? (
-        <div className="p-12 text-center bg-surface-card/60 border border-surface-border rounded-2xl">
-          <div className="w-12 h-12 rounded-full bg-brand-950/80 border border-brand-800/40 flex items-center justify-center text-brand-400 mx-auto mb-3">
-            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+        <div className="p-12 text-center bg-white border border-dashed border-gray-200 rounded-2xl shadow-card">
+          <div className="w-14 h-14 rounded-2xl bg-cream border border-warm-brown/20 flex items-center justify-center text-warm-brown mx-auto mb-3">
+            <svg className="w-7 h-7" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 0 1 .865-.501 48.172 48.172 0 0 0 3.423-.379c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018Z" />
             </svg>
           </div>
-          <h3 className="text-sm font-semibold text-white">
+          <h3 className="text-base font-bold text-gray-900">
             {t('comments.select_prompt', 'Please select a Project and Daily Update to view comments.')}
           </h3>
-          <p className="text-xs text-slate-500 mt-1">
+          <p className="text-xs text-gray-500 mt-1">
             Comments are organized per daily update to maintain clear audit context.
           </p>
         </div>
       ) : (
         <div className="space-y-4">
           <div className="flex items-center justify-between px-1">
-            <h2 className="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
-              <svg className="w-4 h-4 text-brand-400" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+            <h2 className="text-sm font-bold text-gray-900 uppercase tracking-wider flex items-center gap-2">
+              <svg className="w-4 h-4 text-warm-brown" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M8.625 12a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H8.25m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H12m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 0 1-2.555-.337A5.972 5.972 0 0 1 5.41 20.97a5.969 5.969 0 0 1-.474-.065 4.48 4.48 0 0 1-.978-.35c-.412-.207-.63-.64-.537-1.077.067-.306.27-.604.53-.878A7.72 7.72 0 0 0 4.5 14.5c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25Z" />
               </svg>
-              Comments ({totalElements})
+              {t('comments.comments_count', 'Comments')} ({totalElements})
             </h2>
           </div>
 
           {loadingComments ? (
-            <div className="p-12 text-center bg-surface-card/40 rounded-2xl border border-surface-border">
-              <div className="inline-block w-6 h-6 border-2 border-brand-500 border-t-transparent rounded-full animate-spin mb-2" />
-              <p className="text-xs text-slate-400">{t('table.loading', 'Loading comments...')}</p>
+            <div className="p-12 text-center bg-white rounded-2xl border border-gray-200 shadow-card">
+              <div className="inline-block w-6 h-6 border-2 border-warm-brown border-t-transparent rounded-full animate-spin mb-2" />
+              <p className="text-xs text-gray-500">{t('table.loading', 'Loading comments...')}</p>
             </div>
           ) : comments.length === 0 ? (
-            <div className="p-12 text-center bg-surface-card border border-surface-border rounded-2xl text-slate-500 text-xs italic">
+            <div className="p-12 text-center bg-white border border-gray-200 rounded-2xl text-gray-500 text-xs italic shadow-card">
               {t('comments.empty', 'No comments recorded for this daily update.')}
             </div>
           ) : (
             <div className="space-y-4">
               {comments.map((comment) => {
                 const commentId = comment.commentId || comment.id
-                const authorName = comment.clientName || comment.username || comment.client?.fullNameEn || comment.client?.fullNameAr || 'Client'
+                const authorName =
+                  (i18n.language === 'ar' ? comment.clientNameAr || comment.clientNameEn : comment.clientNameEn || comment.clientNameAr) ||
+                  comment.clientFullName ||
+                  comment.clientName ||
+                  comment.client?.fullNameEn ||
+                  comment.client?.fullNameAr ||
+                  comment.clientUsername ||
+                  comment.username ||
+                  t('comments.client', 'Client')
+
+                const authorInitial = authorName ? authorName.charAt(0).toUpperCase() : 'C'
                 const hasReply = Boolean(comment.adminReply || comment.reply)
                 const isHighlighted = String(commentId) === String(highlightedCommentId)
+
+                const adminReplierName =
+                  (i18n.language === 'ar' ? comment.repliedByAdminNameAr || comment.repliedByAdminNameEn : comment.repliedByAdminNameEn || comment.repliedByAdminNameAr) ||
+                  t('comments.admin', 'Admin')
 
                 return (
                   <div
@@ -429,22 +441,27 @@ export default function AdminCommentsPage() {
                     ref={(el) => {
                       if (el) commentRefs.current[String(commentId)] = el
                     }}
-                    className={`bg-surface-card border rounded-2xl p-5 space-y-4 shadow-sm transition-all duration-500 ${
+                    className={`bg-white border rounded-2xl p-5 space-y-4 shadow-card transition-all duration-300 ${
                       isHighlighted
-                        ? 'border-brand-500 ring-2 ring-brand-500/60 bg-brand-950/40 shadow-glow-indigo animate-pulse'
-                        : 'border-surface-border hover:border-slate-700'
+                        ? 'border-warm-brown ring-2 ring-warm-brown/40 bg-warm-brown/5 shadow-card-hover'
+                        : 'border-gray-200 hover:border-gray-300'
                     }`}
                   >
                     {/* Header: Author + Date + Actions */}
-                    <div className="flex items-start justify-between gap-4 border-b border-surface-border/60 pb-3">
+                    <div className="flex items-start justify-between gap-4 border-b border-gray-100 pb-3">
                       <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 rounded-full bg-brand-900/60 border border-brand-700/50 flex items-center justify-center text-xs font-bold text-brand-300">
-                          {authorName.charAt(0).toUpperCase()}
+                        <div className="w-9 h-9 rounded-full bg-blue-100 border border-blue-200 flex items-center justify-center text-xs font-bold text-blue-700">
+                          {authorInitial}
                         </div>
                         <div>
-                          <p className="text-xs font-bold text-white">{authorName}</p>
-                          <span className="text-[10px] text-slate-500 font-mono">
-                            {comment.createdAt ? new Date(comment.createdAt).toLocaleString() : '—'}
+                          <p className="text-sm font-bold text-gray-900">{authorName}</p>
+                          <span className="text-[11px] text-gray-400">
+                            {comment.createdAt
+                              ? new Intl.DateTimeFormat(i18n.language === 'ar' ? 'ar-EG' : 'en-US', {
+                                  dateStyle: 'medium',
+                                  timeStyle: 'short',
+                                }).format(new Date(comment.createdAt))
+                              : '—'}
                           </span>
                         </div>
                       </div>
@@ -455,7 +472,7 @@ export default function AdminCommentsPage() {
                           variant="secondary"
                           size="sm"
                           onClick={() => handleOpenReply(comment)}
-                          className="text-xs py-1 px-3 flex items-center gap-1.5"
+                          className="text-xs py-1.5 px-3 flex items-center gap-1.5"
                         >
                           <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" d="M9 15 3 9m0 0 6-6M3 9h12a6 6 0 0 1 0 12h-3" />
@@ -466,7 +483,7 @@ export default function AdminCommentsPage() {
                         <button
                           type="button"
                           onClick={() => handleOpenDelete(comment)}
-                          className="p-1.5 rounded-lg text-slate-500 hover:text-red-400 hover:bg-red-950/30 transition-colors"
+                          className="p-1.5 rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors"
                           title={t('comments.delete_button', 'Delete')}
                         >
                           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
@@ -477,25 +494,25 @@ export default function AdminCommentsPage() {
                     </div>
 
                     {/* Client Comment Content */}
-                    <div className="bg-slate-900/60 rounded-xl p-3.5 border border-surface-border/40">
-                      <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-500 block mb-1">
-                        Client Comment
+                    <div className="bg-blue-50/60 rounded-xl p-3.5 border border-blue-100">
+                      <span className="text-[10px] font-semibold uppercase tracking-wider text-blue-600 block mb-1">
+                        {t('comments.client_comment', 'Client Comment')}
                       </span>
-                      <p className="text-xs text-slate-200 leading-relaxed font-sans">
-                        {comment.text || comment.commentText || comment.content || '—'}
+                      <p className="text-sm text-gray-900 leading-relaxed">
+                        {comment.clientComment || comment.text || comment.commentText || comment.content || '—'}
                       </p>
                     </div>
 
                     {/* Admin Reply Section (if reply exists) */}
                     {hasReply && (
-                      <div className="bg-brand-950/30 border border-brand-800/40 rounded-xl p-3.5 ms-4 border-s-4 border-s-brand-500 space-y-1">
+                      <div className="bg-amber-50/70 border border-amber-200 rounded-xl p-3.5 ms-4 border-s-4 border-s-amber-400 space-y-1">
                         <div className="flex items-center justify-between">
-                          <span className="text-[10px] font-bold uppercase tracking-wider text-brand-400 flex items-center gap-1.5">
-                            <span className="w-1.5 h-1.5 rounded-full bg-brand-400" />
-                            {t('comments.admin_reply', 'Admin Reply')}
+                          <span className="text-[10px] font-bold uppercase tracking-wider text-amber-700 flex items-center gap-1.5">
+                            <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
+                            {t('comments.admin_reply', 'Admin Reply')} {adminReplierName && adminReplierName !== 'Admin' ? `(${adminReplierName})` : ''}
                           </span>
                         </div>
-                        <p className="text-xs text-slate-200 leading-relaxed font-sans">
+                        <p className="text-sm text-gray-900 leading-relaxed">
                           {comment.adminReply || comment.reply}
                         </p>
                       </div>
@@ -521,17 +538,17 @@ export default function AdminCommentsPage() {
         {activeComment && (
           <form onSubmit={handleSaveReply} className="space-y-4">
             {/* Context snippet */}
-            <div className="bg-slate-900 p-3 rounded-xl border border-surface-border text-xs">
-              <span className="text-slate-500 font-semibold block mb-0.5">Original Comment:</span>
-              <p className="text-slate-300 italic line-clamp-2">
-                "{activeComment.text || activeComment.commentText || activeComment.content}"
+            <div className="bg-gray-50 p-3 rounded-xl border border-gray-200 text-xs">
+              <span className="text-gray-500 font-semibold block mb-0.5">Original Comment:</span>
+              <p className="text-gray-700 italic line-clamp-2">
+                "{activeComment.clientComment || activeComment.text || activeComment.commentText || activeComment.content}"
               </p>
             </div>
 
             {/* Reply Textarea */}
             <div className="space-y-1.5">
-              <label htmlFor="admin-reply-input" className="text-xs font-semibold text-slate-300 block">
-                {t('comments.reply_label', 'Your Official Reply')} <span className="text-rose-400">*</span>
+              <label htmlFor="admin-reply-input" className="text-xs font-semibold text-gray-700 block">
+                {t('comments.reply_label', 'Your Official Reply')} <span className="text-rose-500">*</span>
               </label>
               <textarea
                 id="admin-reply-input"
@@ -540,13 +557,12 @@ export default function AdminCommentsPage() {
                 value={replyText}
                 onChange={(e) => setReplyText(e.target.value)}
                 placeholder={t('comments.reply_placeholder', 'Type your official response to the client...')}
-                className="w-full bg-slate-900 border border-surface-border rounded-xl p-3 text-xs text-slate-200
-                  focus:outline-none focus:ring-2 focus:ring-brand-500/40 leading-relaxed scrollbar-thin"
+                className="input-base text-sm leading-relaxed scrollbar-thin"
               />
             </div>
 
             {/* Modal Actions */}
-            <div className="flex items-center justify-end gap-3 pt-3 border-t border-surface-border">
+            <div className="flex items-center justify-end gap-3 pt-3 border-t border-gray-200">
               <Button
                 type="button"
                 variant="ghost"

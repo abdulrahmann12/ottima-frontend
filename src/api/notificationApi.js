@@ -35,3 +35,13 @@ export const markAsRead = (notificationId) =>
  */
 export const markAllAsRead = () =>
   axiosClient.patch('/api/v1/notifications/read-all')
+
+/**
+ * Resolve parent entity context (projectId, projectItemId, dailyUpdateId, etc.) for a notification reference
+ * @param {string} type ReferenceType (COMMENT, DAILY_UPDATE, PROJECT, etc.)
+ * @param {string} referenceId UUID
+ */
+export const resolveNotificationContext = (type, referenceId) =>
+  axiosClient.get('/api/v1/notifications/resolve-context', {
+    params: { type, referenceId },
+  })

@@ -46,17 +46,17 @@ export default function PasswordStrength({ password, lang = 'en' }) {
         {[1, 2, 3].map((level) => (
           <div
             key={level}
-            className={`h-1 flex-1 rounded-full transition-all duration-300 ${
-              strength >= level ? COLORS[strength] : 'bg-slate-700'
+            className={`h-1.5 flex-1 rounded-full transition-all duration-300 ${
+              strength >= level ? COLORS[strength] : 'bg-gray-200'
             }`}
           />
         ))}
       </div>
       {/* Label */}
-      <p className={`mt-1 text-xs ${
-        strength === 1 ? 'text-red-400' :
-        strength === 2 ? 'text-amber-400' :
-        'text-emerald-400'
+      <p className={`mt-1.5 text-xs font-medium ${
+        strength === 1 ? 'text-red-500' :
+        strength === 2 ? 'text-amber-600' :
+        'text-emerald-600'
       }`}>
         {labels[strength]}
       </p>

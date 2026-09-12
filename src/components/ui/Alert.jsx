@@ -3,19 +3,19 @@ import { CheckCircle, InfoCircle, XCircle } from './icons/Globe'
 
 const VARIANTS = {
   error: {
-    container: 'bg-red-950/60 border border-red-800/60 text-red-300',
+    container: 'bg-red-50 border border-red-200 text-red-700',
     icon: XCircle,
-    iconClass: 'text-red-400',
+    iconClass: 'text-red-500',
   },
   success: {
-    container: 'bg-emerald-950/60 border border-emerald-800/60 text-emerald-300',
+    container: 'bg-emerald-50 border border-emerald-200 text-emerald-800',
     icon: CheckCircle,
-    iconClass: 'text-emerald-400',
+    iconClass: 'text-emerald-600',
   },
   info: {
-    container: 'bg-brand-950/60 border border-brand-800/60 text-brand-300',
+    container: 'bg-light-blue/30 border border-[#B0CEE2] text-gray-800',
     icon: InfoCircle,
-    iconClass: 'text-brand-400',
+    iconClass: 'text-warm-brown',
   },
 }
 

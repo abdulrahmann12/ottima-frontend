@@ -95,24 +95,24 @@ export default function AdminSidebar({
   }
 
   const navLinkClass = ({ isActive }) =>
-    `group flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium
-     transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-brand-500/40
+    `group flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold
+     transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-warm-brown/30
      ${isActive
-       ? 'bg-brand-600/20 border border-brand-500/30 text-brand-300'
-       : 'text-slate-400 hover:bg-slate-800/60 hover:text-slate-200 border border-transparent'
+       ? 'bg-warm-brown text-white shadow-sm'
+       : 'text-gray-800 hover:bg-light-blue hover:text-black border border-transparent'
      }`
 
   /* ── Shared sidebar content ──────────────────────────────── */
   const SidebarContent = () => (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full bg-beige">
       {/* Logo area */}
-      <div className={`flex items-center gap-3 px-4 py-5 border-b border-surface-border flex-shrink-0
+      <div className={`flex items-center gap-3 px-4 py-5 border-b border-warm-brown/20 flex-shrink-0
         ${sidebarCollapsed ? 'justify-center' : ''}`}>
         <OttimaLogoMark />
         {!sidebarCollapsed && (
           <div className="min-w-0">
-            <p className="text-white font-bold text-base tracking-tight truncate">OTTIMA</p>
-            <p className="text-slate-600 text-[10px] truncate">{panelSubtitle}</p>
+            <p className="text-black font-extrabold text-base tracking-tight truncate">OTTIMA</p>
+            <p className="text-gray-700 text-[11px] font-medium truncate">{panelSubtitle}</p>
           </div>
         )}
       </div>
@@ -136,15 +136,15 @@ export default function AdminSidebar({
       </nav>
 
       {/* Bottom: logout */}
-      <div className="px-3 py-4 border-t border-surface-border flex-shrink-0">
+      <div className="px-3 py-4 border-t border-warm-brown/20 flex-shrink-0">
         <button
           type="button"
           onClick={handleLogout}
           disabled={loggingOut}
           className={`w-full group flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium
-            text-slate-500 hover:text-red-400 hover:bg-red-900/20
-            border border-transparent hover:border-red-800/30
-            transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-red-500/30
+            text-gray-500 hover:text-red-600 hover:bg-red-50
+            border border-transparent hover:border-red-200
+            transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-red-400/30
             disabled:opacity-60 disabled:cursor-not-allowed
             ${sidebarCollapsed ? 'justify-center' : ''}`}
           title={sidebarCollapsed ? t('nav.logout') : undefined}
@@ -174,7 +174,7 @@ export default function AdminSidebar({
       {/* ── Mobile drawer ───────────────────────────────── */}
       <aside
         className={`fixed inset-y-0 start-0 z-40 w-64
-          bg-surface-card border-e border-surface-border
+          bg-beige border-e border-beige
           transition-transform duration-300 ease-in-out
           lg:hidden
           ${mobileOpen ? 'translate-x-0' : '-translate-x-full rtl:translate-x-full'}`}
@@ -186,7 +186,7 @@ export default function AdminSidebar({
           onClick={onClose}
           aria-label="Close sidebar"
           className="absolute top-4 end-3 w-8 h-8 flex items-center justify-center
-            text-slate-500 hover:text-slate-200 rounded-lg hover:bg-slate-700/60
+            text-gray-500 hover:text-gray-900 rounded-lg hover:bg-warm-brown/10
             transition-colors focus:outline-none"
         >
           <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
@@ -198,8 +198,8 @@ export default function AdminSidebar({
 
       {/* ── Desktop persistent sidebar ──────────────────── */}
       <aside
-        className={`hidden lg:flex flex-col flex-shrink-0
-          bg-surface-card border-e border-surface-border
+        className={`relative hidden lg:flex flex-col flex-shrink-0 z-30
+          bg-beige border-e border-warm-brown/20
           transition-all duration-300 ease-in-out
           ${sidebarCollapsed ? 'w-[68px]' : 'w-60'}`}
         aria-label="Sidebar navigation"
@@ -209,12 +209,12 @@ export default function AdminSidebar({
           type="button"
           onClick={toggleSidebar}
           aria-label={sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-          className="absolute top-4 -end-3.5 z-10 w-7 h-7
-            bg-surface-card border border-surface-border rounded-full
+          className="absolute top-5 -end-3.5 z-40 w-7 h-7
+            bg-white border border-warm-brown/30 rounded-full
             flex items-center justify-center
-            text-slate-500 hover:text-slate-200
-            shadow-card transition-colors duration-150
-            focus:outline-none focus:ring-2 focus:ring-brand-500/40"
+            text-gray-700 hover:text-black hover:bg-warm-brown/10
+            shadow-sm transition-all duration-200
+            focus:outline-none focus:ring-2 focus:ring-warm-brown/40 cursor-pointer"
         >
           <svg
             className={`w-3.5 h-3.5 transition-transform duration-300
@@ -235,8 +235,8 @@ export default function AdminSidebar({
 
 function OttimaLogoMark() {
   return (
-    <div className="w-8 h-8 rounded-lg bg-brand-900/80 border border-brand-700/50 flex items-center justify-center flex-shrink-0">
-      <svg className="w-4 h-4 text-brand-400" fill="none" viewBox="0 0 40 40">
+    <div className="w-8 h-8 rounded-lg bg-warm-brown border border-warm-brown/80 flex items-center justify-center flex-shrink-0">
+      <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 40 40">
         <path d="M8 32 L20 8 L32 32" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
         <path d="M13 24 L27 24" stroke="currentColor" strokeWidth="3" strokeLinecap="round"/>
       </svg>

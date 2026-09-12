@@ -55,12 +55,12 @@ export default function Modal({ isOpen, onClose, title, size = 'md', children })
       aria-labelledby="modal-title"
     >
       <div
-        className={`relative w-full ${sizeClass} glass-card border border-surface-border
+        className={`relative w-full ${sizeClass} glass-card border border-gray-200
           animate-slide-up max-h-[90dvh] flex flex-col`}
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-surface-border flex-shrink-0">
-          <h2 id="modal-title" className="text-white font-semibold text-base">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 flex-shrink-0">
+          <h2 id="modal-title" className="text-gray-900 font-semibold text-base">
             {title}
           </h2>
           <button
@@ -68,8 +68,8 @@ export default function Modal({ isOpen, onClose, title, size = 'md', children })
             onClick={onClose}
             aria-label={t('common.close')}
             className="w-8 h-8 rounded-lg flex items-center justify-center
-              text-slate-500 hover:text-slate-200 hover:bg-slate-700/60
-              transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-brand-500/40"
+              text-gray-400 hover:text-gray-700 hover:bg-gray-100
+              transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-warm-brown/30"
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />

@@ -1,11 +1,12 @@
 import { useTranslation } from 'react-i18next'
 
 // ─── Formatters ───────────────────────────────────────────────
-function formatMoney(value) {
+function formatMoney(value, language = 'en') {
   if (value == null) return '—'
-  return new Intl.NumberFormat('en-US', {
+  const locale = language === 'ar' ? 'ar-EG' : 'en-EG'
+  return new Intl.NumberFormat(locale, {
     style: 'currency',
-    currency: 'USD',
+    currency: 'EGP',
     minimumFractionDigits: 2,
   }).format(value)
 }
@@ -72,7 +73,7 @@ export default function FinancialSummaryCards({
   showTitle = true,
   className = '',
 }) {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
 
   const displayTitle = title ?? t('projects.financial_summary', { defaultValue: 'Financial Summary' })
 
@@ -82,8 +83,8 @@ export default function FinancialSummaryCards({
       label: t('finance.total_paid', { defaultValue: 'TOTAL PAID' }),
       amount: summary?.totalPaidAmount ?? 0,
       count: summary?.totalPaidCount,
-      textColor: 'text-emerald-400',
-      badgeBg: 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400',
+      textColor: 'text-emerald-600',
+      badgeBg: 'bg-emerald-50 border-emerald-200 text-emerald-600',
       icon: <ArrowDownIcon className="w-5 h-5" />,
     },
     {
@@ -91,8 +92,8 @@ export default function FinancialSummaryCards({
       label: t('finance.total_spent', { defaultValue: 'TOTAL SPENT' }),
       amount: summary?.totalSpentAmount ?? 0,
       count: summary?.totalSpentCount,
-      textColor: 'text-rose-400',
-      badgeBg: 'bg-rose-500/10 border-rose-500/20 text-rose-400',
+      textColor: 'text-rose-600',
+      badgeBg: 'bg-rose-50 border-rose-200 text-rose-600',
       icon: <ArrowUpIcon className="w-5 h-5" />,
     },
     {
@@ -100,8 +101,8 @@ export default function FinancialSummaryCards({
       label: t('finance.balance', { defaultValue: 'BALANCE' }),
       amount: summary?.remainingBalance ?? 0,
       count: null,
-      textColor: 'text-blue-400',
-      badgeBg: 'bg-blue-500/10 border-blue-500/20 text-blue-400',
+      textColor: 'text-blue-600',
+      badgeBg: 'bg-blue-50 border-blue-200 text-blue-600',
       icon: <ScaleIcon className="w-5 h-5" />,
     },
   ]
@@ -109,8 +110,8 @@ export default function FinancialSummaryCards({
   return (
     <div className={`space-y-3 ${className}`}>
       {showTitle && (
-        <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-slate-400">
-          <CoinIcon className="w-4 h-4 text-brand-400" />
+        <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-gray-500">
+          <CoinIcon className="w-4 h-4 text-warm-brown" />
           <span>{displayTitle}</span>
         </div>
       )}
@@ -120,7 +121,7 @@ export default function FinancialSummaryCards({
           {[0, 1, 2].map((i) => (
             <div
               key={i}
-              className="h-28 animate-pulse rounded-3xl border border-surface-border bg-slate-800/40"
+              className="h-28 animate-pulse rounded-2xl border border-gray-200 bg-gray-100"
             />
           ))}
         </div>
@@ -129,21 +130,21 @@ export default function FinancialSummaryCards({
           {cards.map((card) => (
             <div
               key={card.key}
-              className="relative overflow-hidden rounded-3xl border border-surface-border bg-slate-900/60 p-5 shadow-xl transition-all hover:border-slate-700/60"
+              className="relative overflow-hidden rounded-2xl border border-gray-200 bg-gray-50 p-5 shadow-sm transition-all hover:shadow-md hover:border-gray-300"
             >
               <div
                 className={`absolute right-4 top-4 flex h-9 w-9 items-center justify-center rounded-xl border ${card.badgeBg}`}
               >
                 {card.icon}
               </div>
-              <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-slate-400">
+              <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-gray-500">
                 {card.label}
               </p>
               <p className={`mt-2 text-2xl font-bold tracking-tight ${card.textColor}`}>
-                {formatMoney(card.amount)}
+                {formatMoney(card.amount, i18n.language)}
               </p>
               {card.count != null && (
-                <p className="mt-1 text-xs text-slate-500">
+                <p className="mt-1 text-xs text-gray-400">
                   {card.count} {t('finance.transactions', { defaultValue: 'transaction(s)' })}
                 </p>
               )}

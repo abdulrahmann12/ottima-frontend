@@ -1,12 +1,15 @@
 import {
     deleteProject,
     getAdminProjects,
+    restoreProject,
 } from '@/api/projectsApi'
 import { getAllClients, getAllEngineers } from '@/api/usersApi'
+import ConfirmDialog from '@/components/admin/ConfirmDialog'
 import SearchBar from '@/components/admin/SearchBar'
 import ProjectTable from '@/components/projects/ProjectTable'
 import ProjectWizard from '@/components/projects/ProjectWizard'
 import Alert from '@/components/ui/Alert'
+import SearchableSelect from '@/components/ui/SearchableSelect'
 import useProjectsStore from '@/store/projectsStore'
 import { useCallback, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -49,6 +52,8 @@ export default function ProjectsPage() {
 
   const [deleteTarget, setDeleteTarget] = useState(null)
   const [deleting, setDeleting] = useState(false)
+  const [restoring, setRestoring] = useState(false)
+  const [restoreTarget, setRestoreTarget] = useState(null)
 
   // ── Fetch project list ──────────────────────────────────
   const fetchProjects = useCallback(async () => {
@@ -97,7 +102,6 @@ export default function ProjectsPage() {
   }, [fetchFilterOptions])
 
   const handleRowClick = (project) => {
-    if (project.deletedAt) return
     navigate(`/admin/projects/${project.projectId}`)
   }
 
@@ -132,78 +136,94 @@ export default function ProjectsPage() {
     }
   }
 
+  // ── Restore project ─────────────────────────────────────
+  const handleRestore = async (project) => {
+    setRestoreTarget(project)
+    setRestoring(true)
+    try {
+      await restoreProject(project.projectId)
+      setSuccess(t('projects.restore_success', { defaultValue: 'Project restored successfully.' }))
+      fetchProjects()
+    } catch (err) {
+      setError(err?.response?.data?.message ?? t('errors.generic'))
+    } finally {
+      setRestoring(false)
+      setRestoreTarget(null)
+    }
+  }
+
   return (
     <div className="space-y-5">
       {/* ── Page header ─────────────────────────────────── */}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-white">{t('projects.title')}</h1>
-          <p className="mt-1 text-sm text-slate-500">{t('projects.admin_subtitle')}</p>
+          <h1 className="text-xl font-bold text-gray-900">{t('projects.title')}</h1>
+          <p className="mt-0.5 text-sm text-gray-500">{t('projects.admin_subtitle')}</p>
         </div>
-        {/* The wizard renders its own open button and the modal */}
-        <ProjectWizard
-          onSuccess={() => {
-            setSuccess(t('projects.create_success'))
-            fetchProjects()
-          }}
-        />
+        {/* Only show create wizard when NOT in deleted view */}
+        {!filters.isDeleted && (
+          <ProjectWizard
+            onSuccess={() => {
+              setSuccess(t('projects.create_success'))
+              fetchProjects()
+            }}
+          />
+        )}
       </div>
 
       <Alert message={error} variant="error" onClose={() => setError(null)} />
       <Alert message={success} variant="success" onClose={() => setSuccess(null)} />
 
-      <div className="rounded-2xl border border-surface-border bg-surface-card p-4 shadow-xl">
-        <div className="grid grid-cols-1 gap-3 xl:grid-cols-[minmax(0,1.8fr)_minmax(0,1fr)_minmax(0,1fr)_auto]">
-          <SearchBar
-            value={filters.search}
-            onChange={handleSearchChange}
-            placeholder={t('projects.search_placeholder')}
-            className="w-full"
-          />
+      <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-[minmax(0,1.8fr)_minmax(0,1fr)_minmax(0,1fr)_auto] items-end">
+          <div className="w-full">
+            <SearchBar
+              value={filters.search}
+              onChange={handleSearchChange}
+              placeholder={t('projects.search_placeholder')}
+              className="w-full"
+            />
+          </div>
 
-          <label className="form-label text-xs text-slate-500">
-            {t('projects.client_filter')}
-            <select
+          <div>
+            <SearchableSelect
               id="projects-filter-client"
-              className="input-base mt-1.5 text-sm"
+              label={t('projects.client_filter')}
               value={filters.clientId}
               onChange={handleClientChange}
               disabled={loadingFilters}
-            >
-              <option value="">{t('projects.all_clients')}</option>
-              {clients.map((client) => (
-                <option key={client.userId} value={client.userId}>
-                  {formatUserLabel(client)}
-                </option>
-              ))}
-            </select>
-          </label>
+              loading={loadingFilters}
+              placeholder={t('projects.all_clients')}
+              options={clients.map((client) => ({
+                value: client.userId,
+                label: formatUserLabel(client),
+              }))}
+            />
+          </div>
 
-          <label className="form-label text-xs text-slate-500">
-            {t('projects.engineer_filter')}
-            <select
+          <div>
+            <SearchableSelect
               id="projects-filter-engineer"
-              className="input-base mt-1.5 text-sm"
+              label={t('projects.engineer_filter')}
               value={filters.engineerId}
               onChange={handleEngineerChange}
               disabled={loadingFilters}
-            >
-              <option value="">{t('projects.all_engineers')}</option>
-              {engineers.map((engineer) => (
-                <option key={engineer.userId} value={engineer.userId}>
-                  {formatUserLabel(engineer)}
-                </option>
-              ))}
-            </select>
-          </label>
+              loading={loadingFilters}
+              placeholder={t('projects.all_engineers')}
+              options={engineers.map((engineer) => ({
+                value: engineer.userId,
+                label: formatUserLabel(engineer),
+              }))}
+            />
+          </div>
 
-          <label className="flex min-h-11 items-center gap-3 rounded-xl border border-surface-border bg-slate-900/30 px-4 py-2 text-sm text-slate-300">
+          <label className="flex h-[42px] items-center gap-2.5 rounded-xl border border-gray-200 bg-gray-50 px-3.5 py-2 text-xs font-medium text-gray-700 cursor-pointer hover:bg-gray-100 transition-colors self-end">
             <input
               id="projects-filter-deleted"
               type="checkbox"
               checked={filters.isDeleted}
               onChange={handleDeletedToggle}
-              className="h-4 w-4 rounded border-surface-border bg-slate-950 text-brand-500 focus:ring-brand-500/40"
+              className="h-4 w-4 rounded border-gray-300 text-warm-brown focus:ring-warm-brown/40"
             />
             <span>{t('projects.show_deleted')}</span>
           </label>
@@ -211,13 +231,13 @@ export default function ProjectsPage() {
       </div>
 
       {/* ── Projects card ──────────────────────────────── */}
-      <div className="overflow-hidden rounded-2xl border border-surface-border bg-surface-card shadow-xl">
+      <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
         {/* Card header */}
-        <div className="flex items-center justify-between border-b border-surface-border px-5 py-4">
+        <div className="flex items-center justify-between border-b border-gray-200 px-5 py-4">
           <div>
-            <p className="text-sm font-semibold text-white">{t('projects.title')}</p>
+            <p className="text-sm font-semibold text-gray-900">{t('projects.title')}</p>
             {totalElements > 0 && (
-              <p className="mt-0.5 text-xs text-slate-500">{totalElements} {t('projects.total', { defaultValue: 'projects' })}</p>
+              <p className="mt-0.5 text-xs text-gray-500">{totalElements} {t('projects.total', { defaultValue: 'total' })}</p>
             )}
           </div>
         </div>
@@ -231,47 +251,27 @@ export default function ProjectsPage() {
           currentPage={adminPage}
           onPageChange={setAdminPage}
           onRowClick={handleRowClick}
-          onDelete={(project) => setDeleteTarget(project)}
+          onDelete={!filters.isDeleted ? (project) => setDeleteTarget(project) : undefined}
+          onRestore={filters.isDeleted ? handleRestore : undefined}
           deletingProjectId={deleting ? deleteTarget?.projectId : null}
+          restoringProjectId={restoring ? restoreTarget?.projectId : null}
           role="ADMIN"
         />
       </div>
 
       {/* ── Delete confirmation dialog ───────────────── */}
-      {deleteTarget && (
-        <div className="fixed inset-0 z-50 flex items-end justify-center sm:items-center">
-          <div className="absolute inset-0 bg-black/60" onClick={() => !deleting && setDeleteTarget(null)} />
-          <div className="relative w-full max-w-sm rounded-2xl border border-surface-border bg-surface p-6 shadow-2xl sm:w-auto">
-            <h3 className="text-base font-semibold text-white">
-              {t('projects.delete_project', { defaultValue: 'Delete Project' })}
-            </h3>
-            <p className="mt-2 text-sm text-slate-400">
-              {t('projects.delete_confirm', {
-                name: deleteTarget.nameEn,
-                defaultValue: `Are you sure you want to delete "${deleteTarget.nameEn}"? This action cannot be undone.`,
-              })}
-            </p>
-            <div className="mt-5 flex justify-end gap-3">
-              <button
-                type="button"
-                disabled={deleting}
-                onClick={() => setDeleteTarget(null)}
-                className="rounded-lg border border-surface-border px-4 py-2 text-sm font-medium text-slate-400 hover:text-white disabled:opacity-40"
-              >
-                {t('common.cancel')}
-              </button>
-              <button
-                type="button"
-                disabled={deleting}
-                onClick={handleDelete}
-                className="rounded-lg bg-red-600/90 px-4 py-2 text-sm font-semibold text-white hover:bg-red-500 disabled:opacity-40"
-              >
-                {deleting ? t('common.loading') : t('projects.delete_project', { defaultValue: 'Delete' })}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <ConfirmDialog
+        isOpen={!!deleteTarget}
+        onClose={() => setDeleteTarget(null)}
+        onConfirm={handleDelete}
+        loading={deleting}
+        title={t('projects.delete_project', { defaultValue: 'Delete Project' })}
+        message={t('projects.delete_confirm', {
+          name: i18n.language === 'ar' ? (deleteTarget?.nameAr || deleteTarget?.nameEn) : (deleteTarget?.nameEn || deleteTarget?.nameAr),
+          defaultValue: `Are you sure you want to delete "${deleteTarget?.nameEn}"? This action cannot be undone.`,
+        })}
+        confirmLabel={deleting ? t('common.loading') : t('projects.delete_project', { defaultValue: 'Delete' })}
+      />
     </div>
   )
 }

@@ -1,3 +1,4 @@
+import SearchableSelect from '@/components/ui/SearchableSelect'
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
@@ -62,25 +63,22 @@ export default function ProjectItemAssignmentFields({
   return (
     <div className="space-y-4">
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-        <label className="form-label sm:col-span-2">
-          {t('projects.catalog_item')}
-          <select
+        <div className="sm:col-span-2">
+          <SearchableSelect
             id={ids.catalogItem ?? 'project-item-catalog'}
-            className="input-base mt-1.5 text-sm"
+            label={t('projects.catalog_item')}
             value={itemForm.standardItemId}
             onChange={field('standardItemId')}
             disabled={disabled}
-          >
-            <option value="">{t('projects.select_item')}</option>
-            {availableCatalogItems.map((item) => (
-              <option key={item.itemId} value={item.itemId}>
-                {item.nameEn} / {item.nameAr}
-              </option>
-            ))}
-          </select>
-        </label>
+            placeholder={t('projects.select_item')}
+            options={availableCatalogItems.map((item) => ({
+              value: item.itemId,
+              label: `${item.nameEn} / ${item.nameAr}`,
+            }))}
+          />
+        </div>
 
-        <label className="text-xs text-slate-500">
+        <label className="text-xs text-gray-600">
           {t('projects.item_budget')} *
           <input
             id={ids.budget ?? 'project-item-budget'}
@@ -93,7 +91,7 @@ export default function ProjectItemAssignmentFields({
             disabled={disabled}
           />
         </label>
-        <label className="text-xs text-slate-500">
+        <label className="text-xs text-gray-600">
           {t('projects.weight')} % *
           <input
             id={ids.weight ?? 'project-item-weight'}
@@ -107,7 +105,7 @@ export default function ProjectItemAssignmentFields({
             disabled={disabled}
           />
         </label>
-        <label className="text-xs text-slate-500">
+        <label className="text-xs text-gray-600">
           {t('projects.sequence')}
           <input
             id={ids.sequence ?? 'project-item-sequence'}
@@ -119,20 +117,21 @@ export default function ProjectItemAssignmentFields({
             disabled={disabled}
           />
         </label>
-        <label className="text-xs text-slate-500">
+        <label className="text-xs text-gray-600">
           {t('projects.notes')}
           <input
             id={ids.notes ?? 'project-item-notes'}
             className="input-base mt-1 block w-full text-sm"
             value={itemForm.generalNotes}
             onChange={field('generalNotes')}
+            placeholder={t('projects.notes_placeholder', 'Instructions or notes for the site engineer...')}
             disabled={disabled}
           />
         </label>
       </div>
 
       {catalogItems.length > 0 && availableCatalogItems.length === 0 && (
-        <p className="rounded-xl border border-amber-700/30 bg-amber-900/20 px-4 py-3 text-sm text-amber-300">
+        <p className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-700">
           {t('projects.no_available_items')}
         </p>
       )}
@@ -148,34 +147,34 @@ export default function ProjectItemAssignmentFields({
           !itemForm.weightPercentage ||
           availableCatalogItems.length === 0
         }
-        className="rounded-lg border border-brand-500/40 px-4 py-2 text-sm font-medium text-brand-300 transition-colors hover:bg-brand-900/30 disabled:pointer-events-none disabled:opacity-40"
+        className="rounded-lg border border-warm-brown/40 px-4 py-2 text-sm font-medium text-warm-brown transition-colors hover:bg-warm-brown/10 disabled:pointer-events-none disabled:opacity-40"
       >
         + {t('projects.add_item')}
       </button>
 
       {selectedItems.length > 0 && (
-        <div className="space-y-2 rounded-xl border border-surface-border bg-slate-800/20 p-3">
-          <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">
+        <div className="space-y-2 rounded-xl border border-gray-200 bg-gray-50 p-3">
+          <p className="text-[11px] font-semibold uppercase tracking-wider text-gray-500">
             {t('projects.selected_items')} ({selectedItems.length})
           </p>
           {selectedItems.map((item, idx) => (
             <div
               key={item.standardItemId}
-              className="flex items-center justify-between gap-3 rounded-lg bg-slate-800/40 px-3 py-2 text-sm"
+              className="flex items-center justify-between gap-3 rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm shadow-sm"
             >
               <div className="flex min-w-0 items-center gap-2">
-                <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-brand-600/40 text-[10px] font-bold text-brand-300">
+                <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-warm-brown text-[10px] font-bold text-white">
                   {idx + 1}
                 </span>
-                <span className="truncate text-slate-200">{catalogName(item.standardItemId)}</span>
+                <span className="truncate text-gray-800">{catalogName(item.standardItemId)}</span>
               </div>
               <div className="flex shrink-0 items-center gap-3">
-                <span className="text-xs text-slate-500">{item.weightPercentage}%</span>
+                <span className="text-xs text-gray-500">{item.weightPercentage}%</span>
                 <button
                   type="button"
                   onClick={() => onRemoveItem?.(item.standardItemId)}
                   disabled={disabled}
-                  className="text-xs text-red-400 transition-colors hover:text-red-300 disabled:pointer-events-none disabled:opacity-30"
+                  className="text-xs font-medium text-red-500 transition-colors hover:text-red-600 disabled:pointer-events-none disabled:opacity-30"
                 >
                   {t('projects.remove')}
                 </button>

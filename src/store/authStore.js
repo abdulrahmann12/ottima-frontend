@@ -24,6 +24,7 @@ const useAuthStore = create(
       accessToken: null,
       refreshToken: null,
       role: null,
+      user: null,
       isAuthenticated: false,
 
       setTokens: (accessToken, refreshToken) =>
@@ -31,22 +32,26 @@ const useAuthStore = create(
 
       setRole: (role) => set({ role }),
 
+      setUser: (user) => set({ user }),
+
       clearAuth: () =>
         set({
           accessToken: null,
           refreshToken: null,
           role: null,
+          user: null,
           isAuthenticated: false,
         }),
     }),
     {
       name: 'ottima-auth',
       storage: createJSONStorage(() => localStorage),
-      // Only persist the token fields — not ephemeral UI state
+      // Persist auth tokens, role, and user profile
       partialize: (state) => ({
         accessToken:     state.accessToken,
         refreshToken:    state.refreshToken,
         role:            state.role,
+        user:            state.user,
         isAuthenticated: state.isAuthenticated,
       }),
     }

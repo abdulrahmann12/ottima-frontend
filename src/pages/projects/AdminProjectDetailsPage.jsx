@@ -1,4 +1,4 @@
-import { assignProjectItems, getAdminProject } from '@/api/projectsApi'
+import { assignProjectItems, getAdminProject, restoreProject } from '@/api/projectsApi'
 import { getAllStandardItems } from '@/api/standardItemsApi'
 import Modal from '@/components/admin/Modal'
 import ProjectDetailContent from '@/components/projects/ProjectDetailContent'
@@ -28,6 +28,7 @@ export default function AdminProjectDetailsPage() {
   const [assignError, setAssignError] = useState(null)
   const [catalogItems, setCatalogItems] = useState([])
   const [newItems, setNewItems] = useState([])
+  const [restoring, setRestoring] = useState(false)
 
   const fetchProject = useCallback(async () => {
     if (!projectId) return
@@ -103,10 +104,25 @@ export default function AdminProjectDetailsPage() {
     }
   }
 
+  const handleRestore = async () => {
+    setRestoring(true)
+    setError(null)
+    try {
+      await restoreProject(projectId)
+      setSuccess(t('projects.restore_success', { defaultValue: 'Project restored successfully.' }))
+      await fetchProject()
+    } catch (err) {
+      setError(responseError(err, t('errors.generic')))
+    } finally {
+      setRestoring(false)
+    }
+  }
+
   const projectName = i18n.language === 'ar' ? project?.nameAr : project?.nameEn
   const projectAddress = i18n.language === 'ar' ? project?.addressAr : project?.addressEn
   const assignedStandardItemIds = project?.items?.map((item) => item.standardItemId).filter(Boolean) ?? []
   const projectMeta = project ? `${project.clientName} · ${project.engineerName}` : null
+  const isProjectDeleted = Boolean(project?.deletedAt || project?.deletesAt)
 
   return (
     <>
@@ -125,6 +141,24 @@ export default function AdminProjectDetailsPage() {
         emptyMessage={t('projects.not_found')}
       >
         <div className="space-y-5">
+          {/* Deleted project banner + restore */}
+          {isProjectDeleted && (
+            <div className="flex items-center justify-between rounded-xl border border-red-200 bg-red-50 px-4 py-3">
+              <div className="flex items-center gap-2 text-sm font-medium text-red-700">
+                <svg className="h-4 w-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" /></svg>
+                {t('projects.deleted_banner', { defaultValue: 'This project has been deleted.' })}
+              </div>
+              <Button
+                type="button"
+                className="w-auto"
+                loading={restoring}
+                onClick={handleRestore}
+              >
+                {t('projects.restore_action', { defaultValue: 'Restore' })}
+              </Button>
+            </div>
+          )}
+
           <div className="flex justify-end">
             <Button
               type="button"
@@ -142,9 +176,11 @@ export default function AdminProjectDetailsPage() {
             role="ADMIN"
             onRefresh={fetchProject}
             itemHeaderAction={
-              <Button type="button" onClick={openAssignModal}>
-                + {t('projects.assign_new_item')}
-              </Button>
+              !isProjectDeleted && (
+                <Button type="button" onClick={openAssignModal}>
+                  + {t('projects.assign_new_item')}
+                </Button>
+              )
             }
           />
         </div>

@@ -26,7 +26,7 @@ export default function RolePortalLayout({
   const pageTitle = t(titleKey)
 
   return (
-    <div className="flex h-dvh overflow-hidden bg-auth-pattern">
+    <div className="flex h-dvh overflow-hidden bg-cream">
       <AdminSidebar
         mobileOpen={mobileOpen}
         onClose={() => setMobileOpen(false)}

@@ -73,21 +73,21 @@ export default function ResetPassword() {
       {/* Back */}
       <Link
         to="/forgot-password"
-        className="inline-flex items-center gap-1.5 text-xs text-slate-500
-          hover:text-slate-300 transition-colors duration-200 mb-6 group"
+        className="inline-flex items-center gap-1.5 text-xs text-gray-500
+          hover:text-warm-brown transition-colors duration-200 mb-5 group font-medium"
       >
         <span className="group-hover:-translate-x-0.5 rtl:group-hover:translate-x-0.5 transition-transform duration-200">←</span>
         {t('common.back')}
       </Link>
 
       {/* Header */}
-      <div className="mb-8">
-        <div className="w-12 h-12 rounded-xl bg-brand-900/60 border border-brand-700/40
-          flex items-center justify-center mb-4">
-          <KeyIcon className="w-6 h-6 text-brand-400" />
+      <div className="mb-7">
+        <div className="w-11 h-11 rounded-xl bg-warm-brown/10 border border-warm-brown/25
+          flex items-center justify-center mb-3 shadow-sm text-warm-brown">
+          <KeyIcon className="w-5 h-5" />
         </div>
-        <h2 className="text-2xl font-bold text-white">{t('reset_password.title')}</h2>
-        <p className="mt-1 text-slate-400 text-sm">{t('reset_password.subtitle')}</p>
+        <h2 className="text-2xl font-extrabold text-gray-900 tracking-tight">{t('reset_password.title')}</h2>
+        <p className="mt-1 text-gray-600 text-sm">{t('reset_password.subtitle')}</p>
       </div>
 
       {/* Errors */}
@@ -95,27 +95,28 @@ export default function ResetPassword() {
 
       {/* ── Success State ─────────────────────────────── */}
       {success ? (
-        <div className="glass-card p-6 text-center animate-slide-up">
-          <div className="w-14 h-14 rounded-full bg-emerald-900/60 border border-emerald-700/50
-            flex items-center justify-center mx-auto mb-4">
-            <CheckIcon className="w-7 h-7 text-emerald-400" />
+        <div className="bg-[#FAF6F2] border border-warm-brown/20 rounded-2xl p-6 text-center shadow-sm animate-slide-up">
+          <div className="w-12 h-12 rounded-full bg-emerald-100 border border-emerald-300
+            flex items-center justify-center mx-auto mb-3 text-emerald-600">
+            <CheckIcon className="w-6 h-6" />
           </div>
-          <h3 className="text-white font-semibold text-lg mb-2">
+          <h3 className="text-gray-900 font-bold text-lg mb-1.5">
             {t('reset_password.success_title')}
           </h3>
-          <p className="text-slate-400 text-sm mb-6">
+          <p className="text-gray-600 text-sm mb-6 leading-relaxed">
             {t('reset_password.success_message')}
           </p>
           <Button
             id="goto-login-btn"
             onClick={() => navigate('/', { replace: true })}
+            className="w-full shadow-sm"
           >
             {t('reset_password.back_to_login')}
           </Button>
         </div>
       ) : (
         /* ── Form ──────────────────────────────────────── */
-        <form id="reset-password-form" onSubmit={handleSubmit} noValidate className="space-y-5">
+        <form id="reset-password-form" onSubmit={handleSubmit} noValidate className="space-y-4 sm:space-y-5">
           <Input
             id="reset-identifier"
             label={t('reset_password.identifier')}
@@ -164,7 +165,7 @@ export default function ResetPassword() {
             autoComplete="new-password"
           />
 
-          <Button id="reset-password-btn" type="submit" loading={loading}>
+          <Button id="reset-password-btn" type="submit" loading={loading} className="w-full shadow-sm">
             {loading ? t('reset_password.resetting') : t('reset_password.reset')}
           </Button>
         </form>
@@ -189,3 +190,4 @@ function CheckIcon({ className }) {
     </svg>
   )
 }
+

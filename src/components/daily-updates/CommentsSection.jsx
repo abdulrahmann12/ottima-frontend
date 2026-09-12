@@ -113,7 +113,7 @@ function CommentTextarea({ initial = '', placeholder, onConfirm, onCancel, loadi
           type="button"
           onClick={() => onConfirm(text.trim())}
           disabled={loading || !text.trim()}
-          className="flex items-center gap-1.5 rounded-lg bg-brand-600 px-3 py-1.5 text-xs font-semibold text-white transition-all hover:bg-brand-500 disabled:cursor-not-allowed disabled:opacity-50"
+          className="flex items-center gap-1.5 rounded-lg bg-warm-brown px-3 py-1.5 text-xs font-semibold text-white transition-all hover:bg-[#6B4A33] disabled:cursor-not-allowed disabled:opacity-50"
         >
           {loading && <Spinner className="w-3 h-3" />}
           <CheckCircle className="w-3.5 h-3.5" />
@@ -145,20 +145,20 @@ function CommentMenu({ canEdit, onEdit, onDelete, deleting }) {
         type="button"
         id="comment-menu-trigger"
         onClick={() => setOpen((o) => !o)}
-        className="flex h-7 w-7 items-center justify-center rounded-lg text-slate-500 transition-colors hover:bg-slate-700/60 hover:text-slate-200"
+        className="flex h-7 w-7 items-center justify-center rounded-lg text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600"
         aria-label="Comment options"
       >
         <DotsVerticalIcon />
       </button>
 
       {open && (
-        <div className="absolute right-0 top-8 z-20 min-w-[140px] overflow-hidden rounded-xl border border-surface-border bg-slate-900 shadow-xl animate-fade-in">
+        <div className="absolute right-0 top-8 z-20 min-w-[140px] overflow-hidden rounded-xl border border-gray-200 bg-white shadow-lg animate-fade-in">
           {canEdit && (
             <button
               type="button"
               id="comment-edit-btn"
               onClick={() => { setOpen(false); onEdit() }}
-              className="flex w-full items-center gap-2 px-4 py-2.5 text-left text-sm text-slate-300 transition-colors hover:bg-slate-800 hover:text-white"
+              className="flex w-full items-center gap-2 px-4 py-2.5 text-left text-sm text-gray-600 transition-colors hover:bg-gray-50 hover:text-gray-900"
             >
               <PencilIcon />
               Edit
@@ -169,7 +169,7 @@ function CommentMenu({ canEdit, onEdit, onDelete, deleting }) {
             id="comment-delete-btn"
             onClick={() => { setOpen(false); onDelete() }}
             disabled={deleting}
-            className="flex w-full items-center gap-2 px-4 py-2.5 text-left text-sm text-red-400 transition-colors hover:bg-red-950/40 hover:text-red-300 disabled:opacity-50"
+            className="flex w-full items-center gap-2 px-4 py-2.5 text-left text-sm text-red-500 transition-colors hover:bg-red-50 hover:text-red-700 disabled:opacity-50"
           >
             {deleting ? <Spinner className="w-4 h-4" /> : <TrashIcon />}
             Delete
@@ -190,6 +190,8 @@ function CommentCard({
   dailyUpdateId,
   onCommentUpdated,
   onCommentDeleted,
+  isHighlighted,
+  cardRef,
 }) {
   const { i18n } = useTranslation()
   const [editing, setEditing]           = useState(false)
@@ -256,20 +258,32 @@ function CommentCard({
     }
   }
 
+  const clientName = (i18n.language === 'ar' ? comment.clientNameAr || comment.clientNameEn : comment.clientNameEn || comment.clientNameAr) || comment.clientFullName || comment.clientName || 'Client'
+  const adminName = (i18n.language === 'ar' ? comment.repliedByAdminNameAr || comment.repliedByAdminNameEn : comment.repliedByAdminNameEn || comment.repliedByAdminNameAr) || 'Admin'
+  const clientInitial = clientName ? clientName.charAt(0).toUpperCase() : 'C'
+  const adminInitial = adminName ? adminName.charAt(0).toUpperCase() : 'A'
+
   return (
-    <div className="animate-fade-in space-y-3">
+    <div
+      ref={cardRef}
+      className={`space-y-3 transition-all duration-300 rounded-2xl ${
+        isHighlighted
+          ? 'p-3.5 bg-warm-brown/5 ring-2 ring-warm-brown/50 shadow-md'
+          : 'animate-fade-in'
+      }`}
+    >
       {/* ── Client bubble ── */}
       <div className="flex items-start gap-3">
         {/* Avatar */}
-        <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-cyan-500/20 text-xs font-bold text-cyan-300 ring-1 ring-cyan-500/30">
-          C
+        <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-blue-100 text-xs font-bold text-blue-600 ring-1 ring-blue-200">
+          {clientInitial}
         </div>
 
         <div className="min-w-0 flex-1">
           <div className="flex items-center justify-between gap-2">
             <div className="flex items-center gap-2">
-              <span className="text-xs font-semibold text-cyan-300">Client</span>
-              <span className="text-[11px] text-slate-500">
+              <span className="text-xs font-semibold text-blue-700">{clientName}</span>
+              <span className="text-[11px] text-gray-400">
                 {formatRelativeTime(comment.createdAt, i18n.language)}
               </span>
             </div>
@@ -290,7 +304,7 @@ function CommentCard({
                   id={`comment-delete-admin-${comment.id}`}
                   onClick={handleDelete}
                   disabled={deleting}
-                  className="flex h-7 w-7 items-center justify-center rounded-lg text-slate-500 transition-colors hover:bg-red-950/40 hover:text-red-400"
+                  className="flex h-7 w-7 items-center justify-center rounded-lg text-gray-400 transition-colors hover:bg-red-50 hover:text-red-500"
                   aria-label="Delete comment"
                 >
                   {deleting ? <Spinner className="w-3.5 h-3.5" /> : <TrashIcon />}
@@ -312,7 +326,7 @@ function CommentCard({
               />
             </div>
           ) : (
-            <p className="mt-1.5 rounded-xl rounded-tl-none border border-cyan-500/20 bg-cyan-950/30 px-4 py-3 text-sm leading-6 text-slate-200">
+            <p className="mt-1.5 rounded-xl rounded-tl-none border border-blue-100 bg-blue-50 px-4 py-3 text-sm leading-6 text-gray-700">
               {comment.clientComment}
             </p>
           )}
@@ -322,17 +336,17 @@ function CommentCard({
       {/* ── Admin reply / Admin reply form ── */}
       {hasReply ? (
         <div className="ml-11 flex items-start gap-3">
-          <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-brand-500/20 text-xs font-bold text-brand-300 ring-1 ring-brand-500/30">
-            A
+          <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-amber-100 text-xs font-bold text-amber-700 ring-1 ring-amber-200">
+            {adminInitial}
           </div>
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-2">
-              <span className="text-xs font-semibold text-brand-300">Admin</span>
-              <span className="text-[10px] rounded-full bg-brand-500/10 px-2 py-0.5 text-[10px] font-medium text-brand-300 border border-brand-500/20">
+              <span className="text-xs font-semibold text-amber-700">{adminName}</span>
+              <span className="text-[10px] rounded-full bg-amber-50 px-2 py-0.5 text-[10px] font-medium text-amber-600 border border-amber-200">
                 Official Reply
               </span>
             </div>
-            <p className="mt-1.5 rounded-xl rounded-tl-none border border-brand-500/20 bg-brand-950/30 px-4 py-3 text-sm leading-6 text-slate-200">
+            <p className="mt-1.5 rounded-xl rounded-tl-none border border-amber-100 bg-amber-50 px-4 py-3 text-sm leading-6 text-gray-700">
               {comment.adminReply}
             </p>
           </div>
@@ -345,7 +359,7 @@ function CommentCard({
                 type="button"
                 id={`comment-reply-btn-${comment.id}`}
                 onClick={() => setReplying(true)}
-                className="flex items-center gap-1.5 rounded-lg border border-brand-500/30 bg-brand-500/10 px-3 py-1.5 text-xs font-medium text-brand-300 transition-all hover:border-brand-400/50 hover:bg-brand-500/20 hover:text-brand-200"
+                className="flex items-center gap-1.5 rounded-lg border border-warm-brown/30 bg-warm-brown/10 px-3 py-1.5 text-xs font-medium text-warm-brown transition-all hover:border-warm-brown/50 hover:bg-warm-brown/20 hover:text-[#6B4A33]"
               >
                 <ReplyIcon className="w-3.5 h-3.5" />
                 Reply
@@ -374,11 +388,12 @@ function CommentCard({
  * CommentsSection
  *
  * Props:
- *   dailyUpdateId  number | string   — required
- *   userRole       'ADMIN' | 'CLIENT'
- *   updateStatus   string            — must be 'APPROVED' for client to add comments
+ *   dailyUpdateId    number | string   — required
+ *   userRole         'ADMIN' | 'CLIENT'
+ *   updateStatus     string            — must be 'APPROVED' for client to add comments
+ *   targetCommentId  string | null     — optional commentId to highlight and scroll to
  */
-export default function CommentsSection({ dailyUpdateId, userRole, updateStatus }) {
+export default function CommentsSection({ dailyUpdateId, userRole, updateStatus, targetCommentId }) {
   const { t, i18n } = useTranslation()
 
   const [comments,      setComments]      = useState([])
@@ -387,6 +402,8 @@ export default function CommentsSection({ dailyUpdateId, userRole, updateStatus 
   const [page,          setPage]          = useState(0)
   const [totalPages,    setTotalPages]    = useState(0)
   const [totalElements, setTotalElements] = useState(0)
+  const [highlightedId, setHighlightedId] = useState(targetCommentId || null)
+  const commentRefs = useRef({})
 
   const [addText,    setAddText]    = useState('')
   const [addLoading, setAddLoading] = useState(false)
@@ -396,6 +413,33 @@ export default function CommentsSection({ dailyUpdateId, userRole, updateStatus 
   const isAdmin  = userRole === 'ADMIN'
   const isClient = userRole === 'CLIENT'
   const canAddComment = isClient && updateStatus === 'APPROVED'
+
+  // Auto-scroll to targetCommentId when comments load
+  useEffect(() => {
+    if (!targetCommentId || comments.length === 0) return
+
+    const target = comments.find(
+      (c) => String(c.id || c.commentId) === String(targetCommentId)
+    )
+
+    if (target) {
+      const cId = String(target.id || target.commentId)
+      setHighlightedId(cId)
+
+      setTimeout(() => {
+        const el = commentRefs.current[cId]
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth', block: 'center' })
+        }
+      }, 150)
+
+      const timer = setTimeout(() => {
+        setHighlightedId(null)
+      }, 4000)
+
+      return () => clearTimeout(timer)
+    }
+  }, [comments, targetCommentId])
 
   // ── Fetch ──
   const fetchComments = useCallback(async () => {
@@ -458,16 +502,16 @@ export default function CommentsSection({ dailyUpdateId, userRole, updateStatus 
     <section
       id="comments-section"
       aria-label="Comments"
-      className="overflow-hidden rounded-3xl border border-surface-border bg-slate-900/40 shadow-xl"
+      className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-card"
     >
       {/* Header */}
-      <div className="flex items-center gap-3 border-b border-surface-border bg-[radial-gradient(circle_at_top_left,rgba(99,102,241,0.12),transparent_50%)] px-5 py-4 sm:px-6">
-        <div className="flex h-9 w-9 items-center justify-center rounded-xl border border-brand-500/30 bg-brand-500/10 text-brand-300">
+      <div className="flex items-center gap-3 border-b border-gray-200 bg-gray-50 px-5 py-4 sm:px-6">
+        <div className="flex h-9 w-9 items-center justify-center rounded-xl border border-warm-brown/20 bg-warm-brown/10 text-warm-brown">
           <ChatBubbleIcon />
         </div>
         <div>
-          <h2 className="text-base font-semibold text-white">Comments</h2>
-          <p className="text-[11px] text-slate-500">
+          <h2 className="text-base font-semibold text-gray-900">Comments</h2>
+          <p className="text-[11px] text-gray-500">
             {totalElements} {totalElements === 1 ? 'comment' : 'comments'}
           </p>
         </div>
@@ -476,11 +520,11 @@ export default function CommentsSection({ dailyUpdateId, userRole, updateStatus 
       <div className="p-5 sm:p-6 space-y-6">
         {/* ── Add comment (Client only, APPROVED only) ── */}
         {canAddComment && (
-          <div className="space-y-3 rounded-2xl border border-surface-border bg-slate-950/40 p-4">
-            <p className="text-xs font-medium text-slate-400">Add a comment</p>
+          <div className="space-y-3 rounded-xl border border-gray-200 bg-gray-50 p-4">
+            <p className="text-xs font-medium text-gray-500">Add a comment</p>
             <Alert message={addError} variant="error" onClose={() => setAddError(null)} className="text-xs" />
             {addSuccess && (
-              <div className="flex items-center gap-2 rounded-xl bg-emerald-950/50 border border-emerald-800/40 px-3 py-2 text-xs text-emerald-300 animate-fade-in">
+              <div className="flex items-center gap-2 rounded-xl bg-emerald-50 border border-emerald-200 px-3 py-2 text-xs text-emerald-700 animate-fade-in">
                 <CheckCircle className="w-3.5 h-3.5" />
                 Comment added successfully.
               </div>
@@ -500,7 +544,7 @@ export default function CommentsSection({ dailyUpdateId, userRole, updateStatus 
                 id="submit-comment-btn"
                 onClick={handleAddComment}
                 disabled={addLoading || !addText.trim()}
-                className="flex items-center gap-2 rounded-xl bg-brand-600 px-5 py-2 text-sm font-semibold text-white transition-all hover:bg-brand-500 hover:shadow-glow-indigo disabled:cursor-not-allowed disabled:opacity-50 active:scale-[0.98]"
+                className="flex items-center gap-2 rounded-xl bg-warm-brown px-5 py-2 text-sm font-semibold text-white transition-all hover:bg-[#6B4A33] hover:shadow-sm disabled:cursor-not-allowed disabled:opacity-50 active:scale-[0.98]"
               >
                 {addLoading && <Spinner className="w-3.5 h-3.5" />}
                 Post Comment
@@ -511,7 +555,7 @@ export default function CommentsSection({ dailyUpdateId, userRole, updateStatus 
 
         {/* ── Not approved notice (Client view, non-APPROVED) ── */}
         {isClient && updateStatus !== 'APPROVED' && (
-          <div className="flex items-center gap-3 rounded-2xl border border-amber-500/20 bg-amber-950/20 px-4 py-3 text-xs text-amber-300">
+          <div className="flex items-center gap-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-xs text-amber-700">
             <XCircle className="w-4 h-4 flex-shrink-0 text-amber-400" />
             Comments are only available on approved daily updates.
           </div>
@@ -525,10 +569,10 @@ export default function CommentsSection({ dailyUpdateId, userRole, updateStatus 
           <div className="space-y-4">
             {Array.from({ length: 3 }).map((_, i) => (
               <div key={i} className="flex gap-3">
-                <div className="h-8 w-8 flex-shrink-0 animate-pulse rounded-full bg-slate-800" />
+                <div className="h-8 w-8 flex-shrink-0 animate-pulse rounded-full bg-gray-200" />
                 <div className="flex-1 space-y-2">
-                  <div className="h-3 w-24 animate-pulse rounded bg-slate-800" />
-                  <div className="h-16 animate-pulse rounded-xl bg-slate-800/70" />
+                  <div className="h-3 w-24 animate-pulse rounded bg-gray-200" />
+                  <div className="h-16 animate-pulse rounded-xl bg-gray-100" />
                 </div>
               </div>
             ))}
@@ -536,37 +580,46 @@ export default function CommentsSection({ dailyUpdateId, userRole, updateStatus 
         ) : comments.length === 0 ? (
           /* ── Empty state ── */
           <div className="py-10 text-center">
-            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl border border-surface-border bg-slate-950/60 text-slate-600">
+            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl border border-gray-200 bg-gray-50 text-gray-300">
               <ChatBubbleIcon className="w-6 h-6" />
             </div>
-            <p className="mt-4 text-sm font-medium text-slate-400">No comments yet</p>
-            <p className="mt-1 text-xs text-slate-600">
+            <p className="mt-4 text-sm font-medium text-gray-500">No comments yet</p>
+            <p className="mt-1 text-xs text-gray-400">
               {canAddComment ? 'Be the first to leave a comment.' : 'No comments have been posted.'}
             </p>
           </div>
         ) : (
           /* ── Comment thread ── */
-          <div className="space-y-6 divide-y divide-surface-border">
-            {comments.map((comment) => (
-              <div key={comment.id} className="pt-6 first:pt-0">
-                <CommentCard
-                  comment={comment}
-                  userRole={userRole}
-                  dailyUpdateId={dailyUpdateId}
-                  onCommentUpdated={handleCommentUpdated}
-                  onCommentDeleted={handleCommentDeleted}
-                />
-              </div>
-            ))}
+          <div className="space-y-6 divide-y divide-gray-100">
+            {comments.map((comment) => {
+              const cId = String(comment.id || comment.commentId)
+              const isHighlighted = cId === String(highlightedId)
+
+              return (
+                <div key={comment.id} className="pt-6 first:pt-0">
+                  <CommentCard
+                    comment={comment}
+                    userRole={userRole}
+                    dailyUpdateId={dailyUpdateId}
+                    isHighlighted={isHighlighted}
+                    cardRef={(el) => {
+                      if (el) commentRefs.current[cId] = el
+                    }}
+                    onCommentUpdated={handleCommentUpdated}
+                    onCommentDeleted={handleCommentDeleted}
+                  />
+                </div>
+              )
+            })}
           </div>
         )}
 
         {/* ── Pagination ── */}
         {!loading && totalPages > 1 && (
-          <div className="flex items-center justify-between rounded-2xl border border-surface-border bg-slate-950/40 px-4 py-3">
-            <p className="text-xs text-slate-500">
-              Page <span className="font-medium text-slate-200">{page + 1}</span> of{' '}
-              <span className="font-medium text-slate-200">{totalPages}</span>
+          <div className="flex items-center justify-between rounded-xl border border-gray-200 bg-gray-50 px-4 py-3">
+            <p className="text-xs text-gray-500">
+              Page <span className="font-medium text-gray-900">{page + 1}</span> of{' '}
+              <span className="font-medium text-gray-900">{totalPages}</span>
             </p>
             <div className="flex gap-2">
               <PagerButton disabled={page === 0} onClick={() => setPage((p) => p - 1)}>
@@ -591,7 +644,7 @@ function PagerButton({ children, disabled, onClick }) {
       type="button"
       disabled={disabled}
       onClick={onClick}
-      className="rounded-lg border border-surface-border px-3 py-1.5 text-xs text-slate-400 transition-colors hover:border-brand-500/60 hover:text-white disabled:pointer-events-none disabled:opacity-30"
+      className="rounded-lg border border-gray-200 px-3 py-1.5 text-xs text-gray-500 transition-colors hover:border-warm-brown/40 hover:text-gray-900 disabled:pointer-events-none disabled:opacity-30"
     >
       {children}
     </button>

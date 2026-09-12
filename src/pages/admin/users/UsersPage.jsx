@@ -19,6 +19,7 @@ import UserBadge from '@/components/admin/UserBadge'
 import Alert from '@/components/ui/Alert'
 import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
+import SearchableSelect from '@/components/ui/SearchableSelect'
 import { useCallback, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
@@ -309,25 +310,25 @@ export default function UsersPage() {
       header: t('users.full_name_en'),
       render: (val, row) => (
         <div>
-          <p className="text-white font-medium">{val}</p>
-          <p className="text-slate-500 text-xs font-mono">{row.username}</p>
+          <p className="text-gray-900 font-semibold text-sm">{val}</p>
+          <p className="text-gray-500 text-xs font-mono">{row.username}</p>
         </div>
       ),
     },
     {
       key: 'fullNameAr',
       header: t('users.full_name_ar'),
-      render: (val) => <span className="text-slate-300" dir="rtl">{val}</span>,
+      render: (val) => <span className="text-gray-800 font-medium text-sm" dir="rtl">{val || '—'}</span>,
     },
     {
       key: 'email',
       header: t('users.email'),
-      render: (val) => <span className="text-slate-300 font-mono text-xs">{val}</span>,
+      render: (val) => <span className="text-gray-700 font-mono text-xs">{val || '—'}</span>,
     },
     {
       key: 'phoneNumber',
       header: t('users.phone'),
-      render: (val) => <span className="text-slate-300 font-mono text-xs">{val}</span>,
+      render: (val) => <span className="text-gray-700 font-mono text-xs">{val || '—'}</span>,
     },
     {
       key: 'active',
@@ -342,7 +343,7 @@ export default function UsersPage() {
     {
       key: 'createdAt',
       header: t('standard_items.created_at'),
-      render: (val) => <span className="text-slate-500 text-xs whitespace-nowrap">{formatDate(val)}</span>,
+      render: (val) => <span className="text-gray-500 text-xs whitespace-nowrap">{formatDate(val)}</span>,
     },
     {
       key: '_actions',
@@ -357,8 +358,8 @@ export default function UsersPage() {
               type="button"
               onClick={() => openEditModal(row)}
               title={t('roles.edit')}
-              className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-500
-                hover:text-brand-300 hover:bg-brand-900/30 transition-colors focus:outline-none"
+              className="w-8 h-8 rounded-lg flex items-center justify-center text-gray-500
+                hover:text-warm-brown hover:bg-light-blue/40 transition-colors focus:outline-none"
             >
               <EditIcon />
             </button>
@@ -367,8 +368,8 @@ export default function UsersPage() {
                 type="button"
                 onClick={() => setConfirmTarget({ user: row, action: 'deactivate' })}
                 title={t('users.deactivate')}
-                className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-500
-                  hover:text-red-400 hover:bg-red-900/30 transition-colors focus:outline-none"
+                className="w-8 h-8 rounded-lg flex items-center justify-center text-gray-500
+                  hover:text-red-600 hover:bg-red-50 transition-colors focus:outline-none"
               >
                 <PowerOffIcon />
               </button>
@@ -377,8 +378,8 @@ export default function UsersPage() {
                 type="button"
                 onClick={() => setConfirmTarget({ user: row, action: 'activate' })}
                 title={t('users.activate')}
-                className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-500
-                  hover:text-emerald-400 hover:bg-emerald-900/30 transition-colors focus:outline-none"
+                className="w-8 h-8 rounded-lg flex items-center justify-center text-gray-500
+                  hover:text-emerald-600 hover:bg-emerald-50 transition-colors focus:outline-none"
               >
                 <PowerOnIcon />
               </button>
@@ -397,8 +398,8 @@ export default function UsersPage() {
       {/* Page Heading & Actions */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h2 className="text-xl font-bold text-white">{t('users.title')}</h2>
-          <p className="text-slate-500 text-sm mt-0.5">{t('users.subtitle')}</p>
+          <h2 className="text-xl font-bold text-gray-900">{t('users.title')}</h2>
+          <p className="text-gray-500 text-sm mt-0.5">{t('users.subtitle')}</p>
         </div>
         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
           <input
@@ -406,7 +407,7 @@ export default function UsersPage() {
             placeholder={t('users.search_placeholder', 'Search users...')}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="px-4 py-2 bg-slate-800 border border-surface-border rounded-xl text-sm text-white focus:outline-none focus:border-brand-500 w-full sm:w-64 transition-colors"
+            className="px-4 py-2 bg-white border border-gray-200 rounded-xl text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:border-warm-brown focus:ring-2 focus:ring-warm-brown/20 w-full sm:w-64 transition-all shadow-sm"
           />
           {activeTab !== 'DEACTIVATED' && (
             <button
@@ -414,9 +415,9 @@ export default function UsersPage() {
               type="button"
               onClick={openCreateModal}
               className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl
-                bg-brand-600 hover:bg-brand-500 text-white font-semibold text-sm
-                transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-brand-500/50
-                active:scale-[0.98] shadow-glow-indigo self-start"
+                bg-warm-brown hover:bg-[#6B4A33] text-white font-semibold text-sm
+                transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-warm-brown/50
+                active:scale-[0.98] shadow-sm self-start"
             >
               <PlusIcon />
               {t(`users.${tabLabelKey}`)}
@@ -430,7 +431,7 @@ export default function UsersPage() {
       <Alert message={success} variant="success" onClose={() => setSuccess(null)} />
 
       {/* Tabs */}
-      <div className="flex items-center gap-2 border-b border-surface-border pb-2 overflow-x-auto">
+      <div className="flex items-center gap-2 border-b border-gray-200 pb-2 overflow-x-auto">
         {[
           { id: 'ADMIN',    label: t('users.tab_admins') },
           { id: 'ENGINEER', label: t('users.tab_engineers') },
@@ -443,8 +444,8 @@ export default function UsersPage() {
             onClick={() => handleTabChange(tab.id)}
             className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200
               ${activeTab === tab.id
-                ? 'bg-brand-600 text-white shadow-glow-indigo'
-                : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
+                ? 'bg-warm-brown text-white shadow-sm'
+                : 'text-gray-600 hover:text-gray-900 hover:bg-white/80'
               }`}
           >
             {tab.label}
@@ -540,7 +541,7 @@ export default function UsersPage() {
             />
           </div>
 
-          <div className="flex items-center justify-end gap-3 pt-3 border-t border-surface-border">
+          <div className="flex items-center justify-end gap-3 pt-3 border-t border-gray-200">
             <Button variant="ghost" type="button" onClick={() => setCreateModalOpen(false)} disabled={saving}>
               {t('common.cancel')}
             </Button>
@@ -605,24 +606,26 @@ export default function UsersPage() {
             />
 
             <div>
-              <label className="form-label">{t('users.role')}</label>
-              <select
+              <SearchableSelect
+                id="edit-user-role"
+                label={t('users.role')}
+                placeholder={t('users.select_role', 'Select Role')}
                 value={editForm.roleId}
-                onChange={(e) => setEditForm({ ...editForm, roleId: e.target.value })}
-                className="input-base text-sm"
-              >
-                <option value="" disabled>Select Role</option>
-                {availableRoles.map((r) => (
-                  <option key={r.roleId} value={r.roleId} className="bg-slate-800 text-white">
-                    {r.roleName}
-                  </option>
-                ))}
-              </select>
-              {fieldErrors.roleId && <p className="mt-1 text-xs text-red-400">{fieldErrors.roleId}</p>}
+                onChange={(val) => {
+                  const value = typeof val === 'object' && val !== null && 'target' in val ? val.target.value : val
+                  setEditForm((prev) => ({ ...prev, roleId: value }))
+                }}
+                error={fieldErrors.roleId}
+                options={availableRoles.map((r) => ({
+                  value: r.roleId,
+                  label: r.roleName,
+                  sublabel: r.description,
+                }))}
+              />
             </div>
           </div>
 
-          <div className="flex items-center justify-end gap-3 pt-3 border-t border-surface-border">
+          <div className="flex items-center justify-end gap-3 pt-3 border-t border-gray-200">
             <Button variant="ghost" type="button" onClick={() => setEditTarget(null)} disabled={saving}>
               {t('common.cancel')}
             </Button>
@@ -642,39 +645,39 @@ export default function UsersPage() {
       >
         {viewTarget && (
           <div className="space-y-4">
-            <div className="flex items-center gap-4 border-b border-surface-border pb-4">
-               <div className="w-14 h-14 rounded-2xl bg-brand-900/80 border border-brand-700/50 flex items-center justify-center text-brand-400 font-bold text-xl">
+            <div className="flex items-center gap-4 border-b border-gray-200 pb-4">
+               <div className="w-14 h-14 rounded-2xl bg-warm-brown text-white shadow-sm flex items-center justify-center font-bold text-xl">
                  {viewTarget.fullNameEn?.charAt(0) || 'U'}
                </div>
                <div>
-                 <h2 className="text-lg font-bold text-white">{viewTarget.fullNameEn}</h2>
-                 <p className="text-slate-400 text-sm font-mono">@{viewTarget.username}</p>
+                 <h2 className="text-lg font-bold text-gray-900">{viewTarget.fullNameEn}</h2>
+                 <p className="text-gray-500 text-sm font-mono">@{viewTarget.username}</p>
                </div>
             </div>
             <div className="grid grid-cols-2 gap-4 text-sm mt-2">
                <div>
-                  <span className="text-slate-500 block mb-1">{t('users.full_name_ar')}</span>
-                  <span className="text-slate-300" dir="rtl">{viewTarget.fullNameAr}</span>
+                  <span className="text-gray-500 text-xs font-medium block mb-1">{t('users.full_name_ar')}</span>
+                  <span className="text-gray-900 font-medium" dir="rtl">{viewTarget.fullNameAr || '—'}</span>
                </div>
                <div>
-                  <span className="text-slate-500 block mb-1">{t('users.email')}</span>
-                  <span className="text-slate-300 font-mono break-all">{viewTarget.email}</span>
+                  <span className="text-gray-500 text-xs font-medium block mb-1">{t('users.email')}</span>
+                  <span className="text-gray-900 font-mono text-xs break-all">{viewTarget.email || '—'}</span>
                </div>
                <div>
-                  <span className="text-slate-500 block mb-1">{t('users.phone')}</span>
-                  <span className="text-slate-300 font-mono">{viewTarget.phoneNumber}</span>
+                  <span className="text-gray-500 text-xs font-medium block mb-1">{t('users.phone')}</span>
+                  <span className="text-gray-900 font-mono text-xs">{viewTarget.phoneNumber || '—'}</span>
                </div>
                <div>
-                  <span className="text-slate-500 block mb-1">{t('users.role')}</span>
+                  <span className="text-gray-500 text-xs font-medium block mb-1">{t('users.role')}</span>
                   <UserBadge roleName={viewTarget.roleName} type="role" />
                </div>
                <div>
-                  <span className="text-slate-500 block mb-1">{t('users.status')}</span>
+                  <span className="text-gray-500 text-xs font-medium block mb-1">{t('users.status')}</span>
                   <UserBadge active={isUserActive(viewTarget)} />
                </div>
                <div>
-                  <span className="text-slate-500 block mb-1">{t('standard_items.created_at')}</span>
-                  <span className="text-slate-300 whitespace-nowrap">{formatDate(viewTarget.createdAt)}</span>
+                  <span className="text-gray-500 text-xs font-medium block mb-1">{t('standard_items.created_at')}</span>
+                  <span className="text-gray-900 text-xs whitespace-nowrap">{formatDate(viewTarget.createdAt)}</span>
                </div>
             </div>
           </div>

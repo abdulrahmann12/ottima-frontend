@@ -24,7 +24,9 @@ export default function ProjectTable({
   onPageChange,
   onRowClick,
   onDelete,
+  onRestore,
   deletingProjectId = null,
+  restoringProjectId = null,
   role = 'ADMIN',
   emptyMessage,
 }) {
@@ -46,7 +48,7 @@ export default function ProjectTable({
     return (
       <div className="animate-pulse space-y-3 p-4">
         {Array.from({ length: 5 }).map((_, i) => (
-          <div key={i} className="h-14 rounded-xl bg-slate-800/60" />
+          <div key={i} className="h-14 rounded-xl bg-gray-100" />
         ))}
       </div>
     )
@@ -55,10 +57,10 @@ export default function ProjectTable({
   if (!projects.length) {
     return (
       <div className="flex flex-col items-center justify-center py-16 text-center">
-        <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-slate-800/60 border border-surface-border">
+        <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-gray-50 border border-gray-200 text-gray-400">
           <FolderIcon />
         </div>
-        <p className="text-sm font-medium text-slate-400">{emptyMessage || t('projects.no_projects')}</p>
+        <p className="text-sm font-medium text-gray-500">{emptyMessage || t('projects.no_projects')}</p>
       </div>
     )
   }
@@ -68,83 +70,83 @@ export default function ProjectTable({
       <div className="overflow-x-auto">
         <table className="w-full border-collapse text-sm">
           <thead>
-            <tr className="border-b border-surface-border">
-              <th className="px-4 py-3 text-start text-[11px] font-semibold uppercase tracking-wider text-slate-500">
+            <tr className="border-b border-gray-200">
+              <th className="px-4 py-3 text-start text-[11px] font-semibold uppercase tracking-wider text-gray-500">
                 {t('projects.name')}
               </th>
               {role !== 'CLIENT' && (
-                <th className="hidden px-4 py-3 text-start text-[11px] font-semibold uppercase tracking-wider text-slate-500 sm:table-cell">
+                <th className="hidden px-4 py-3 text-start text-[11px] font-semibold uppercase tracking-wider text-gray-500 sm:table-cell">
                   {t('projects.client')}
                 </th>
               )}
               {role === 'ADMIN' && (
-                <th className="hidden px-4 py-3 text-start text-[11px] font-semibold uppercase tracking-wider text-slate-500 md:table-cell">
+                <th className="hidden px-4 py-3 text-start text-[11px] font-semibold uppercase tracking-wider text-gray-500 md:table-cell">
                   {t('projects.engineer')}
                 </th>
               )}
-              <th className="px-4 py-3 text-start text-[11px] font-semibold uppercase tracking-wider text-slate-500">
+              <th className="px-4 py-3 text-start text-[11px] font-semibold uppercase tracking-wider text-gray-500">
                 {t('projects.status')}
               </th>
-              <th className="hidden px-4 py-3 text-start text-[11px] font-semibold uppercase tracking-wider text-slate-500 sm:table-cell">
+              <th className="hidden px-4 py-3 text-start text-[11px] font-semibold uppercase tracking-wider text-gray-500 sm:table-cell">
                 {t('projects.progress')}
               </th>
-              <th className="hidden px-4 py-3 text-start text-[11px] font-semibold uppercase tracking-wider text-slate-500 lg:table-cell">
+              <th className="hidden px-4 py-3 text-start text-[11px] font-semibold uppercase tracking-wider text-gray-500 lg:table-cell">
                 {t('projects.target_date')}
               </th>
               {role === 'ADMIN' && (
-                <th className="hidden px-4 py-3 text-start text-[11px] font-semibold uppercase tracking-wider text-slate-500 xl:table-cell">
+                <th className="hidden px-4 py-3 text-start text-[11px] font-semibold uppercase tracking-wider text-gray-500 xl:table-cell">
                   {t('projects.deleted_at')}
                 </th>
               )}
-              {role === 'ADMIN' && onDelete && (
-                <th className="px-4 py-3 text-end text-[11px] font-semibold uppercase tracking-wider text-slate-500">
+              {role === 'ADMIN' && (onDelete || onRestore) && (
+                <th className="px-4 py-3 text-end text-[11px] font-semibold uppercase tracking-wider text-gray-500">
                   {t('projects.actions')}
                 </th>
               )}
             </tr>
           </thead>
-          <tbody className="divide-y divide-surface-border">
+          <tbody className="divide-y divide-gray-100">
             {projects.map((project) => {
               const deletedAt = project.deletedAt ?? project.deletesAt
               const isDeleted = Boolean(deletedAt)
-              const rowClickable = Boolean(onRowClick) && !(role === 'ADMIN' && isDeleted)
+              const rowClickable = Boolean(onRowClick)
 
               return (
                 <tr
                   key={project.projectId}
                   onClick={rowClickable ? () => onRowClick?.(project) : undefined}
-                  className={`group transition-colors ${rowClickable ? 'cursor-pointer hover:bg-slate-800/40' : ''} ${isDeleted ? 'bg-rose-950/10 opacity-70' : ''}`}
+                  className={`group transition-colors ${rowClickable ? 'cursor-pointer hover:bg-gray-50' : ''}`}
                 >
                   <td className="px-4 py-3.5">
-                    <p className={`font-semibold leading-tight transition-colors ${isDeleted ? 'text-slate-300' : 'text-white'} ${rowClickable ? 'group-hover:text-brand-300' : ''}`}>
+                    <p className={`font-semibold leading-tight transition-colors text-gray-900 ${rowClickable ? 'group-hover:text-warm-brown' : ''}`}>
                       {isRtl ? project.nameAr : project.nameEn}
                     </p>
                     {(project.addressEn || project.addressAr) && (
-                      <p className="mt-0.5 text-[11px] leading-tight text-slate-500">
+                      <p className="mt-0.5 text-[11px] leading-tight text-gray-500">
                         {isRtl ? project.addressAr : project.addressEn}
                       </p>
                     )}
                     {isDeleted && (
-                      <p className="mt-1 text-[11px] font-medium leading-tight text-rose-300 xl:hidden">
+                      <p className="mt-1 text-[11px] font-medium leading-tight text-red-600 xl:hidden">
                         {t('projects.deleted_at')}: {formatDeletedAt(deletedAt)}
                       </p>
                     )}
                   </td>
                   {role !== 'CLIENT' && (
                     <td className="hidden px-4 py-3.5 sm:table-cell">
-                      <span className="text-xs text-slate-400">{project.clientName ?? '—'}</span>
+                      <span className="text-xs text-gray-700">{project.clientName ?? '—'}</span>
                     </td>
                   )}
                   {role === 'ADMIN' && (
                     <td className="hidden px-4 py-3.5 md:table-cell">
-                      <span className="text-xs text-slate-400">{project.engineerName ?? '—'}</span>
+                      <span className="text-xs text-gray-700">{project.engineerName ?? '—'}</span>
                     </td>
                   )}
                   <td className="px-4 py-3.5">
                     <div className="flex flex-col gap-1">
                       {isDeleted ? <DeletedBadge label={t('projects.deleted')} /> : <StatusBadge status={project.overallStatus} />}
                       {isDeleted && (
-                        <span className="text-[11px] text-slate-500">{project.overallStatus ?? '—'}</span>
+                        <span className="text-[11px] text-gray-500">{project.overallStatus ?? '—'}</span>
                       )}
                     </div>
                   </td>
@@ -152,28 +154,42 @@ export default function ProjectTable({
                     <ProgressBar value={project.overallProgressPercentage} />
                   </td>
                   <td className="hidden px-4 py-3.5 lg:table-cell">
-                    <span className="whitespace-nowrap text-xs text-slate-500">{project.targetCompletionDate ?? '—'}</span>
+                    <span className="whitespace-nowrap text-xs text-gray-600">{project.targetCompletionDate ?? '—'}</span>
                   </td>
                   {role === 'ADMIN' && (
                     <td className="hidden px-4 py-3.5 xl:table-cell">
-                      <span className={`whitespace-nowrap text-xs ${isDeleted ? 'text-rose-200' : 'text-slate-600'}`}>
+                      <span className={`whitespace-nowrap text-xs ${isDeleted ? 'text-red-600 font-medium' : 'text-gray-500'}`}>
                         {isDeleted ? formatDeletedAt(deletedAt) : '—'}
                       </span>
                     </td>
                   )}
-                  {role === 'ADMIN' && onDelete && (
+                  {role === 'ADMIN' && (onDelete || onRestore) && (
                     <td className="px-4 py-3.5 text-end">
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          onDelete(project)
-                        }}
-                        disabled={isDeleted || deletingProjectId === project.projectId}
-                        className="rounded-lg border border-red-500/40 px-3 py-1.5 text-xs font-medium text-red-300 transition-colors hover:bg-red-900/30 disabled:pointer-events-none disabled:opacity-30"
-                      >
-                        {deletingProjectId === project.projectId ? t('common.loading') : t('projects.delete_action')}
-                      </button>
+                      {isDeleted ? (
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            onRestore?.(project)
+                          }}
+                          disabled={restoringProjectId === project.projectId}
+                          className="rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-1.5 text-xs font-semibold text-emerald-700 transition-colors hover:bg-emerald-100 hover:text-emerald-800 disabled:pointer-events-none disabled:opacity-40"
+                        >
+                          {restoringProjectId === project.projectId ? t('common.loading') : t('projects.restore_action')}
+                        </button>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            onDelete?.(project)
+                          }}
+                          disabled={deletingProjectId === project.projectId}
+                          className="rounded-lg border border-red-200 bg-red-50 px-3 py-1.5 text-xs font-semibold text-red-600 transition-colors hover:bg-red-100 hover:text-red-700 disabled:pointer-events-none disabled:opacity-40"
+                        >
+                          {deletingProjectId === project.projectId ? t('common.loading') : t('projects.delete_action')}
+                        </button>
+                      )}
                     </td>
                   )}
                 </tr>
@@ -185,12 +201,12 @@ export default function ProjectTable({
 
       {/* Pagination */}
       {totalPages > 1 && (
-        <div className="flex items-center justify-between border-t border-surface-border px-4 py-3">
-          <p className="text-xs text-slate-500">
-            {t('table.page')} <span className="text-slate-300 font-medium">{currentPage + 1}</span>{' '}
-            {t('table.of')} <span className="text-slate-300 font-medium">{totalPages}</span>
+        <div className="flex items-center justify-between border-t border-gray-200 px-4 py-3">
+          <p className="text-xs text-gray-500">
+            {t('table.page')} <span className="text-gray-900 font-semibold">{currentPage + 1}</span>{' '}
+            {t('table.of')} <span className="text-gray-900 font-semibold">{totalPages}</span>
             {totalElements > 0 && (
-              <span className="ml-2 text-slate-600">({totalElements})</span>
+              <span className="ml-2 text-gray-500">({totalElements})</span>
             )}
           </p>
           <div className="flex gap-2">
@@ -216,7 +232,7 @@ function PaginationBtn({ disabled, onClick, label }) {
     <button
       disabled={disabled}
       onClick={onClick}
-      className="rounded-lg border border-surface-border px-3 py-1.5 text-xs text-slate-400 transition-colors hover:border-brand-500/60 hover:text-white disabled:pointer-events-none disabled:opacity-30"
+      className="rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-medium text-gray-700 transition-colors hover:bg-gray-50 hover:text-gray-900 disabled:pointer-events-none disabled:opacity-30 shadow-sm"
     >
       {label}
     </button>
@@ -226,13 +242,13 @@ function PaginationBtn({ disabled, onClick, label }) {
 // ── Shared display primitives (also exported for re-use) ─────
 export function StatusBadge({ status }) {
   const palette = {
-    ACTIVE:      'bg-emerald-900/40 text-emerald-400 border-emerald-700/40',
-    PAUSED:      'bg-amber-900/40 text-amber-400 border-amber-700/40',
-    DELIVERED:   'bg-cyan-900/40 text-cyan-400 border-cyan-700/40',
-    COMPLETED:   'bg-emerald-900/40 text-emerald-400 border-emerald-700/40',
-    PENDING:     'bg-slate-700/60 text-slate-300 border-slate-600',
-    IN_PROGRESS: 'bg-blue-900/40 text-blue-400 border-blue-700/40',
-    CANCELLED:   'bg-red-900/40 text-red-400 border-red-700/40',
+    ACTIVE:      'bg-emerald-50 text-emerald-700 border-emerald-200',
+    PAUSED:      'bg-amber-50 text-amber-700 border-amber-200',
+    DELIVERED:   'bg-teal-50 text-teal-700 border-teal-200',
+    COMPLETED:   'bg-emerald-50 text-emerald-700 border-emerald-200',
+    PENDING:     'bg-gray-100 text-gray-700 border-gray-200',
+    IN_PROGRESS: 'bg-blue-50 text-blue-700 border-blue-200',
+    CANCELLED:   'bg-red-50 text-red-700 border-red-200',
   }
   return (
     <span className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-[11px] font-semibold ${palette[status] ?? palette.PENDING}`}>
@@ -243,7 +259,7 @@ export function StatusBadge({ status }) {
 
 function DeletedBadge({ label }) {
   return (
-    <span className="inline-flex items-center rounded-full border border-rose-700/40 bg-rose-900/40 px-2.5 py-0.5 text-[11px] font-semibold text-rose-300">
+    <span className="inline-flex items-center rounded-full border border-red-200 bg-red-50 px-2.5 py-0.5 text-[11px] font-semibold text-red-700">
       {label}
     </span>
   )
@@ -251,23 +267,23 @@ function DeletedBadge({ label }) {
 
 export function ProgressBar({ value, className = '' }) {
   const pct = Math.min(Math.max(Number(value ?? 0), 0), 100)
-  const color = pct >= 80 ? 'bg-emerald-400' : pct >= 40 ? 'bg-brand-400' : 'bg-cyan-400'
+  const color = pct >= 80 ? 'bg-emerald-500' : pct >= 40 ? 'bg-warm-brown' : 'bg-amber-500'
   return (
     <div className={`flex items-center gap-2.5 ${className}`}>
-      <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-slate-700">
+      <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-gray-200">
         <div
           className={`h-full rounded-full transition-all duration-500 ${color}`}
           style={{ width: `${pct}%` }}
         />
       </div>
-      <span className="w-9 text-end text-[11px] tabular-nums text-slate-500">{pct.toFixed(0)}%</span>
+      <span className="w-9 text-end text-[11px] tabular-nums font-mono text-gray-600">{pct.toFixed(0)}%</span>
     </div>
   )
 }
 
 function FolderIcon() {
   return (
-    <svg className="h-6 w-6 text-slate-500" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+    <svg className="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
       <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 9.776c.112-.017.227-.026.344-.026h15.812c.117 0 .232.009.344.026m-16.5 0a2.25 2.25 0 0 0-1.883 2.542l.857 6a2.25 2.25 0 0 0 2.227 1.932H19.05a2.25 2.25 0 0 0 2.227-1.932l.857-6a2.25 2.25 0 0 0-1.883-2.542m-16.5 0V6A2.25 2.25 0 0 1 6 3.75h3.879a1.5 1.5 0 0 1 1.06.44l2.122 2.12a1.5 1.5 0 0 0 1.06.44H18A2.25 2.25 0 0 1 20.25 9v.776" />
     </svg>
   )

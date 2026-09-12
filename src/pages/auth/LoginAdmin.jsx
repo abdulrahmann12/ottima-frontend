@@ -14,10 +14,12 @@ import useAuthStore from '@/store/authStore'
  * Fields: Username or Email + Password
  * On success: stores tokens, sets role to ADMIN, redirects to /admin/dashboard
  */
+import { getMyProfile } from '@/api/usersApi'
+
 export default function LoginAdmin() {
   const { t } = useTranslation()
   const navigate = useNavigate()
-  const { setTokens, setRole } = useAuthStore()
+  const { setTokens, setRole, setUser, clearAuth } = useAuthStore()
 
   const [identifier, setIdentifier] = useState('')
   const [password, setPassword]     = useState('')
@@ -48,8 +50,27 @@ export default function LoginAdmin() {
       const { data: res } = await loginApi(identifier.trim(), password)
       const { accessToken, refreshToken } = res.data
       setTokens(accessToken, refreshToken)
-      setRole('ADMIN')
-      navigate('/admin/dashboard', { replace: true })
+
+      // Strict role authorization check
+      try {
+        const profileRes = await getMyProfile()
+        const user = profileRes.data?.data || profileRes.data || {}
+        const userRole = (user.roleName || user.role || '').toUpperCase()
+
+        if (userRole !== 'ADMIN') {
+          clearAuth()
+          const correctRoleDisplay = userRole ? (userRole.charAt(0) + userRole.slice(1).toLowerCase()) : 'appropriate'
+          setError(`Access Denied: You are not authorized to access this portal. Please use the ${correctRoleDisplay} login page.`)
+          return
+        }
+
+        setUser(user)
+        setRole('ADMIN')
+        navigate('/admin/dashboard', { replace: true })
+      } catch (profileErr) {
+        clearAuth()
+        setError(profileErr.response?.data?.message || t('errors.generic'))
+      }
     } catch (err) {
       const msg =
         err.response?.data?.message ||
@@ -66,17 +87,17 @@ export default function LoginAdmin() {
       <BackLink />
 
       {/* Header */}
-      <div className="mb-8">
-        <RoleBadge label={t('role.admin')} color="brand" />
-        <h2 className="mt-4 text-2xl font-bold text-white">{t('login.title_admin')}</h2>
-        <p className="mt-1 text-slate-400 text-sm">{t('login.subtitle')}</p>
+      <div className="mb-7">
+        <RoleBadge label={t('role.admin')} />
+        <h2 className="mt-3 text-2xl font-extrabold text-gray-900 tracking-tight">{t('login.title_admin')}</h2>
+        <p className="mt-1 text-gray-600 text-sm">{t('login.subtitle')}</p>
       </div>
 
       {/* Error */}
       <Alert message={error} variant="error" onClose={() => setError(null)} className="mb-5" />
 
       {/* Form */}
-      <form id="admin-login-form" onSubmit={handleSubmit} noValidate className="space-y-5">
+      <form id="admin-login-form" onSubmit={handleSubmit} noValidate className="space-y-4 sm:space-y-5">
         <Input
           id="admin-identifier"
           label={t('login.username_or_email')}
@@ -102,7 +123,7 @@ export default function LoginAdmin() {
 
         {/* Forgot password */}
         <div className="flex justify-end">
-          <Link to="/forgot-password" className="link text-sm">
+          <Link to="/forgot-password" className="text-warm-brown hover:text-[#6B4A33] font-semibold text-xs sm:text-sm transition-colors duration-200">
             {t('login.forgot_password')}
           </Link>
         </div>
@@ -111,14 +132,15 @@ export default function LoginAdmin() {
           id="admin-login-btn"
           type="submit"
           loading={loading}
+          className="w-full shadow-sm"
         >
           {loading ? t('login.signing_in') : t('login.sign_in')}
         </Button>
       </form>
 
-      <p className="mt-6 text-center text-xs text-slate-600">
+      <p className="mt-6 text-center text-xs text-gray-500">
         {t('login.no_access')}{' '}
-        <span className="text-slate-500">{t('login.contact_admin')}</span>
+        <span className="text-gray-700 font-medium">{t('login.contact_admin')}</span>
       </p>
     </AuthLayout>
   )
@@ -129,8 +151,8 @@ function BackLink() {
   return (
     <Link
       to="/"
-      className="inline-flex items-center gap-1.5 text-xs text-slate-500
-        hover:text-slate-300 transition-colors duration-200 mb-6 group"
+      className="inline-flex items-center gap-1.5 text-xs text-gray-500
+        hover:text-warm-brown transition-colors duration-200 mb-5 group font-medium"
     >
       <span className="group-hover:-translate-x-0.5 rtl:group-hover:translate-x-0.5 transition-transform duration-200">←</span>
       {t('common.back')}
@@ -138,16 +160,12 @@ function BackLink() {
   )
 }
 
-function RoleBadge({ label, color }) {
-  const colors = {
-    brand:   'bg-brand-900/60 border-brand-700/50 text-brand-300',
-    cyan:    'bg-cyan-900/60  border-cyan-700/50  text-cyan-300',
-    emerald: 'bg-emerald-900/60 border-emerald-700/50 text-emerald-300',
-  }
+function RoleBadge({ label }) {
   return (
-    <span className={`inline-flex items-center px-3 py-1 rounded-full
-      text-xs font-medium border ${colors[color] || colors.brand}`}>
+    <span className="inline-flex items-center px-3 py-1 rounded-full
+      text-xs font-semibold bg-warm-brown/10 border border-warm-brown/25 text-warm-brown">
       {label}
     </span>
   )
 }
+

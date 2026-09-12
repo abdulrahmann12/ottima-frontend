@@ -7,6 +7,7 @@ import FinancialRecordModal from '@/components/admin/finance/FinancialRecordModa
 import ConfirmDialog from '@/components/admin/ConfirmDialog'
 import DataTable from '@/components/admin/DataTable'
 import Alert from '@/components/ui/Alert'
+import SearchableSelect from '@/components/ui/SearchableSelect'
 import { getAdminProjects, getAdminProject } from '@/api/projectsApi'
 import FinancialSummaryCards from '@/components/finance/FinancialSummaryCards'
 import { useCallback, useEffect, useState } from 'react'
@@ -16,11 +17,12 @@ const PAGE_SIZE = 10
 const apiErr = (err, fb) => err?.response?.data?.message ?? fb
 
 // ─── Currency formatter ───────────────────────────────────────
-function formatMoney(value) {
+function formatMoney(value, language = 'en') {
   if (value == null) return '—'
-  return new Intl.NumberFormat('en-US', {
+  const locale = language === 'ar' ? 'ar-EG' : 'en-EG'
+  return new Intl.NumberFormat(locale, {
     style: 'currency',
-    currency: 'USD',
+    currency: 'EGP',
     minimumFractionDigits: 2,
   }).format(value)
 }
@@ -198,7 +200,7 @@ export default function AdminFinancePage() {
       header: 'Amount',
       render: (v, row) => (
         <span className={`font-semibold ${row.recordType === 'DEPOSIT' ? 'text-emerald-300' : 'text-rose-300'}`}>
-          {row.recordType === 'EXPENSE' ? '−' : '+'}{formatMoney(v)}
+          {row.recordType === 'EXPENSE' ? '−' : '+'}{formatMoney(v, lang)}
         </span>
       ),
     },
@@ -270,17 +272,13 @@ export default function AdminFinancePage() {
   return (
     <div className="space-y-6">
       {/* ── Page header ── */}
-      <section className="overflow-hidden rounded-3xl border border-surface-border bg-slate-900/40 shadow-xl">
-        <div className="bg-[radial-gradient(circle_at_top_left,rgba(99,102,241,0.18),transparent_45%),radial-gradient(circle_at_bottom_right,rgba(16,185,129,0.10),transparent_35%)] px-5 py-6 sm:px-6">
-          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-brand-300/80">
-            Financial Management
-          </p>
-          <h1 className="mt-3 text-3xl font-bold text-white">Finance</h1>
-          <p className="mt-2 text-sm leading-6 text-slate-300">
-            Track deposits, expenses, and receipts across all projects.
-          </p>
+      <div className="flex items-center justify-between bg-white border border-gray-200 rounded-xl shadow-sm px-5 py-4">
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-widest text-gray-400">Financial Management</p>
+          <h1 className="mt-1 text-xl font-bold text-gray-900">Finance</h1>
+          <p className="mt-0.5 text-sm text-gray-500">Track deposits, expenses, and receipts across all projects.</p>
         </div>
-      </section>
+      </div>
 
       {/* ── Alerts ── */}
       <Alert message={error} variant="error" onClose={() => setError(null)} />
@@ -295,33 +293,33 @@ export default function AdminFinancePage() {
       )}
 
       {/* ── Main card ── */}
-      <section className="overflow-hidden rounded-3xl border border-surface-border bg-slate-900/40 shadow-xl">
+      <section className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
         {/* Toolbar */}
-        <div className="flex flex-col gap-4 border-b border-surface-border px-5 py-4 sm:flex-row sm:items-end sm:px-6">
+        <div className="flex flex-col gap-4 border-b border-gray-200 px-5 py-4 sm:flex-row sm:items-end sm:px-6">
           {/* Project selector */}
-          <label className="flex-1 text-xs font-semibold uppercase tracking-wider text-slate-500">
-            Select Project
-            <select
-              className="input-base mt-2 text-sm"
+          <div className="flex-1">
+            <SearchableSelect
+              id="admin-finance-project-select"
+              label="Select Project"
               value={selectedProject?.projectId ?? ''}
               onChange={handleProjectChange}
               disabled={projectsLoading}
-            >
-              <option value="">— Choose a project —</option>
-              {projects.map((p) => (
-                <option key={p.projectId} value={p.projectId}>
-                  {projectName(p)}
-                </option>
-              ))}
-            </select>
-          </label>
+              loading={projectsLoading}
+              placeholder="— Choose a project —"
+              options={projects.map((p) => ({
+                value: p.projectId,
+                label: projectName(p),
+                sublabel: p.clientName ? `Client: ${p.clientName}` : undefined,
+              }))}
+            />
+          </div>
 
           {/* Stats */}
           {selectedProject && !loading && (
             <div className="flex items-center gap-3">
-              <div className="rounded-2xl border border-surface-border bg-slate-950/50 px-4 py-2.5 text-center">
-                <p className="text-[10px] uppercase tracking-wider text-slate-500">Records</p>
-                <p className="mt-0.5 text-lg font-bold text-brand-300">{totalElements}</p>
+              <div className="rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-center">
+                <p className="text-[10px] uppercase tracking-wider text-gray-500">Records</p>
+                <p className="mt-0.5 text-lg font-bold text-warm-brown">{totalElements}</p>
               </div>
             </div>
           )}
@@ -332,8 +330,8 @@ export default function AdminFinancePage() {
             id="new-financial-record-btn"
             disabled={!selectedProject}
             onClick={() => { setEditRecord(null); setModalOpen(true) }}
-            className="flex items-center gap-2 rounded-xl bg-brand-600 px-5 py-2.5 text-sm font-semibold text-white
-              transition-all hover:bg-brand-500 hover:shadow-glow-indigo
+            className="flex items-center gap-2 rounded-xl bg-warm-brown px-5 py-2.5 text-sm font-semibold text-white
+              transition-all hover:bg-[#6B4A33] hover:shadow-sm
               disabled:cursor-not-allowed disabled:opacity-40 active:scale-[0.98]"
           >
             <PlusIcon className="w-4 h-4" />
@@ -344,10 +342,10 @@ export default function AdminFinancePage() {
         {/* Empty project state */}
         {!selectedProject ? (
           <div className="px-6 py-16 text-center">
-            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-3xl border border-surface-border bg-slate-950/60 text-slate-600">
+            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl border border-gray-200 bg-gray-50 text-gray-300">
               <BanknoteIcon className="h-7 w-7" />
             </div>
-            <p className="mt-4 text-base font-semibold text-slate-400">Select a project to begin</p>
+            <p className="mt-4 text-base font-semibold text-gray-500">Select a project to begin</p>
             <p className="mt-1 text-sm text-slate-600">
               Financial records are scoped per project. Choose one from the dropdown above.
             </p>
