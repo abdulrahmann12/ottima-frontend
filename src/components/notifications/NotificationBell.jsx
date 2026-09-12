@@ -159,7 +159,14 @@ export default function NotificationBell() {
 
       {/* Popover Dropdown Drawer */}
       {isOpen && (
-        <div className="absolute end-0 mt-2 w-80 sm:w-96 bg-white border border-gray-200 rounded-2xl shadow-2xl z-50 overflow-hidden animate-slide-up flex flex-col max-h-[480px]">
+        <>
+          {/* Mobile overlay backdrop */}
+          <div
+            className="fixed inset-0 bg-black/30 z-40 sm:hidden animate-fade-in"
+            onClick={() => setIsOpen(false)}
+          />
+
+          <div className="fixed inset-x-3.5 top-16 sm:absolute sm:inset-x-auto sm:end-0 sm:top-full sm:mt-2 w-auto sm:w-96 bg-white border border-[#D9C7B8] sm:border-gray-200 rounded-2xl shadow-2xl z-50 overflow-hidden animate-slide-up flex flex-col max-h-[75vh] sm:max-h-[480px]">
           {/* Popover Header */}
           <div className="flex items-center justify-between px-4 py-3.5 border-b border-gray-200/80 bg-gray-50/90">
             <div className="flex items-center gap-2">
@@ -250,6 +257,7 @@ export default function NotificationBell() {
             )}
           </div>
         </div>
+        </>
       )}
     </div>
   )

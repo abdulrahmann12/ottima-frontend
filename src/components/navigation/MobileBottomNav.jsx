@@ -112,16 +112,17 @@ export default function MobileBottomNav({ navItems: customNavItems }) {
         aria-label="Mobile Bottom Navigation"
         className="lg:hidden fixed bottom-0 inset-x-0 z-40 bg-white/95 backdrop-blur-md border-t border-[#D9C7B8] shadow-lg select-none"
       >
-        <div className={`grid ${overflowTabs.length > 0 ? 'grid-cols-5' : 'grid-cols-4'} h-16 max-w-lg mx-auto items-center px-1`}>
+        <div className={`grid ${overflowTabs.length > 0 ? 'grid-cols-5' : 'grid-cols-4'} h-16 w-full max-w-lg mx-auto items-center px-1`}>
           {primaryTabs.map((item) => {
             const active = isActive(item.to)
             const Icon = item.icon
+            const label = t(`nav.${item.key}_short`, { defaultValue: t(`nav.${item.key}`, item.key.replace('_', ' ')) })
             return (
               <button
                 key={item.key}
                 type="button"
                 onClick={() => navigate(item.to)}
-                className={`relative flex flex-col items-center justify-center h-full min-h-[48px] py-1 transition-all cursor-pointer ${
+                className={`relative flex flex-col items-center justify-center h-full min-h-[48px] py-1 px-0.5 transition-all cursor-pointer ${
                   active ? 'text-[#7D583F]' : 'text-gray-400 hover:text-gray-700 active:scale-95'
                 }`}
               >
@@ -130,10 +131,10 @@ export default function MobileBottomNav({ navItems: customNavItems }) {
                   <span className="absolute top-0 w-8 h-1 rounded-b-full bg-[#7D583F] shadow-xs animate-fade-in" />
                 )}
                 {Icon && (
-                  <Icon className={`w-5 h-5 transition-transform ${active ? 'scale-110' : ''}`} />
+                  <Icon className={`w-5 h-5 transition-transform shrink-0 ${active ? 'scale-110' : ''}`} />
                 )}
-                <span className={`text-[10px] mt-1 truncate max-w-[64px] ${active ? 'font-bold text-[#7D583F]' : 'font-medium text-gray-500'}`}>
-                  {t(`nav.${item.key}`, { defaultValue: item.key.replace('_', ' ') })}
+                <span className={`text-[10px] mt-1 w-full text-center truncate px-0.5 leading-tight ${active ? 'font-bold text-[#7D583F]' : 'font-medium text-gray-500'}`}>
+                  {label}
                 </span>
               </button>
             )
@@ -144,14 +145,14 @@ export default function MobileBottomNav({ navItems: customNavItems }) {
             <button
               type="button"
               onClick={() => setSheetOpen(true)}
-              className={`relative flex flex-col items-center justify-center h-full min-h-[48px] py-1 transition-all cursor-pointer ${
+              className={`relative flex flex-col items-center justify-center h-full min-h-[48px] py-1 px-0.5 transition-all cursor-pointer ${
                 sheetOpen ? 'text-[#7D583F]' : 'text-gray-400 hover:text-gray-700 active:scale-95'
               }`}
             >
-              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+              <svg className="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
               </svg>
-              <span className="text-[10px] mt-1 font-medium text-gray-500">
+              <span className="text-[10px] mt-1 w-full text-center truncate px-0.5 leading-tight font-medium text-gray-500">
                 {t('common.more', { defaultValue: 'Menu' })}
               </span>
             </button>

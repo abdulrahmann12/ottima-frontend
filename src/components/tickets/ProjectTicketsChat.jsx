@@ -383,20 +383,22 @@ export default function ProjectTicketsChat({
                     >
                       {/* ── Incoming sender label ────────────────── */}
                       {!isOutgoing && (
-                        <div className="flex items-center justify-between gap-2 mb-2 pb-2 border-b border-[#E0D0C0]/60">
-                          <div className="flex items-center gap-2 min-w-0">
-                            <div className="w-6 h-6 rounded-full bg-warm-brown text-white text-[10px] font-bold flex items-center justify-center shrink-0">
+                        <div className="flex flex-wrap items-center justify-between gap-1.5 mb-2 pb-2 border-b border-[#E0D0C0]/60">
+                          <div className="flex items-center gap-1.5 min-w-0">
+                            <div className="w-6 h-6 rounded-full bg-warm-brown text-white text-[10px] font-bold flex items-center justify-center shrink-0 shadow-2xs">
                               {(ticket.senderNameEn || ticket.senderNameAr || 'U').charAt(0).toUpperCase()}
                             </div>
                             <span className="text-xs font-bold text-gray-900 truncate">
-                              {i18n.language === 'ar' ? (ticket.senderNameAr || ticket.senderNameEn) : (ticket.senderNameEn || ticket.senderNameAr)}
+                              {i18n.language === 'ar' ? (ticket.senderNameAr || ticket.senderNameEn || 'User') : (ticket.senderNameEn || ticket.senderNameAr || 'User')}
                             </span>
-                            <span className="px-1.5 py-0.5 rounded text-[10px] font-medium bg-gray-200/80 text-gray-700 uppercase">
-                              {ticket.senderRole}
-                            </span>
+                            {ticket.senderRole && (
+                              <span className="px-1.5 py-0.2 rounded text-[9px] font-medium bg-gray-200/80 text-gray-700 uppercase shrink-0">
+                                {ticket.senderRole}
+                              </span>
+                            )}
                           </div>
 
-                          <div className="flex items-center gap-1.5 shrink-0">
+                          <div className="flex items-center gap-1 shrink-0 ml-auto rtl:mr-auto">
                             <TicketTypeBadge type={ticket.ticketType} />
                             <TicketStatusBadge status={ticket.status} />
                           </div>
@@ -570,44 +572,44 @@ export default function ProjectTicketsChat({
       </div>
 
       {/* ── Bottom Sticky Bar: Quick Actions & New Request ── */}
-      <div className="p-3 sm:p-4 bg-white border-t border-[#D9C7B8] flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 shrink-0">
-        <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-1 sm:pb-0">
+      <div className="p-3 sm:p-4 bg-white border-t border-[#D9C7B8] flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 shrink-0">
+        <div className="flex items-center gap-1.5 overflow-x-auto pb-0.5 sm:pb-0 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
           <span className="text-[11px] font-semibold text-gray-500 hidden md:inline shrink-0 mr-1">
             {t('tickets.quick_actions', { defaultValue: 'Quick Action:' })}
           </span>
           <button
             type="button"
             onClick={() => openCreateModal('EXPENSE')}
-            className="min-h-[40px] sm:min-h-0 px-3 py-2 sm:py-1.5 rounded-xl bg-warm-brown/10 hover:bg-warm-brown/20 text-warm-brown text-xs font-bold transition-colors flex items-center gap-1.5 border border-warm-brown/20 shrink-0 cursor-pointer"
+            className="min-h-[38px] px-3 py-1.5 rounded-xl bg-warm-brown/10 hover:bg-warm-brown/20 text-warm-brown text-xs font-bold transition-colors flex items-center gap-1 border border-warm-brown/20 shrink-0 cursor-pointer"
           >
-            💰 + {t('tickets.types.expense', { defaultValue: 'Expense' })}
+            💰 {t('tickets.types.expense', { defaultValue: 'Expense' })}
           </button>
           <button
             type="button"
             onClick={() => openCreateModal('INSTRUCTION')}
-            className="min-h-[40px] sm:min-h-0 px-3 py-2 sm:py-1.5 rounded-xl bg-light-blue/40 hover:bg-light-blue text-gray-800 text-xs font-bold transition-colors flex items-center gap-1.5 border border-light-blue shrink-0 cursor-pointer"
+            className="min-h-[38px] px-3 py-1.5 rounded-xl bg-light-blue/40 hover:bg-light-blue text-gray-800 text-xs font-bold transition-colors flex items-center gap-1 border border-light-blue shrink-0 cursor-pointer"
           >
-            📝 + {t('tickets.types.instruction', { defaultValue: 'Instruction' })}
+            📝 {t('tickets.types.instruction', { defaultValue: 'Instruction' })}
           </button>
           <button
             type="button"
             onClick={() => openCreateModal('MEASUREMENT')}
-            className="min-h-[40px] sm:min-h-0 px-3 py-2 sm:py-1.5 rounded-xl bg-teal-50 hover:bg-teal-100 text-teal-800 text-xs font-bold transition-colors flex items-center gap-1.5 border border-teal-200 shrink-0 cursor-pointer"
+            className="min-h-[38px] px-3 py-1.5 rounded-xl bg-teal-50 hover:bg-teal-100 text-teal-800 text-xs font-bold transition-colors flex items-center gap-1 border border-teal-200 shrink-0 cursor-pointer"
           >
-            📐 + {t('tickets.types.measurement', { defaultValue: 'Measurement' })}
+            📐 {t('tickets.types.measurement', { defaultValue: 'Measurement' })}
           </button>
           <button
             type="button"
             onClick={() => openCreateModal('SITE_REPORT')}
-            className="min-h-[40px] sm:min-h-0 px-3 py-2 sm:py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold transition-colors flex items-center gap-1.5 border border-slate-200 shrink-0 cursor-pointer"
+            className="min-h-[38px] px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold transition-colors flex items-center gap-1 border border-slate-200 shrink-0 cursor-pointer"
           >
-            📋 + {t('tickets.types.site_report', { defaultValue: 'Report' })}
+            📋 {t('tickets.types.site_report', { defaultValue: 'Report' })}
           </button>
         </div>
 
         <Button
           type="button"
-          className="w-full sm:w-auto min-h-[44px] sm:min-h-0 py-2.5 px-6 text-xs font-bold shadow-sm"
+          className="w-full sm:w-auto min-h-[44px] py-2.5 px-6 text-xs font-bold shadow-sm"
           onClick={() => openCreateModal('INSTRUCTION')}
         >
           + {t('tickets.create_request_btn', { defaultValue: 'Create Internal Request' })}
