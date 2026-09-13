@@ -619,5 +619,83 @@
     "prev_page": "الصفحة السابقة",
     "next_page": "الصفحة التالية",
     "page_indicator": "صفحة {{page}}"
+  },
+  "activity_logs": {
+    "title": "سجل النشاطات والعمليات",
+    "subtitle": "متابعة جميع حركات النظام والتعديلات بأسلوب واضح ومفهوم لجميع المستخدمين",
+    "filters": "تصفية السجلات",
+    "filter_user": "المستخدم / القائم بالعملية",
+    "all_users": "جميع المستخدمين",
+    "search_users": "ابحث بالاسم أو البريد...",
+    "filter_action": "نوع الإجراء",
+    "all_actions": "جميع الإجراءات",
+    "filter_status": "حالة العملية",
+    "all_statuses": "جميع الحالات",
+    "filter_entity": "القسم / العنصر",
+    "filter_entity_placeholder": "مثال: مشروع، مالية، تقرير موقع",
+    "empty": "لا توجد سجلات نشاط مطابقة لمعايير البحث.",
+    "copied": "تم النسخ بنجاح!",
+    "copy_json": "نسخ كود JSON",
+    "table": {
+      "date": "التاريخ والوقت",
+      "user": "القائم بالعملية",
+      "action": "نوع الإجراء",
+      "entity": "العنصر المتأثر",
+      "summary": "ماذا حدث",
+      "status": "النتيجة",
+      "ip": "عنوان IP",
+      "actions": "إجراءات",
+      "view_changes": "عرض التفاصيل"
+    },
+    "modal": {
+      "title": "تفاصيل النشاط والعملية",
+      "executive_summary": "ملخص تنفيذي",
+      "event_story": "ماذا حدث؟",
+      "operator_info": "من قام بهذا الإجراء؟",
+      "target_info": "العنصر المستهدف",
+      "session_info": "الجهاز والموقع",
+      "date_time": "التاريخ والوقت",
+      "changes_title": "البيانات والتغييرات",
+      "created_data": "البيانات المسجلة الجديدة",
+      "updated_data": "التعديلات التي تمت",
+      "deleted_data": "السجل الذي تم تعطيله",
+      "no_changes": "لم يتم تسجيل تغييرات تفصيلية محددة لهذه العملية.",
+      "previous_value": "القيمة السابقة",
+      "new_value": "القيمة الجديدة",
+      "field_name": "البيان / الحقل",
+      "technical_details": "بيانات تشخيصية تقنية (للمطورين)",
+      "hide_technical": "إخفاء البيانات التقنية",
+      "details_note": "ملاحظة النظام / الوصف"
+    },
+    "entities": {
+      "User": "حساب مستخدم",
+      "Admin": "مدير النظام",
+      "Engineer": "مهندس الموقع",
+      "Client": "حساب عميل",
+      "StandardItem": "بند تشطيب قياسي",
+      "Project": "مشروع",
+      "ProjectItem": "بند بالمشروع",
+      "DailyUpdate": "تقرير موقع يومي",
+      "Comment": "تعليق / محادثة",
+      "FinancialRecord": "معاملة مالية",
+      "InternalTicket": "طلب داخلي / تذكرة",
+      "Ticket": "طلب داخلي / تذكرة",
+      "Attachment": "مرفق ملف",
+      "Authentication": "جلسة تسجيل دخول"
+    },
+    "actions": {
+      "CREATE": "إنشاء / إضافة جديدة",
+      "UPDATE": "تعديل وتحديث",
+      "DELETE": "تعطيل / حذف",
+      "LOGIN_SUCCESS": "تسجيل دخول ناجح",
+      "LOGIN_FAILED": "فشل تسجيل الدخول",
+      "LOGOUT": "تسجيل خروج",
+      "UPLOAD": "رفع ملف",
+      "DOWNLOAD": "تحميل ملف"
+    },
+    "statuses": {
+      "SUCCESS": "تمت بنجاح",
+      "FAILED": "فشلت العملية"
+    }
   }
 }

@@ -623,5 +623,83 @@
     "prev_page": "Previous Page",
     "next_page": "Next Page",
     "page_indicator": "Page {{page}}"
+  },
+  "activity_logs": {
+    "title": "System Activity Logs",
+    "subtitle": "Track all system actions, updates, and user operations in clear business terms",
+    "filters": "Filter Logs",
+    "filter_user": "Operator / User",
+    "all_users": "All Users",
+    "search_users": "Search users...",
+    "filter_action": "Action Type",
+    "all_actions": "All Actions",
+    "filter_status": "Status",
+    "all_statuses": "All Statuses",
+    "filter_entity": "Category / Entity",
+    "filter_entity_placeholder": "e.g. Project, Financial, Daily Update",
+    "empty": "No activity logs found matching your criteria.",
+    "copied": "Copied to Clipboard!",
+    "copy_json": "Copy Raw JSON",
+    "table": {
+      "date": "Date & Time",
+      "user": "Operator",
+      "action": "Action",
+      "entity": "Subject / Entity",
+      "summary": "What Happened",
+      "status": "Result",
+      "ip": "IP Address",
+      "actions": "Actions",
+      "view_changes": "View Details"
+    },
+    "modal": {
+      "title": "Activity Log Details",
+      "executive_summary": "Executive Summary",
+      "event_story": "What Happened?",
+      "operator_info": "Who Did This?",
+      "target_info": "Target / Subject",
+      "session_info": "Device & Location",
+      "date_time": "Date & Time",
+      "changes_title": "Information & Changes",
+      "created_data": "Registered Information",
+      "updated_data": "Changes Made",
+      "deleted_data": "Deactivated / Removed Record",
+      "no_changes": "No specific field changes recorded for this event.",
+      "previous_value": "Before",
+      "new_value": "After",
+      "field_name": "Field",
+      "technical_details": "Technical Diagnostics (For Developers)",
+      "hide_technical": "Hide Technical Diagnostics",
+      "details_note": "System Note / Description"
+    },
+    "entities": {
+      "User": "User Account",
+      "Admin": "Administrator",
+      "Engineer": "Site Engineer",
+      "Client": "Client Account",
+      "StandardItem": "Standard Item",
+      "Project": "Project",
+      "ProjectItem": "Project Item",
+      "DailyUpdate": "Daily Site Update",
+      "Comment": "Discussion Comment",
+      "FinancialRecord": "Financial Record",
+      "InternalTicket": "Internal Request",
+      "Ticket": "Internal Request",
+      "Attachment": "File Attachment",
+      "Authentication": "Security Session"
+    },
+    "actions": {
+      "CREATE": "Created",
+      "UPDATE": "Updated",
+      "DELETE": "Deactivated",
+      "LOGIN_SUCCESS": "Logged In",
+      "LOGIN_FAILED": "Login Failed",
+      "LOGOUT": "Logged Out",
+      "UPLOAD": "Uploaded File",
+      "DOWNLOAD": "Downloaded File"
+    },
+    "statuses": {
+      "SUCCESS": "Completed Successfully",
+      "FAILED": "Operation Failed"
+    }
   }
 }
