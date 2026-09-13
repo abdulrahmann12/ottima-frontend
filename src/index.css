@@ -44,11 +44,11 @@
     @apply bg-white border border-gray-200 rounded-2xl shadow-card;
   }
 
-  /* ── Input ── */
+  /* ── Input (text-base on mobile to avoid iOS Safari auto-zoom, text-sm on desktop) ── */
   .input-base {
-    @apply w-full px-4 py-3 rounded-xl
+    @apply w-full px-4 py-2.5 sm:py-3 rounded-xl
            bg-white border border-gray-200
-           text-gray-900 placeholder-gray-400
+           text-base sm:text-sm text-gray-900 placeholder-gray-400
            focus:outline-none focus:border-warm-brown focus:ring-2 focus:ring-warm-brown/20
            transition-all duration-200
            disabled:opacity-50 disabled:cursor-not-allowed;
@@ -67,7 +67,7 @@
            focus:outline-none focus:ring-2 focus:ring-warm-brown/40 focus:ring-offset-2 focus:ring-offset-white
            disabled:opacity-60 disabled:cursor-not-allowed
            shadow-sm hover:shadow-md
-           active:scale-[0.98];
+           active:scale-[0.98] cursor-pointer;
   }
 
   /* ── Ghost/text button ── */
@@ -77,12 +77,12 @@
            text-sm font-medium
            transition-colors duration-200
            focus:outline-none focus:ring-2 focus:ring-light-blue
-           hover:bg-light-blue/40;
+           hover:bg-light-blue/40 cursor-pointer;
   }
 
   /* ── Form label ── */
   .form-label {
-    @apply block text-sm font-medium text-gray-700 mb-1.5;
+    @apply block text-xs sm:text-sm font-semibold text-gray-700 mb-1.5;
   }
 
   /* ── Link ── */
@@ -96,6 +96,23 @@
 
   .text-gradient {
     @apply bg-gradient-to-r from-warm-brown to-light-blue bg-clip-text text-transparent;
+  }
+
+  /* iOS Safe Area Inset Helpers */
+  .pb-safe {
+    padding-bottom: max(1.25rem, env(safe-area-inset-bottom, 0px));
+  }
+  .pt-safe {
+    padding-top: max(0.5rem, env(safe-area-inset-top, 0px));
+  }
+
+  /* No Scrollbar Utility */
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
   }
 
   /* Light luxury ambient pattern */
@@ -113,6 +130,7 @@
 
   .scrollbar-thin::-webkit-scrollbar {
     width: 4px;
+    height: 4px;
   }
 
   .scrollbar-thin::-webkit-scrollbar-track {

@@ -223,7 +223,7 @@ export default function Dashboard() {
       <Alert message={error} variant="error" onClose={() => setError(null)} />
 
       {/* ── EXACT 5 KPI STAT CARDS ───────────────────────────── */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3 sm:gap-4">
         {FIVE_KPIS.map((card) => (
           <StatCard
             key={card.key}
@@ -238,10 +238,10 @@ export default function Dashboard() {
       </div>
 
       {/* ── Live Active Project Lifecycle Donut Chart ────────── */}
-      <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-gray-100 pb-4 mb-6">
+      <div className="rounded-2xl border border-gray-200 bg-white p-4 sm:p-6 shadow-sm">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-gray-100 pb-4 mb-4 sm:mb-6">
           <div>
-            <h3 className="text-lg font-bold text-gray-900">
+            <h3 className="text-base sm:text-lg font-bold text-gray-900">
               {t('dashboard.project_breakdown_title', 'Project Lifecycle Distribution')}
             </h3>
             <p className="text-xs text-gray-500 mt-0.5">
@@ -256,10 +256,10 @@ export default function Dashboard() {
           </Link>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 items-center">
           {/* Donut Chart Visualization */}
-          <div className="lg:col-span-5 flex flex-col items-center justify-center py-4">
-            <div className="relative w-52 h-52 flex items-center justify-center">
+          <div className="lg:col-span-5 flex flex-col items-center justify-center py-2 sm:py-4">
+            <div className="relative w-44 h-44 sm:w-52 sm:h-52 flex items-center justify-center">
               <DonutSvg
                 segments={projectMetrics.segments}
                 total={projectMetrics.total}
@@ -267,10 +267,10 @@ export default function Dashboard() {
                 onHoverSegment={setActiveDonutSegment}
               />
               <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none text-center">
-                <span className="text-4xl font-black text-gray-900 tabular-nums tracking-tight">
+                <span className="text-3xl sm:text-4xl font-black text-gray-900 tabular-nums tracking-tight">
                   {projectMetrics.total}
                 </span>
-                <span className="text-xs font-bold text-gray-500 uppercase tracking-wider mt-0.5">
+                <span className="text-[10px] sm:text-xs font-bold text-gray-500 uppercase tracking-wider mt-0.5">
                   {t('dashboard.total_projects', 'Projects')}
                 </span>
               </div>

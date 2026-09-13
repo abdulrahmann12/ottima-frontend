@@ -67,30 +67,31 @@ export default function ProjectTable({
 
   return (
     <div>
-      <div className="overflow-x-auto">
+      {/* ── Desktop View (md+): Standard Table ───────────────── */}
+      <div className="hidden md:block overflow-x-auto">
         <table className="w-full border-collapse text-sm">
           <thead>
-            <tr className="border-b border-gray-200">
+            <tr className="border-b border-gray-200 bg-gray-50/60">
               <th className="px-4 py-3 text-start text-[11px] font-semibold uppercase tracking-wider text-gray-500">
                 {t('projects.name')}
               </th>
               {role !== 'CLIENT' && (
-                <th className="hidden px-4 py-3 text-start text-[11px] font-semibold uppercase tracking-wider text-gray-500 sm:table-cell">
+                <th className="px-4 py-3 text-start text-[11px] font-semibold uppercase tracking-wider text-gray-500">
                   {t('projects.client')}
                 </th>
               )}
               {role === 'ADMIN' && (
-                <th className="hidden px-4 py-3 text-start text-[11px] font-semibold uppercase tracking-wider text-gray-500 md:table-cell">
+                <th className="px-4 py-3 text-start text-[11px] font-semibold uppercase tracking-wider text-gray-500">
                   {t('projects.engineer')}
                 </th>
               )}
               <th className="px-4 py-3 text-start text-[11px] font-semibold uppercase tracking-wider text-gray-500">
                 {t('projects.status')}
               </th>
-              <th className="hidden px-4 py-3 text-start text-[11px] font-semibold uppercase tracking-wider text-gray-500 sm:table-cell">
+              <th className="px-4 py-3 text-start text-[11px] font-semibold uppercase tracking-wider text-gray-500">
                 {t('projects.progress')}
               </th>
-              <th className="hidden px-4 py-3 text-start text-[11px] font-semibold uppercase tracking-wider text-gray-500 lg:table-cell">
+              <th className="px-4 py-3 text-start text-[11px] font-semibold uppercase tracking-wider text-gray-500">
                 {t('projects.target_date')}
               </th>
               {role === 'ADMIN' && (
@@ -133,12 +134,12 @@ export default function ProjectTable({
                     )}
                   </td>
                   {role !== 'CLIENT' && (
-                    <td className="hidden px-4 py-3.5 sm:table-cell">
+                    <td className="px-4 py-3.5">
                       <span className="text-xs text-gray-700">{project.clientName ?? '—'}</span>
                     </td>
                   )}
                   {role === 'ADMIN' && (
-                    <td className="hidden px-4 py-3.5 md:table-cell">
+                    <td className="px-4 py-3.5">
                       <span className="text-xs text-gray-700">{project.engineerName ?? '—'}</span>
                     </td>
                   )}
@@ -150,10 +151,10 @@ export default function ProjectTable({
                       )}
                     </div>
                   </td>
-                  <td className="hidden min-w-[140px] px-4 py-3.5 sm:table-cell">
+                  <td className="min-w-[140px] px-4 py-3.5">
                     <ProgressBar value={project.overallProgressPercentage} />
                   </td>
-                  <td className="hidden px-4 py-3.5 lg:table-cell">
+                  <td className="px-4 py-3.5">
                     <span className="whitespace-nowrap text-xs text-gray-600">{project.targetCompletionDate ?? '—'}</span>
                   </td>
                   {role === 'ADMIN' && (
@@ -173,7 +174,7 @@ export default function ProjectTable({
                             onRestore?.(project)
                           }}
                           disabled={restoringProjectId === project.projectId}
-                          className="rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-1.5 text-xs font-semibold text-emerald-700 transition-colors hover:bg-emerald-100 hover:text-emerald-800 disabled:pointer-events-none disabled:opacity-40"
+                          className="rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-1.5 text-xs font-semibold text-emerald-700 transition-colors hover:bg-emerald-100 hover:text-emerald-800 disabled:pointer-events-none disabled:opacity-40 cursor-pointer"
                         >
                           {restoringProjectId === project.projectId ? t('common.loading') : t('projects.restore_action')}
                         </button>
@@ -185,7 +186,7 @@ export default function ProjectTable({
                             onDelete?.(project)
                           }}
                           disabled={deletingProjectId === project.projectId}
-                          className="rounded-lg border border-red-200 bg-red-50 px-3 py-1.5 text-xs font-semibold text-red-600 transition-colors hover:bg-red-100 hover:text-red-700 disabled:pointer-events-none disabled:opacity-40"
+                          className="rounded-lg border border-red-200 bg-red-50 px-3 py-1.5 text-xs font-semibold text-red-600 transition-colors hover:bg-red-100 hover:text-red-700 disabled:pointer-events-none disabled:opacity-40 cursor-pointer"
                         >
                           {deletingProjectId === project.projectId ? t('common.loading') : t('projects.delete_action')}
                         </button>
@@ -197,6 +198,101 @@ export default function ProjectTable({
             })}
           </tbody>
         </table>
+      </div>
+
+      {/* ── Mobile View (<md): Stacked Native Project Cards ──── */}
+      <div className="block md:hidden p-3.5 space-y-3">
+        {projects.map((project) => {
+          const deletedAt = project.deletedAt ?? project.deletesAt
+          const isDeleted = Boolean(deletedAt)
+          const rowClickable = Boolean(onRowClick)
+
+          return (
+            <div
+              key={project.projectId}
+              onClick={rowClickable ? () => onRowClick?.(project) : undefined}
+              className={`bg-white rounded-2xl border border-[#D9C7B8] p-4 shadow-xs space-y-3 transition-all duration-150 ${
+                rowClickable ? 'cursor-pointer active:scale-[0.99] active:bg-[#F4EDE4]/30 hover:border-warm-brown/60' : ''
+              }`}
+            >
+              {/* Header: Title + Status */}
+              <div className="flex items-start justify-between gap-2">
+                <div className="min-w-0 flex-1">
+                  <h3 className="text-sm font-bold text-gray-900 leading-snug truncate">
+                    {isRtl ? project.nameAr : project.nameEn}
+                  </h3>
+                  {(project.addressEn || project.addressAr) && (
+                    <p className="text-[11px] text-gray-500 truncate mt-0.5">
+                      📍 {isRtl ? project.addressAr : project.addressEn}
+                    </p>
+                  )}
+                </div>
+                <div className="shrink-0">
+                  {isDeleted ? <DeletedBadge label={t('projects.deleted')} /> : <StatusBadge status={project.overallStatus} />}
+                </div>
+              </div>
+
+              {/* Progress Bar Section */}
+              <div className="space-y-1.5 pt-1">
+                <div className="flex items-center justify-between text-[11px]">
+                  <span className="text-gray-500 font-medium">{t('projects.progress', { defaultValue: 'Progress' })}</span>
+                  <span className="font-bold text-gray-900">{project.overallProgressPercentage ?? 0}%</span>
+                </div>
+                <ProgressBar value={project.overallProgressPercentage} />
+              </div>
+
+              {/* Meta Pills (Client, Engineer, Target Date) */}
+              <div className="flex flex-wrap items-center gap-1.5 pt-1 text-[11px]">
+                {role !== 'CLIENT' && project.clientName && (
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-gray-100 text-gray-700">
+                    👤 {project.clientName}
+                  </span>
+                )}
+                {role === 'ADMIN' && project.engineerName && (
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-light-blue/40 text-gray-800">
+                    👷 {project.engineerName}
+                  </span>
+                )}
+                {project.targetCompletionDate && (
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-amber-50 text-amber-800 border border-amber-200/60 ml-auto rtl:mr-auto">
+                    📅 {project.targetCompletionDate}
+                  </span>
+                )}
+              </div>
+
+              {/* Admin Actions on Deleted / Active */}
+              {role === 'ADMIN' && (onDelete || onRestore) && (
+                <div className="pt-2 border-t border-gray-100 flex items-center justify-end gap-2">
+                  {isDeleted ? (
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        onRestore?.(project)
+                      }}
+                      disabled={restoringProjectId === project.projectId}
+                      className="min-h-[38px] px-3.5 py-1.5 rounded-xl border border-emerald-200 bg-emerald-50 text-xs font-bold text-emerald-700 hover:bg-emerald-100 transition-colors disabled:opacity-40 cursor-pointer"
+                    >
+                      {restoringProjectId === project.projectId ? t('common.loading') : t('projects.restore_action')}
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        onDelete?.(project)
+                      }}
+                      disabled={deletingProjectId === project.projectId}
+                      className="min-h-[38px] px-3.5 py-1.5 rounded-xl border border-red-200 bg-red-50 text-xs font-bold text-red-600 hover:bg-red-100 transition-colors disabled:opacity-40 cursor-pointer"
+                    >
+                      {deletingProjectId === project.projectId ? t('common.loading') : t('projects.delete_action')}
+                    </button>
+                  )}
+                </div>
+              )}
+            </div>
+          )
+        })}
       </div>
 
       {/* Pagination */}
