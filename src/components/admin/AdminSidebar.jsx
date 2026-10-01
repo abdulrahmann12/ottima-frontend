@@ -1,6 +1,7 @@
 import { logout as logoutApi } from '@/api/authApi'
 import useAuthStore from '@/store/authStore'
 import useUIStore from '@/store/uiStore'
+import OttimaLogo from '@/components/ui/OttimaLogo'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { NavLink, useNavigate } from 'react-router-dom'
@@ -113,13 +114,12 @@ export default function AdminSidebar({
       {/* Logo area */}
       <div className={`flex items-center gap-3 px-4 py-5 border-b border-warm-brown/20 flex-shrink-0
         ${sidebarCollapsed ? 'justify-center' : ''}`}>
-        <OttimaLogoMark />
-        {!sidebarCollapsed && (
-          <div className="min-w-0">
-            <p className="text-black font-extrabold text-base tracking-tight truncate">OTTIMA</p>
-            <p className="text-gray-700 text-[11px] font-medium truncate">{panelSubtitle}</p>
-          </div>
-        )}
+        <OttimaLogo
+          variant="lockup"
+          color="c1"
+          collapsed={sidebarCollapsed}
+          subtitle={panelSubtitle}
+        />
       </div>
 
       {/* Navigation */}
@@ -237,17 +237,6 @@ export default function AdminSidebar({
 }
 
 /* ── Icons ────────────────────────────────────────────────── */
-
-function OttimaLogoMark() {
-  return (
-    <div className="w-8 h-8 rounded-lg bg-warm-brown border border-warm-brown/80 flex items-center justify-center flex-shrink-0">
-      <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 40 40">
-        <path d="M8 32 L20 8 L32 32" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
-        <path d="M13 24 L27 24" stroke="currentColor" strokeWidth="3" strokeLinecap="round"/>
-      </svg>
-    </div>
-  )
-}
 
 export function DashboardIcon({ className }) {
   return (

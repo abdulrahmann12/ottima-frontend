@@ -36,13 +36,18 @@ export default {
         'brand-accent':    '#C4DAE8',
         'brand-dark':      '#111827',
 
+        // ── Brand logo palette ──────────────────────────────────
+        'brand-c1': '#5B4B3A',   // Deep bronze warm brown (from Ottima Logo C1)
+        'brand-c2': '#C6AB7C',   // Champagne sand gold (from Ottima Logo C2)
+
         // ── Accent color (used in AuthLayout decorative elements) ─
         accent: '#C4DAE8',  // = light-blue
       },
 
       fontFamily: {
-        sans:   ['Inter', 'system-ui', 'sans-serif'],
-        arabic: ['Cairo', 'system-ui', 'sans-serif'],
+        sans:   ['"Century Gothic"', 'Montserrat', 'Urbanist', 'system-ui', '-apple-system', 'sans-serif'],
+        brand:  ['"Century Gothic"', 'Montserrat', 'Urbanist', 'sans-serif'],
+        arabic: ['Alexandria', 'Cairo', 'system-ui', 'sans-serif'],
       },
 
       backgroundImage: {

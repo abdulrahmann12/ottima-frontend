@@ -37,6 +37,9 @@ export default function AdminHeader({ title, onMenuToggle }) {
             </svg>
           </button>
 
+          {/* Mobile brand icon */}
+          <img src="/logos/ICON_C1.png" alt="OTTIMA" className="lg:hidden w-6 h-6 object-contain shrink-0" />
+
           {/* Page title */}
           <div className="min-w-0">
             <h1 className="text-black font-extrabold text-base tracking-tight truncate">{title}</h1>

@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next'
 import LanguageSwitcher from '@/components/ui/LanguageSwitcher'
+import OttimaLogo from '@/components/ui/OttimaLogo'
 
 /**
  * AuthLayout — Dashboard-matched Modern Classic Light Aesthetic
@@ -26,15 +27,15 @@ export default function AuthLayout({ children }) {
 
         {/* Brand content */}
         <div className="relative z-10 text-center max-w-md mx-auto">
-          {/* Logo mark */}
-          <div className="flex items-center justify-center mb-8">
-            <OttimaLogo className="w-20 h-20" />
+          {/* Logo mark & Wordmark */}
+          <div className="flex flex-col items-center justify-center mb-8">
+            <OttimaLogo
+              variant="full"
+              color="c1"
+              className="h-36 sm:h-44 xl:h-52 w-auto max-w-[280px] xl:max-w-[320px] drop-shadow-sm transition-transform duration-300 hover:scale-[1.02]"
+              alt="OTTIMA"
+            />
           </div>
-
-          {/* Wordmark */}
-          <h1 className="text-5xl xl:text-6xl font-extrabold tracking-[0.16em] text-gray-900 mb-4">
-            OT<span className="text-warm-brown">TIM</span>A
-          </h1>
 
           {/* Tagline */}
           <p className="text-gray-800 text-lg xl:text-xl font-semibold tracking-wide leading-relaxed">
@@ -90,10 +91,7 @@ export default function AuthLayout({ children }) {
         <div className="flex items-center justify-between px-6 py-4 lg:px-8 lg:py-5">
           {/* Mobile-only logo */}
           <div className="lg:hidden flex items-center gap-2.5">
-            <OttimaLogoSmall />
-            <span className="font-extrabold text-gray-900 text-lg tracking-wider">
-              OT<span className="text-warm-brown">TIM</span>A
-            </span>
+            <OttimaLogo variant="lockup" color="c1" />
           </div>
           {/* Desktop spacer */}
           <div className="hidden lg:block" />
@@ -120,34 +118,6 @@ export default function AuthLayout({ children }) {
 }
 
 /* ── Sub-components ─────────────────────────────────────────── */
-
-function OttimaLogo({ className }) {
-  return (
-    <div className={`${className} relative flex items-center justify-center`}>
-      {/* Outer subtle halo ring */}
-      <div className="absolute inset-0 rounded-2xl border border-warm-brown/30 shadow-[0_0_24px_rgba(125,88,63,0.15)] animate-pulse-soft" />
-      {/* Inner warm brown container */}
-      <div className="absolute inset-2 rounded-xl bg-warm-brown flex items-center justify-center shadow-md">
-        <svg className="w-9 h-9 text-white" fill="none" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
-          <path d="M8 32 L20 8 L32 32" stroke="currentColor" strokeWidth="2.75" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
-          <path d="M12 24 L28 24" stroke="currentColor" strokeWidth="2.75" strokeLinecap="round"/>
-          <circle cx="20" cy="8" r="2" fill="currentColor"/>
-        </svg>
-      </div>
-    </div>
-  )
-}
-
-function OttimaLogoSmall() {
-  return (
-    <div className="w-8 h-8 rounded-lg bg-warm-brown border border-warm-brown/80 flex items-center justify-center flex-shrink-0 shadow-sm">
-      <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 40 40">
-        <path d="M8 32 L20 8 L32 32" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
-        <path d="M13 24 L27 24" stroke="currentColor" strokeWidth="3" strokeLinecap="round"/>
-      </svg>
-    </div>
-  )
-}
 
 function DecorativeGeometry() {
   return (

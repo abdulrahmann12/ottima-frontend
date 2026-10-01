@@ -238,6 +238,12 @@ export default function MobileBottomNav({ navItems: customNavItems }) {
                 <span>{t('auth.logout', { defaultValue: 'Logout' })}</span>
               </button>
             </div>
+
+            {/* Brand Footer */}
+            <div className="pt-3 pb-1 flex items-center justify-center gap-1.5 opacity-60">
+              <img src="/logos/ICON_C1.png" alt="OTTIMA" className="w-4 h-4 object-contain" />
+              <img src="/logos/TYPE_C1.png" alt="OTTIMA" className="h-2.5 w-auto object-contain" />
+            </div>
           </div>
         </div>
       )}
