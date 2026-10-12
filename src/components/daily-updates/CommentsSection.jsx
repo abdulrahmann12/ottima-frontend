@@ -23,14 +23,33 @@ const PAGE_SIZE = 10
 const apiError = (err, fallback) => err?.response?.data?.message ?? fallback
 
 function formatRelativeTime(value, language) {
-  if (!value) return '—'
+  if (!value) return ''
   const parsed = new Date(value)
   if (Number.isNaN(parsed.getTime())) return value
-  const locale = language === 'ar' ? 'ar-EG' : 'en-US'
-  return new Intl.DateTimeFormat(locale, {
-    dateStyle: 'medium',
-    timeStyle: 'short',
-  }).format(parsed)
+  const isAr = language === 'ar'
+  const today = new Date()
+  const yesterday = new Date(today)
+  yesterday.setDate(yesterday.getDate() - 1)
+
+  const timeStr = parsed.toLocaleTimeString(isAr ? 'ar-EG' : 'en-US', {
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: true,
+  })
+
+  if (parsed.toDateString() === today.toDateString()) {
+    return `${isAr ? 'اليوم' : 'Today'} · ${timeStr}`
+  }
+  if (parsed.toDateString() === yesterday.toDateString()) {
+    return `${isAr ? 'أمس' : 'Yesterday'} · ${timeStr}`
+  }
+
+  const dateStr = parsed.toLocaleDateString(isAr ? 'ar-EG' : 'en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: parsed.getFullYear() !== today.getFullYear() ? 'numeric' : undefined,
+  })
+  return `${dateStr} · ${timeStr}`
 }
 
 // ─── Inline SVG icons ─────────────────────────────────────────
@@ -280,16 +299,22 @@ function CommentCard({
         </div>
 
         <div className="min-w-0 flex-1">
-          <div className="flex items-center justify-between gap-2">
-            <div className="flex items-center gap-2">
-              <span className="text-xs font-semibold text-blue-700">{clientName}</span>
-              <span className="text-[11px] text-gray-400">
-                {formatRelativeTime(comment.createdAt, i18n.language)}
-              </span>
+          <div className="flex items-start justify-between gap-2">
+            <div className="min-w-0 flex-1">
+              <div className="flex flex-wrap items-center gap-x-2.5 gap-y-0.5">
+                <span className="text-xs font-bold text-blue-700 truncate max-w-[180px] sm:max-w-none" title={clientName}>
+                  {clientName}
+                </span>
+                {comment.createdAt && (
+                  <span className="text-[11px] text-gray-400 font-medium whitespace-nowrap shrink-0">
+                    {formatRelativeTime(comment.createdAt, i18n.language)}
+                  </span>
+                )}
+              </div>
             </div>
 
             {/* Actions */}
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-1 shrink-0 -mt-0.5">
               {isClient && (
                 <CommentMenu
                   canEdit={canEdit}
@@ -304,7 +329,7 @@ function CommentCard({
                   id={`comment-delete-admin-${comment.id}`}
                   onClick={handleDelete}
                   disabled={deleting}
-                  className="flex h-7 w-7 items-center justify-center rounded-lg text-gray-400 transition-colors hover:bg-red-50 hover:text-red-500"
+                  className="flex h-7 w-7 items-center justify-center rounded-lg text-gray-400 transition-colors hover:bg-red-50 hover:text-red-500 cursor-pointer"
                   aria-label="Delete comment"
                 >
                   {deleting ? <Spinner className="w-3.5 h-3.5" /> : <TrashIcon />}
@@ -326,7 +351,7 @@ function CommentCard({
               />
             </div>
           ) : (
-            <p className="mt-1.5 rounded-xl rounded-tl-none border border-blue-100 bg-blue-50 px-4 py-3 text-sm leading-6 text-gray-700">
+            <p className="mt-1.5 rounded-2xl rounded-ss-xs border border-blue-100/90 bg-blue-50/70 px-4 py-2.5 text-sm leading-relaxed text-gray-800 break-words shadow-2xs">
               {comment.clientComment}
             </p>
           )}
@@ -335,31 +360,31 @@ function CommentCard({
 
       {/* ── Admin reply / Admin reply form ── */}
       {hasReply ? (
-        <div className="ml-11 flex items-start gap-3">
+        <div className="ms-8 sm:ms-11 flex items-start gap-3">
           <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-amber-100 text-xs font-bold text-amber-700 ring-1 ring-amber-200">
             {adminInitial}
           </div>
           <div className="min-w-0 flex-1">
-            <div className="flex items-center gap-2">
-              <span className="text-xs font-semibold text-amber-700">{adminName}</span>
-              <span className="text-[10px] rounded-full bg-amber-50 px-2 py-0.5 text-[10px] font-medium text-amber-600 border border-amber-200">
+            <div className="flex flex-wrap items-center gap-x-2.5 gap-y-0.5">
+              <span className="text-xs font-bold text-amber-800">{adminName}</span>
+              <span className="rounded-full bg-amber-100/80 px-2 py-0.5 text-[10px] font-bold text-amber-700 border border-amber-200">
                 Official Reply
               </span>
             </div>
-            <p className="mt-1.5 rounded-xl rounded-tl-none border border-amber-100 bg-amber-50 px-4 py-3 text-sm leading-6 text-gray-700">
+            <p className="mt-1.5 rounded-2xl rounded-ss-xs border border-amber-200/80 bg-amber-50/80 px-4 py-2.5 text-sm leading-relaxed text-gray-800 break-words shadow-2xs">
               {comment.adminReply}
             </p>
           </div>
         </div>
       ) : (
         isAdmin && (
-          <div className="ml-11">
+          <div className="ms-8 sm:ms-11">
             {!replying ? (
               <button
                 type="button"
                 id={`comment-reply-btn-${comment.id}`}
                 onClick={() => setReplying(true)}
-                className="flex items-center gap-1.5 rounded-lg border border-warm-brown/30 bg-warm-brown/10 px-3 py-1.5 text-xs font-medium text-warm-brown transition-all hover:border-warm-brown/50 hover:bg-warm-brown/20 hover:text-[#6B4A33]"
+                className="flex items-center gap-1.5 rounded-lg border border-warm-brown/30 bg-warm-brown/10 px-3 py-1.5 text-xs font-medium text-warm-brown transition-all hover:border-warm-brown/50 hover:bg-warm-brown/20 hover:text-[#6B4A33] cursor-pointer"
               >
                 <ReplyIcon className="w-3.5 h-3.5" />
                 Reply

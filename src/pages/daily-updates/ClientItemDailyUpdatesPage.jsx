@@ -1,7 +1,7 @@
 import { getClientDailyUpdates } from '@/api/clientDailyUpdateApi'
 import { resolveNotificationContext } from '@/api/notificationApi'
 import CommentsSection from '@/components/daily-updates/CommentsSection'
-import ImageLightboxModal from '@/components/daily-updates/ImageLightboxModal'
+import DailyUpdateMediaGallery from '@/components/daily-updates/DailyUpdateMediaGallery'
 import Alert from '@/components/ui/Alert'
 import { optimizeCloudinaryUrl } from '@/utils/imageUtils'
 import { useCallback, useEffect, useRef, useState } from 'react'
@@ -137,7 +137,7 @@ export default function ClientItemDailyUpdatesPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 pb-20 sm:pb-8">
       <section className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-card">
         <div className="border-b border-gray-200 bg-gradient-to-r from-cream/60 via-white to-gray-50/80 px-5 py-6 sm:px-6">
           <button
@@ -252,34 +252,11 @@ export default function ClientItemDailyUpdatesPage() {
                       </p>
 
                       {update.images?.length > 0 && (
-                        <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                          {update.images.map((image) => (
-                            <div
-                              key={image.updateImageId}
-                              className="group relative overflow-hidden rounded-xl border border-gray-200 bg-gray-50 shadow-sm transition-all hover:border-warm-brown/40"
-                            >
-                              <div
-                                className="aspect-[4/3] overflow-hidden bg-gray-100 cursor-zoom-in"
-                                onClick={() => setPreviewImage(image.imageUrl)}
-                                title="Click to zoom image"
-                              >
-                                <img
-                                  src={optimizeCloudinaryUrl(image.imageUrl, { width: 600 })}
-                                  alt={update.title}
-                                  loading="lazy"
-                                  decoding="async"
-                                  className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-                                />
-                              </div>
-                              <div className="flex items-center justify-between border-t border-gray-200 bg-white px-3 py-2">
-                                <p className="text-[11px] font-semibold uppercase tracking-wider text-gray-400">{t('daily_updates.image_review')}</p>
-                                <span className="inline-flex items-center rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-0.5 text-[11px] font-semibold text-emerald-700">
-                                  {t('daily_updates.approved')}
-                                </span>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
+                        <DailyUpdateMediaGallery
+                          images={update.images}
+                          title={update.title}
+                          showApprovalStatus={false}
+                        />
                       )}
 
                       {/* ── Comments thread ── */}
@@ -318,12 +295,6 @@ export default function ClientItemDailyUpdatesPage() {
         </section>
       )}
 
-      <ImageLightboxModal
-        isOpen={Boolean(previewImage)}
-        src={previewImage}
-        alt="Daily Update Image"
-        onClose={() => setPreviewImage(null)}
-      />
     </div>
   )
 }

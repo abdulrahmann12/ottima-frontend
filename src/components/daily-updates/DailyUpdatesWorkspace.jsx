@@ -1,4 +1,5 @@
 import SearchableSelect from '@/components/ui/SearchableSelect'
+import { useTranslation } from 'react-i18next'
 
 export function DailyUpdatesSelectionCard({
   eyebrow,
@@ -94,17 +95,24 @@ export function DailyUpdatesPlaceholder({ title, copy }) {
 }
 
 export function DailyUpdateStatusPill({ status }) {
+  const { i18n } = useTranslation()
+  const isAr = i18n.language === 'ar'
   const palette = {
     PENDING:  'border-amber-200  bg-amber-50  text-amber-700',
     APPROVED: 'border-emerald-200 bg-emerald-50 text-emerald-700',
     REJECTED: 'border-rose-200   bg-rose-50   text-rose-700',
+  }
+  const labels = {
+    PENDING: isAr ? 'قيد المراجعة' : 'Pending',
+    APPROVED: isAr ? 'معتمد' : 'Approved',
+    REJECTED: isAr ? 'مرفوض' : 'Rejected',
   }
 
   return (
     <span
       className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-[11px] font-semibold ${palette[status] ?? 'border-gray-200 bg-gray-100 text-gray-600'}`}
     >
-      {status ?? 'PENDING'}
+      {labels[status] || status || (isAr ? 'قيد المراجعة' : 'Pending')}
     </span>
   )
 }

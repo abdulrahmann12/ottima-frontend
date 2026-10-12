@@ -118,10 +118,10 @@ export default function Dashboard() {
           key: 'COMPLETED',
           label: t('dashboard.completed_projects', 'Completed Projects'),
           count: completed,
-          color: '#556B2F', // Olive / Forest Green
-          hoverColor: '#6B8E23',
+          color: '#10B981', // Clean Vibrant Emerald Green
+          hoverColor: '#059669',
           bg: 'bg-emerald-50 text-emerald-800 border-emerald-200',
-          dotBg: 'bg-emerald-600',
+          dotBg: 'bg-emerald-500',
         },
         {
           key: 'DELIVERED',
@@ -197,11 +197,8 @@ export default function Dashboard() {
       {/* ── Page Header ────────────────────────────────────────── */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 tracking-tight flex items-center gap-2.5">
-            <span>{t('dashboard.title', 'Executive Dashboard')}</span>
-            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
-              ● Live System
-            </span>
+          <h1 className="text-2xl font-bold text-gray-900 tracking-tight">
+            {t('dashboard.title', 'Executive Dashboard')}
           </h1>
           <p className="text-gray-500 text-sm mt-1">
             {t('dashboard.subtitle', 'Real-time project operations, performance KPIs, and system analytics')}
@@ -223,7 +220,7 @@ export default function Dashboard() {
       <Alert message={error} variant="error" onClose={() => setError(null)} />
 
       {/* ── EXACT 5 KPI STAT CARDS ───────────────────────────── */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3 sm:gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-2 sm:gap-4">
         {FIVE_KPIS.map((card) => (
           <StatCard
             key={card.key}

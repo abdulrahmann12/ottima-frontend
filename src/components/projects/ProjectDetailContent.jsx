@@ -90,13 +90,18 @@ export default function ProjectDetailContent({
       return
     }
 
+    const initialEngineerIds = project.engineerIds?.length
+      ? project.engineerIds.map(String)
+      : (project.engineerId ? [String(project.engineerId)] : [])
+
     setEditForm({
       nameAr: project.nameAr ?? '',
       nameEn: project.nameEn ?? '',
       addressAr: project.addressAr ?? '',
       addressEn: project.addressEn ?? '',
       estimatedBudget: String(project.estimatedBudget ?? ''),
-      engineerId: String(project.engineerId ?? ''),
+      engineerId: initialEngineerIds[0] ?? '',
+      engineerIds: initialEngineerIds,
       startDate: project.startDate ?? '',
       targetCompletionDate: project.targetCompletionDate ?? '',
     })
@@ -107,10 +112,18 @@ export default function ProjectDetailContent({
 
   const submitEdit = (e) => {
     e.preventDefault()
+    const selectedEngIds = (editForm.engineerIds || []).map(Number).filter(Boolean)
+    const primaryEng = selectedEngIds[0] || (editForm.engineerId ? Number(editForm.engineerId) : undefined)
+    if (!primaryEng && selectedEngIds.length === 0) {
+      setError(t('projects.engineer_required', 'At least one engineer must be assigned'))
+      return
+    }
+
     mutate(
       () => updateProject(project.projectId, {
         ...editForm,
-        engineerId: Number(editForm.engineerId),
+        engineerId: primaryEng,
+        engineerIds: selectedEngIds.length > 0 ? selectedEngIds : [primaryEng],
         estimatedBudget: Number(editForm.estimatedBudget),
         overallStatus: project.overallStatus,
       }),
@@ -174,13 +187,18 @@ export default function ProjectDetailContent({
           <Input id="edit-budget" label={t('projects.budget')} type="number" min="0" step="0.01" value={editForm.estimatedBudget} onChange={field('estimatedBudget')} required />
           <SearchableSelect
             id="edit-engineer"
-            label={t('projects.engineer')}
+            label={t('projects.engineers', 'Engineers')}
             required
-            placeholder={project.engineerName || t('projects.select_engineer', 'Select Engineer')}
-            value={editForm.engineerId}
-            onChange={(val) => {
-              const value = typeof val === 'object' && val !== null && 'target' in val ? val.target.value : val
-              setEditForm((prev) => ({ ...prev, engineerId: value }))
+            multiple
+            placeholder={t('projects.select_engineers', 'Select Engineers')}
+            value={editForm.engineerIds}
+            onChange={(e) => {
+              const vals = Array.isArray(e.target.value) ? e.target.value : [e.target.value]
+              setEditForm((prev) => ({
+                ...prev,
+                engineerIds: vals,
+                engineerId: vals[0] || '',
+              }))
             }}
             options={engineers.map((engineer) => ({
               value: engineer.userId,
@@ -334,7 +352,7 @@ function ProjectItemCard({ item, projectId, isAdmin, isEngineer, saving, t, i18n
       {isAdmin && showItemEdit && (
         <form className="mt-3 grid grid-cols-2 gap-2 border-t border-gray-200 pt-3 sm:grid-cols-4" onSubmit={submitItemConfig}>
           <MiniInput name="budget" label={t('projects.item_budget')} type="number" min="0" step="0.01" defaultValue={item.budget} />
-          <MiniInput name="weightPercentage" label={t('projects.weight')} type="number" min="0" max="100" step="0.01" defaultValue={item.weightPercentage} />
+          <MiniInput name="weightPercentage" label={`${t('projects.weight')} (%)`} type="number" min="0" max="100" step="0.01" defaultValue={item.weightPercentage} />
           <MiniInput name="sequenceOrder" label={t('projects.sequence')} type="number" min="1" defaultValue={item.sequenceOrder} />
           <MiniInput name="generalNotes" label={t('projects.notes')} defaultValue={item.generalNotes} />
           <div className="col-span-full flex justify-end">

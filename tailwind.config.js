@@ -45,9 +45,9 @@ export default {
       },
 
       fontFamily: {
-        sans:   ['"Century Gothic"', 'Montserrat', 'Urbanist', 'system-ui', '-apple-system', 'sans-serif'],
-        brand:  ['"Century Gothic"', 'Montserrat', 'Urbanist', 'sans-serif'],
-        arabic: ['Alexandria', 'Cairo', 'system-ui', 'sans-serif'],
+        sans:   ['Montserrat', 'Alexandria', 'system-ui', '-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'Roboto', 'sans-serif'],
+        brand:  ['Montserrat', 'Alexandria', 'sans-serif'],
+        arabic: ['Alexandria', 'Cairo', 'system-ui', '-apple-system', 'sans-serif'],
       },
 
       backgroundImage: {
@@ -69,6 +69,7 @@ export default {
       animation: {
         'fade-in':    'fadeIn 0.15s ease-out',
         'slide-up':   'slideUp 0.2s ease-out',
+        'slide-down': 'slideDown 0.2s ease-out',
         'float':      'float 6s ease-in-out infinite',
         'pulse-soft': 'pulseSoft 3s ease-in-out infinite',
         'spin-slow':  'spin 8s linear infinite',
@@ -81,6 +82,10 @@ export default {
         },
         slideUp: {
           '0%':   { opacity: '0', transform: 'translateY(12px)' },
+          '100%': { opacity: '1', transform: 'translateY(0)' },
+        },
+        slideDown: {
+          '0%':   { opacity: '0', transform: 'translateY(-12px)' },
           '100%': { opacity: '1', transform: 'translateY(0)' },
         },
         float: {

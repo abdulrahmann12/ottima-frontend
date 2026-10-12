@@ -140,7 +140,20 @@ export default function ProjectTable({
                   )}
                   {role === 'ADMIN' && (
                     <td className="px-4 py-3.5">
-                      <span className="text-xs text-gray-700">{project.engineerName ?? '—'}</span>
+                      {project.engineerName ? (
+                        <div className="flex flex-wrap gap-1 max-w-[240px]">
+                          {project.engineerName.split(',').map((name, i) => (
+                            <span
+                              key={i}
+                              className="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-medium bg-[#8B5A2B]/10 text-[#8B5A2B] border border-[#8B5A2B]/20"
+                            >
+                              {name.trim()}
+                            </span>
+                          ))}
+                        </div>
+                      ) : (
+                        <span className="text-xs text-gray-400">—</span>
+                      )}
                     </td>
                   )}
                   <td className="px-4 py-3.5">
@@ -174,9 +187,12 @@ export default function ProjectTable({
                             onRestore?.(project)
                           }}
                           disabled={restoringProjectId === project.projectId}
-                          className="rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-1.5 text-xs font-semibold text-emerald-700 transition-colors hover:bg-emerald-100 hover:text-emerald-800 disabled:pointer-events-none disabled:opacity-40 cursor-pointer"
+                          className="inline-flex items-center gap-1.5 rounded-xl border border-emerald-200 bg-emerald-50 px-2.5 py-1.5 text-xs font-semibold text-emerald-700 transition-colors hover:bg-emerald-100 hover:text-emerald-800 disabled:pointer-events-none disabled:opacity-40 cursor-pointer shadow-2xs"
                         >
-                          {restoringProjectId === project.projectId ? t('common.loading') : t('projects.restore_action')}
+                          <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
+                          </svg>
+                          <span>{restoringProjectId === project.projectId ? t('common.loading') : t('projects.restore_action')}</span>
                         </button>
                       ) : (
                         <button
@@ -186,9 +202,13 @@ export default function ProjectTable({
                             onDelete?.(project)
                           }}
                           disabled={deletingProjectId === project.projectId}
-                          className="rounded-lg border border-red-200 bg-red-50 px-3 py-1.5 text-xs font-semibold text-red-600 transition-colors hover:bg-red-100 hover:text-red-700 disabled:pointer-events-none disabled:opacity-40 cursor-pointer"
+                          className="inline-flex items-center gap-1.5 rounded-xl border border-red-200 bg-red-50/80 px-2.5 py-1.5 text-xs font-semibold text-red-600 transition-colors hover:bg-red-100 hover:text-red-700 hover:border-red-300 disabled:pointer-events-none disabled:opacity-40 cursor-pointer shadow-2xs"
+                          title={t('projects.delete_action', 'Delete Project')}
                         >
-                          {deletingProjectId === project.projectId ? t('common.loading') : t('projects.delete_action')}
+                          <svg className="w-3.5 h-3.5 text-red-500" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                          </svg>
+                          <span>{deletingProjectId === project.projectId ? t('common.loading') : t('projects.delete_action')}</span>
                         </button>
                       )}
                     </td>
@@ -201,7 +221,7 @@ export default function ProjectTable({
       </div>
 
       {/* ── Mobile View (<md): Stacked Native Project Cards ──── */}
-      <div className="block md:hidden p-3.5 space-y-3">
+      <div className="block md:hidden p-0 sm:p-3.5 space-y-3">
         {projects.map((project) => {
           const deletedAt = project.deletedAt ?? project.deletesAt
           const isDeleted = Boolean(deletedAt)
@@ -211,8 +231,8 @@ export default function ProjectTable({
             <div
               key={project.projectId}
               onClick={rowClickable ? () => onRowClick?.(project) : undefined}
-              className={`bg-white rounded-2xl border border-[#D9C7B8] p-4 shadow-xs space-y-3 transition-all duration-150 ${
-                rowClickable ? 'cursor-pointer active:scale-[0.99] active:bg-[#F4EDE4]/30 hover:border-warm-brown/60' : ''
+              className={`bg-white rounded-2xl border border-gray-200/90 hover:border-warm-brown/40 p-4 shadow-xs hover:shadow-md transition-all duration-200 space-y-3 ${
+                rowClickable ? 'cursor-pointer active:scale-[0.99]' : ''
               }`}
             >
               {/* Header: Title + Status */}
@@ -222,8 +242,12 @@ export default function ProjectTable({
                     {isRtl ? project.nameAr : project.nameEn}
                   </h3>
                   {(project.addressEn || project.addressAr) && (
-                    <p className="text-[11px] text-gray-500 truncate mt-0.5">
-                      📍 {isRtl ? project.addressAr : project.addressEn}
+                    <p className="text-[11px] text-gray-500 truncate mt-0.5 flex items-center gap-1">
+                      <svg className="w-3 h-3 text-gray-400 shrink-0" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />
+                      </svg>
+                      <span className="truncate">{isRtl ? project.addressAr : project.addressEn}</span>
                     </p>
                   )}
                 </div>
@@ -238,58 +262,89 @@ export default function ProjectTable({
                   <span className="text-gray-500 font-medium">{t('projects.progress', { defaultValue: 'Progress' })}</span>
                   <span className="font-bold text-gray-900">{project.overallProgressPercentage ?? 0}%</span>
                 </div>
-                <ProgressBar value={project.overallProgressPercentage} />
+                <ProgressBar value={project.overallProgressPercentage} showValue={false} />
               </div>
 
-              {/* Meta Pills (Client, Engineer, Target Date) */}
+              {/* Meta Pills (Client, Engineers, Target Date) */}
               <div className="flex flex-wrap items-center gap-1.5 pt-1 text-[11px]">
                 {role !== 'CLIENT' && project.clientName && (
-                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-gray-100 text-gray-700">
-                    👤 {project.clientName}
+                  <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-gray-100 text-gray-700 font-medium border border-gray-200/60">
+                    <svg className="w-3 h-3 text-gray-400 shrink-0" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
+                    </svg>
+                    <span>{project.clientName}</span>
                   </span>
                 )}
                 {role === 'ADMIN' && project.engineerName && (
-                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-light-blue/40 text-gray-800">
-                    👷 {project.engineerName}
-                  </span>
+                  <div className="flex flex-wrap items-center gap-1">
+                    {project.engineerName.split(',').map((name, i) => (
+                      <span
+                        key={i}
+                        className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-[#8B5A2B]/10 text-[#8B5A2B] text-[11px] font-medium border border-[#8B5A2B]/20"
+                      >
+                        {name.trim()}
+                      </span>
+                    ))}
+                  </div>
                 )}
                 {project.targetCompletionDate && (
-                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-amber-50 text-amber-800 border border-amber-200/60 ml-auto rtl:mr-auto">
-                    📅 {project.targetCompletionDate}
+                  <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-amber-50 text-amber-800 text-[11px] font-medium border border-amber-200/60 ml-auto rtl:mr-auto">
+                    <svg className="w-3 h-3 text-amber-600 shrink-0" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 9v7.5" />
+                    </svg>
+                    <span>{project.targetCompletionDate}</span>
                   </span>
                 )}
               </div>
 
-              {/* Admin Actions on Deleted / Active */}
-              {role === 'ADMIN' && (onDelete || onRestore) && (
-                <div className="pt-2 border-t border-gray-100 flex items-center justify-end gap-2">
-                  {isDeleted ? (
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        onRestore?.(project)
-                      }}
-                      disabled={restoringProjectId === project.projectId}
-                      className="min-h-[38px] px-3.5 py-1.5 rounded-xl border border-emerald-200 bg-emerald-50 text-xs font-bold text-emerald-700 hover:bg-emerald-100 transition-colors disabled:opacity-40 cursor-pointer"
-                    >
-                      {restoringProjectId === project.projectId ? t('common.loading') : t('projects.restore_action')}
-                    </button>
-                  ) : (
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        onDelete?.(project)
-                      }}
-                      disabled={deletingProjectId === project.projectId}
-                      className="min-h-[38px] px-3.5 py-1.5 rounded-xl border border-red-200 bg-red-50 text-xs font-bold text-red-600 hover:bg-red-100 transition-colors disabled:opacity-40 cursor-pointer"
-                    >
-                      {deletingProjectId === project.projectId ? t('common.loading') : t('projects.delete_action')}
-                    </button>
-                  )}
-                </div>
-              )}
+              {/* Card Footer: Details Link + Delete / Restore */}
+              <div className="pt-2.5 border-t border-gray-100 flex items-center justify-between gap-2">
+                {rowClickable ? (
+                  <span className="text-xs font-semibold text-warm-brown flex items-center gap-1 hover:underline">
+                    {t('common.details', 'View Details')}
+                    <svg className="w-3.5 h-3.5 rtl:rotate-180" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+                    </svg>
+                  </span>
+                ) : <div />}
+
+                {role === 'ADMIN' && (onDelete || onRestore) && (
+                  <div>
+                    {isDeleted ? (
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          onRestore?.(project)
+                        }}
+                        disabled={restoringProjectId === project.projectId}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-emerald-200 bg-emerald-50 text-xs font-semibold text-emerald-700 hover:bg-emerald-100 transition-all active:scale-95 cursor-pointer disabled:opacity-40"
+                      >
+                        <svg className="w-3.5 h-3.5 text-emerald-600" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
+                        </svg>
+                        <span>{restoringProjectId === project.projectId ? t('common.loading') : t('projects.restore_action')}</span>
+                      </button>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          onDelete?.(project)
+                        }}
+                        disabled={deletingProjectId === project.projectId}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-red-200 bg-red-50 text-xs font-semibold text-red-600 hover:bg-red-100 hover:text-red-700 transition-all active:scale-95 cursor-pointer disabled:opacity-40 shadow-2xs"
+                        title={t('projects.delete_action', 'Delete')}
+                      >
+                        <svg className="w-3.5 h-3.5 text-red-500" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                        </svg>
+                        <span>{deletingProjectId === project.projectId ? t('common.loading') : t('projects.delete_action')}</span>
+                      </button>
+                    )}
+                  </div>
+                )}
+              </div>
             </div>
           )
         })}
@@ -361,7 +416,7 @@ function DeletedBadge({ label }) {
   )
 }
 
-export function ProgressBar({ value, className = '' }) {
+export function ProgressBar({ value, className = '', showValue = true }) {
   const pct = Math.min(Math.max(Number(value ?? 0), 0), 100)
   const color = pct >= 80 ? 'bg-emerald-500' : pct >= 40 ? 'bg-warm-brown' : 'bg-amber-500'
   return (
@@ -372,7 +427,9 @@ export function ProgressBar({ value, className = '' }) {
           style={{ width: `${pct}%` }}
         />
       </div>
-      <span className="w-9 text-end text-[11px] tabular-nums font-mono text-gray-600">{pct.toFixed(0)}%</span>
+      {showValue && (
+        <span className="w-9 text-end text-[11px] tabular-nums font-mono text-gray-600">{pct.toFixed(0)}%</span>
+      )}
     </div>
   )
 }

@@ -337,36 +337,77 @@ function AdminDailyUpdateCard({ update, language, t, onEvaluate, onPreviewImage 
           </Button>
         </div>
 
+        {update.status === 'REJECTED' && update.rejectionReason && (
+          <div className="rounded-xl border border-rose-200 bg-rose-50/90 p-4 text-sm text-rose-900 shadow-xs">
+            <div className="flex items-center gap-2 font-bold text-rose-800">
+              <svg className="h-4 w-4 shrink-0 text-rose-600" viewBox="0 0 20 20" fill="currentColor">
+                <path
+                  fillRule="evenodd"
+                  d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                  clipRule="evenodd"
+                />
+              </svg>
+              <span>{t('daily_updates.rejection_reason')}:</span>
+            </div>
+            <p className="mt-1.5 whitespace-pre-line font-medium text-rose-700 leading-relaxed">
+              {update.rejectionReason}
+            </p>
+          </div>
+        )}
+
         <p className="rounded-xl border border-gray-200 bg-gray-50 px-4 py-3.5 text-sm leading-6 text-gray-700">
           {update.notes || t('daily_updates.no_notes')}
         </p>
 
         {update.images?.length > 0 ? (
           <div className="grid grid-cols-2 gap-3.5 lg:grid-cols-4">
-            {update.images.map((image) => (
-              <div
-                key={image.updateImageId}
-                className="group relative overflow-hidden rounded-xl border border-gray-200 bg-gray-50 shadow-sm transition-all hover:border-warm-brown/40"
-              >
+            {update.images.map((image) => {
+              const isImageRejected = update.status === 'REJECTED' || image.approved === false
+              const effectiveApproved = update.status === 'REJECTED' ? false : image.approved
+              const rejectionReason = image.rejectionReason || (update.status === 'REJECTED' ? update.rejectionReason : null)
+
+              return (
                 <div
-                  className="aspect-[4/3] overflow-hidden bg-gray-100 cursor-zoom-in"
-                  onClick={() => onPreviewImage?.(image.imageUrl)}
-                  title="Click to zoom image"
+                  key={image.updateImageId}
+                  className="group relative overflow-hidden rounded-xl border border-gray-200 bg-gray-50 shadow-sm transition-all hover:border-warm-brown/40"
                 >
-                  <img
-                    src={optimizeCloudinaryUrl(image.imageUrl, { width: 600 })}
-                    alt={update.title}
-                    loading="lazy"
-                    decoding="async"
-                    className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-                  />
+                  <div
+                    className="aspect-[4/3] overflow-hidden bg-gray-100 cursor-zoom-in relative"
+                    onClick={() => onPreviewImage?.(image.imageUrl)}
+                    title="Click to zoom image"
+                  >
+                    <img
+                      src={optimizeCloudinaryUrl(image.imageUrl, { width: 600 })}
+                      alt={update.title}
+                      loading="lazy"
+                      decoding="async"
+                      className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                    />
+                    {isImageRejected && (
+                      <div className="absolute top-2 left-2 rounded-md bg-rose-600/90 px-2 py-0.5 text-[10px] font-bold text-white shadow-xs">
+                        {t('daily_updates.rejected')}
+                      </div>
+                    )}
+                  </div>
+                  <div className="flex flex-col gap-1.5 border-t border-gray-200 bg-white px-3 py-2">
+                    <div className="flex items-center justify-between gap-2">
+                      <p className="text-[11px] font-semibold uppercase tracking-wider text-gray-400">{t('daily_updates.image_review')}</p>
+                      <ImageApprovalPill approved={effectiveApproved} t={t} />
+                    </div>
+                    {isImageRejected && rejectionReason && (
+                      <div className="rounded-lg border border-rose-200/80 bg-rose-50 p-2 text-xs text-rose-800">
+                        <span className="block text-[10px] font-bold uppercase tracking-wider text-rose-600">
+                          {t('daily_updates.image_rejection_reason')}:
+                        </span>
+                        <p className="mt-0.5 whitespace-pre-line font-medium text-rose-700">
+                          {rejectionReason}
+                        </p>
+                      </div>
+                    )}
+                  </div>
                 </div>
-                <div className="flex items-center justify-between gap-2 border-t border-gray-200 bg-white px-3 py-2">
-                  <p className="text-[11px] font-semibold uppercase tracking-wider text-gray-400">{t('daily_updates.image_review')}</p>
-                  <ImageApprovalPill approved={image.approved} t={t} />
-                </div>
-              </div>
-            ))}
+              )
+            })}
           </div>
         ) : (
           <div className="rounded-xl border border-dashed border-gray-200 bg-gray-50 px-4 py-4 text-sm text-gray-400 text-center">

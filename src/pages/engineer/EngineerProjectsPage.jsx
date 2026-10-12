@@ -4,25 +4,21 @@ import { useNavigate } from 'react-router-dom'
 import ProjectTable from '@/components/projects/ProjectTable'
 import Alert from '@/components/ui/Alert'
 import useProjectsStore from '@/store/projectsStore'
-import {
-  getEngineerProjects,
-  getAssignedEngineerProjects,
-} from '@/api/projectsApi'
+import { getAssignedEngineerProjects } from '@/api/projectsApi'
 
 const PAGE_SIZE = 10
 
 /**
- * EngineerProjectsPage — dual-tab project dashboard for engineers.
+ * EngineerProjectsPage — project dashboard for engineers displaying assigned projects.
  *
- * Tab "assigned" → GET /api/v1/engineer/projects/assigned
- * Tab "all"      → GET /api/v1/engineer/projects
+ * GET /api/v1/engineer/projects/assigned
  *
  * Clicking a row navigates to a full-page detail route at /engineer/projects/:id.
  */
 export default function EngineerProjectsPage() {
   const { t } = useTranslation()
   const navigate = useNavigate()
-  const { engineerTab, engineerPage, setEngineerTab, setEngineerPage } = useProjectsStore()
+  const { engineerPage, setEngineerPage } = useProjectsStore()
 
   const [projects, setProjects] = useState([])
   const [totalPages, setTotalPages] = useState(0)
@@ -30,13 +26,12 @@ export default function EngineerProjectsPage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
 
-  // ── Fetch list based on active tab ──────────────────────
+  // ── Fetch assigned projects ──────────────────────────────
   const fetchProjects = useCallback(async () => {
     setLoading(true)
     setError(null)
     try {
-      const fetcher = engineerTab === 'assigned' ? getAssignedEngineerProjects : getEngineerProjects
-      const { data } = await fetcher(engineerPage, PAGE_SIZE)
+      const { data } = await getAssignedEngineerProjects(engineerPage, PAGE_SIZE)
       const page = data.data
       setProjects(page?.content ?? [])
       setTotalPages(page?.totalPages ?? 0)
@@ -46,7 +41,7 @@ export default function EngineerProjectsPage() {
     } finally {
       setLoading(false)
     }
-  }, [engineerTab, engineerPage, t])
+  }, [engineerPage, t])
 
   useEffect(() => {
     fetchProjects()
@@ -54,11 +49,6 @@ export default function EngineerProjectsPage() {
 
   const handleRowClick = (project) => {
     navigate(`/engineer/projects/${project.projectId}`, { state: { projectSummary: project } })
-  }
-
-  const handleTabChange = (tab) => {
-    setEngineerTab(tab)
-    setEngineerPage(0)
   }
 
   return (
@@ -73,21 +63,13 @@ export default function EngineerProjectsPage() {
 
       {/* ── Card container ──────────────────────────── */}
       <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-card">
-        {/* ── Tabs ─────────────────────────────────── */}
+        {/* ── Tabs (Only My Assigned) ──────────────────────── */}
         <div className="flex border-b border-gray-200 bg-gray-50/50 px-2 pt-1.5">
           <TabBtn
             id="tab-assigned"
-            active={engineerTab === 'assigned'}
-            onClick={() => handleTabChange('assigned')}
+            active
             label={t('projects.my_assigned')}
-            count={engineerTab === 'assigned' ? totalElements : undefined}
-          />
-          <TabBtn
-            id="tab-all"
-            active={engineerTab === 'all'}
-            onClick={() => handleTabChange('all')}
-            label={t('projects.all_projects')}
-            count={engineerTab === 'all' ? totalElements : undefined}
+            count={totalElements}
           />
         </div>
 

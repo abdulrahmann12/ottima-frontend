@@ -92,13 +92,13 @@ function GallerySection({ projectId, language }) {
       <Alert message={error} variant="error" onClose={() => setError(null)} />
 
       {loading ? (
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+        <div className="grid grid-cols-1 min-[420px]:grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3.5">
           {Array.from({ length: 4 }).map((_, i) => (
-            <div key={i} className="aspect-[4/3] animate-pulse rounded-2xl bg-gray-100 border border-gray-200" />
+            <div key={i} className="aspect-[16/10] animate-pulse rounded-2xl bg-gray-100 border border-gray-200" />
           ))}
         </div>
       ) : (
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+        <div className="grid grid-cols-1 min-[420px]:grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3.5">
           {items.map((record) => {
             const isPdf = isPdfDocument(record.documentUrl)
             const date = formatDate(record.transactionDate, language)
@@ -110,9 +110,9 @@ function GallerySection({ projectId, language }) {
                 key={record.financialRecordId}
                 type="button"
                 onClick={() => setActive(record)}
-                className="group relative overflow-hidden rounded-2xl border border-gray-200 bg-white text-start shadow-xs transition-all hover:border-warm-brown/50 hover:shadow-card-hover focus:outline-none focus:ring-2 focus:ring-warm-brown/30 cursor-pointer"
+                className="group relative flex flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white text-start shadow-xs transition-all hover:border-warm-brown/60 hover:shadow-card-hover focus:outline-none focus:ring-2 focus:ring-warm-brown/30 cursor-pointer"
               >
-                <div className="relative aspect-[4/3] overflow-hidden bg-gray-100 border-b border-gray-100 flex items-center justify-center">
+                <div className="relative aspect-[16/10] overflow-hidden bg-gray-100 border-b border-gray-100 flex items-center justify-center">
                   {isPdf ? (
                     <>
                       <img
@@ -135,29 +135,38 @@ function GallerySection({ projectId, language }) {
                       className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
                     />
                   )}
-                  <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white">
-                    <span className="text-[11px] font-bold bg-black/60 px-2 py-1 rounded-lg backdrop-blur-xs">
-                      {t('common.view', { defaultValue: 'View' })}
+                  <div className="absolute inset-0 bg-black/25 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white">
+                    <span className="text-[11px] font-bold bg-black/60 px-2.5 py-1 rounded-lg backdrop-blur-xs flex items-center gap-1">
+                      <span>👁️</span>
+                      <span>{t('common.view', { defaultValue: 'View' })}</span>
                     </span>
                   </div>
                 </div>
-                <div className="p-3 space-y-1">
-                  <div className="flex items-center justify-between gap-1">
-                    <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded border uppercase ${
+
+                <div className="p-3.5 flex-1 flex flex-col justify-between space-y-2">
+                  <div className="flex items-center justify-between gap-2">
+                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-md border uppercase tracking-wider ${
                       isDeposit
                         ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
                         : 'bg-rose-50 text-rose-700 border-rose-200'
                     }`}>
                       {record.recordType}
                     </span>
-                    <span className="text-xs font-bold text-gray-900 tabular-nums">
-                      {formatMoney(record.amount)}
+                    <span className="text-[11px] text-gray-500 font-medium">
+                      {date}
                     </span>
                   </div>
-                  <p className="text-[11px] text-gray-400 font-medium">{date}</p>
-                  {itemLabel && (
-                    <p className="text-[11px] text-gray-600 truncate font-medium">{itemLabel}</p>
-                  )}
+
+                  <div className="flex items-baseline justify-between gap-2 pt-0.5">
+                    <span className="text-sm sm:text-base font-extrabold text-gray-900 tabular-nums">
+                      {formatMoney(record.amount, language)}
+                    </span>
+                    {itemLabel && (
+                      <span className="text-xs font-semibold text-gray-600 truncate max-w-[120px]" title={itemLabel}>
+                        {itemLabel}
+                      </span>
+                    )}
+                  </div>
                 </div>
               </button>
             )
@@ -223,7 +232,7 @@ function LedgerSection({ projectId, language }) {
       <Alert message={error} variant="error" onClose={() => setError(null)} />
 
       <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
-        {/* Table head */}
+        {/* Table head (Desktop only) */}
         <div className="hidden grid-cols-[1.2fr_0.8fr_1fr_0.8fr_1fr] gap-4 border-b border-gray-200 bg-gray-50 px-4 py-3 sm:grid">
           {['date', 'type', 'amount', 'method', 'item'].map((h) => (
             <span key={h} className="text-[11px] font-bold uppercase tracking-wider text-gray-700">
@@ -252,45 +261,91 @@ function LedgerSection({ projectId, language }) {
         ) : (
           <div className="divide-y divide-gray-100">
             {records.map((rec) => {
-              const itemLabel = (language === 'ar' ? rec.itemNameAr : rec.itemNameEn)
+              const itemLabel = (language === 'ar' ? rec.itemNameAr : rec.itemNameEn) || rec.expenseCategory || null
               const isDeposit = rec.recordType === 'DEPOSIT'
               return (
-                <div
-                  key={rec.financialRecordId}
-                  className="grid grid-cols-1 gap-x-4 gap-y-1 px-4 py-3.5 transition-colors hover:bg-gray-50/80 sm:grid-cols-[1.2fr_0.8fr_1fr_0.8fr_1fr] sm:items-center"
-                >
-                  {/* Date */}
-                  <p className="text-xs text-gray-800 font-medium">
-                    {formatDate(rec.transactionDate, language)}
-                  </p>
+                <div key={rec.financialRecordId} className="transition-colors hover:bg-gray-50/80">
+                  {/* Desktop Row (sm+) */}
+                  <div className="hidden sm:grid grid-cols-[1.2fr_0.8fr_1fr_0.8fr_1fr] items-center gap-4 px-4 py-3.5">
+                    {/* Date */}
+                    <p className="text-xs text-gray-800 font-medium">
+                      {formatDate(rec.transactionDate, language)}
+                    </p>
 
-                  {/* Type badge */}
-                  <div>
-                    <span
-                      className={`inline-flex items-center rounded-md border px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ${
-                        isDeposit
-                          ? 'border-emerald-200 bg-emerald-50 text-emerald-700'
-                          : 'border-rose-200 bg-rose-50 text-rose-700'
-                      }`}
-                    >
-                      {rec.recordType}
-                    </span>
+                    {/* Type badge */}
+                    <div>
+                      <span
+                        className={`inline-flex items-center rounded-md border px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ${
+                          isDeposit
+                            ? 'border-emerald-200 bg-emerald-50 text-emerald-700'
+                            : 'border-rose-200 bg-rose-50 text-rose-700'
+                        }`}
+                      >
+                        {rec.recordType}
+                      </span>
+                    </div>
+
+                    {/* Amount */}
+                    <p className={`text-sm font-bold tabular-nums ${isDeposit ? 'text-emerald-700' : 'text-rose-700'}`}>
+                      {isDeposit ? '+' : '−'}{formatMoney(rec.amount, language)}
+                    </p>
+
+                    {/* Method */}
+                    <p className="text-xs text-gray-600 font-medium">
+                      {rec.paymentMethod?.replace('_', ' ') ?? '—'}
+                    </p>
+
+                    {/* Item */}
+                    <p className="text-xs text-gray-600 truncate font-medium">
+                      {itemLabel || (
+                        isDeposit ? (
+                          <span className="text-gray-400 italic">Project-level</span>
+                        ) : (
+                          <span className="text-amber-700 font-semibold">{language === 'ar' ? 'أخرى' : 'Other'}</span>
+                        )
+                      )}
+                    </p>
                   </div>
 
-                  {/* Amount */}
-                  <p className={`text-sm font-bold tabular-nums ${isDeposit ? 'text-emerald-700' : 'text-rose-700'}`}>
-                    {isDeposit ? '+' : '−'}{formatMoney(rec.amount, language)}
-                  </p>
+                  {/* Mobile Card (< sm) */}
+                  <div className="block sm:hidden p-4 space-y-2.5">
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="flex items-center gap-2">
+                        <span
+                          className={`inline-flex items-center rounded-md border px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ${
+                            isDeposit
+                              ? 'border-emerald-200 bg-emerald-50 text-emerald-700'
+                              : 'border-rose-200 bg-rose-50 text-rose-700'
+                          }`}
+                        >
+                          {rec.recordType}
+                        </span>
+                        {rec.paymentMethod && (
+                          <span className="text-[11px] text-gray-600 font-semibold bg-gray-100 border border-gray-200/80 px-2 py-0.5 rounded-md uppercase">
+                            {rec.paymentMethod.replace('_', ' ')}
+                          </span>
+                        )}
+                      </div>
+                      <span className="text-xs text-gray-500 font-medium">
+                        {formatDate(rec.transactionDate, language)}
+                      </span>
+                    </div>
 
-                  {/* Method */}
-                  <p className="text-xs text-gray-600 font-medium">
-                    {rec.paymentMethod?.replace('_', ' ') ?? '—'}
-                  </p>
-
-                  {/* Item */}
-                  <p className="text-xs text-gray-600 truncate font-medium">
-                    {itemLabel || <span className="text-gray-400 italic">Project-level</span>}
-                  </p>
+                    <div className="flex items-baseline justify-between gap-3 pt-1 border-t border-gray-100">
+                      <p className="text-sm font-bold text-gray-900 truncate min-w-0 flex-1">
+                        {itemLabel || (
+                          isDeposit ? (
+                            <span className="text-gray-500 italic font-medium">{language === 'ar' ? 'إيداع للمشروع' : 'Project Deposit'}</span>
+                          ) : (
+                            <span className="text-gray-800">{language === 'ar' ? 'أخرى' : 'Other'}</span>
+                          )
+                        )}
+                      </p>
+                      <p className={`text-base font-extrabold tabular-nums shrink-0 ${isDeposit ? 'text-emerald-700' : 'text-rose-700'}`}>
+                        {isDeposit ? '+' : '−'}{formatMoney(rec.amount, language)}
+                      </p>
+                    </div>
+                  </div>
                 </div>
               )
             })}
@@ -336,7 +391,7 @@ export default function ClientFinanceDashboard({ projectId, language = 'en' }) {
   if (!projectId) return null
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 pb-16 sm:pb-8">
       <SummarySection projectId={projectId} />
       <GallerySection projectId={projectId} language={language} />
       <LedgerSection projectId={projectId} language={language} />

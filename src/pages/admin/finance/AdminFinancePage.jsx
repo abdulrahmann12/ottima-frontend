@@ -215,7 +215,14 @@ export default function AdminFinancePage() {
       key: 'itemNameEn',
       header: 'Item',
       render: (_, row) => {
-        const name = (lang === 'ar' ? row.itemNameAr : row.itemNameEn)
+        const name = (lang === 'ar' ? row.itemNameAr : row.itemNameEn) || row.expenseCategory
+        if (row.recordType === 'EXPENSE' && !row.projectItemId) {
+          return (
+            <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[11px] font-semibold bg-amber-500/10 text-amber-300 border border-amber-500/20">
+              🏷️ {name || (lang === 'ar' ? 'أخرى' : 'Other')}
+            </span>
+          )
+        }
         return <span className="text-slate-400 text-xs">{name || <em className="text-slate-600">Project-level</em>}</span>
       },
     },

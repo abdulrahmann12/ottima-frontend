@@ -54,7 +54,7 @@ export default function Modal({ isOpen, onClose, title, size = 'md', children })
       ref={overlayRef}
       onClick={handleOverlayClick}
       className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4
-        bg-black/60 backdrop-blur-xs animate-fade-in"
+        bg-black/25 backdrop-blur-xs animate-fade-in"
       role="dialog"
       aria-modal="true"
       aria-labelledby="modal-title"

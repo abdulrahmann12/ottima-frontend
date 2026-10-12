@@ -9,6 +9,7 @@ import {
     formatDailyUpdateDate,
 } from '@/components/daily-updates/DailyUpdatesWorkspace'
 import EngineerDailyUpdateFormModal from '@/components/daily-updates/EngineerDailyUpdateFormModal'
+import DailyUpdateDetailsModal from '@/components/daily-updates/DailyUpdateDetailsModal'
 import Alert from '@/components/ui/Alert'
 import Button from '@/components/ui/Button'
 import SearchableSelect from '@/components/ui/SearchableSelect'
@@ -44,6 +45,7 @@ export default function EngineerDailyUpdates() {
   const [totalPages, setTotalPages] = useState(0)
   const [totalElements, setTotalElements] = useState(0)
   const [modalOpen, setModalOpen] = useState(false)
+  const [selectedUpdateForDetails, setSelectedUpdateForDetails] = useState(null)
   const [success, setSuccess] = useState(null)
 
   const fetchProjects = useCallback(async () => {
@@ -167,6 +169,12 @@ export default function EngineerDailyUpdates() {
           <p className="mt-1 truncate text-xs text-gray-500">
             {summarizeText(update.notes, t('daily_updates.no_notes'))}
           </p>
+          {update.status === 'REJECTED' && update.rejectionReason && (
+            <div className="mt-1.5 flex items-start gap-1 rounded-md border border-rose-200 bg-rose-50 px-2 py-1 text-xs text-rose-700">
+              <span className="font-bold shrink-0">{t('daily_updates.rejection_reason')}:</span>
+              <span className="truncate">{update.rejectionReason}</span>
+            </div>
+          )}
         </div>
       ),
     },
@@ -199,7 +207,124 @@ export default function EngineerDailyUpdates() {
         update.approvedByAdminNameEn,
       ),
     },
+    {
+      key: 'actions',
+      header: t('projects.actions', { defaultValue: 'Actions' }),
+      headerClass: 'text-center',
+      className: 'text-center',
+      render: (_, update) => (
+        <div className="flex items-center justify-center">
+          <button
+            type="button"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold
+              bg-white border border-gray-200 text-gray-700 hover:text-warm-brown hover:border-warm-brown/40 hover:bg-warm-brown/5
+              shadow-2xs transition-all duration-150 cursor-pointer active:scale-[0.98]"
+            onClick={() => setSelectedUpdateForDetails(update)}
+          >
+            <EyeIcon className="w-3.5 h-3.5 text-warm-brown" />
+            <span>{t('daily_updates.view_update', { defaultValue: 'View Details' })}</span>
+          </button>
+        </div>
+      ),
+    },
   ]
+
+  /* ── Mobile Card Renderer ───────────────────────────── */
+  const renderEngineerUpdateCard = (update) => {
+    return (
+      <div
+        onClick={() => setSelectedUpdateForDetails(update)}
+        className="bg-white rounded-2xl border border-gray-200/90 p-4 shadow-xs hover:shadow-md transition-all duration-200 space-y-3 cursor-pointer active:scale-[0.99]"
+      >
+        {/* Top Header: Icon + Title & Item + Status & Image badge */}
+        <div className="flex items-start justify-between gap-3">
+          <div className="flex items-center gap-3 min-w-0">
+            <div
+              className={`w-10 h-10 rounded-xl border flex items-center justify-center font-bold shrink-0 ${
+                update.status === 'APPROVED'
+                  ? 'bg-emerald-50 border-emerald-200 text-emerald-700'
+                  : update.status === 'REJECTED'
+                  ? 'bg-rose-50 border-rose-200 text-rose-700'
+                  : 'bg-amber-50 border-amber-200 text-amber-700'
+              }`}
+            >
+              <NotebookIcon className="w-5 h-5" />
+            </div>
+            <div className="min-w-0">
+              <h3 className="text-gray-900 font-bold text-sm truncate">
+                {update.title}
+              </h3>
+              <p className="text-gray-500 text-xs truncate">
+                {localizedValue(i18n.language, update.itemNameAr, update.itemNameEn)}
+              </p>
+            </div>
+          </div>
+
+          <div className="flex flex-col items-end gap-1.5 shrink-0">
+            <DailyUpdateStatusPill status={update.status} />
+            {update.images?.length > 0 && (
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium bg-gray-100 text-gray-600 border border-gray-200">
+                <PhotoIcon className="w-3 h-3" />
+                <span>{update.images.length}</span>
+              </span>
+            )}
+          </div>
+        </div>
+
+        {/* Notes preview if available */}
+        {update.notes && (
+          <p className="text-xs text-gray-600 bg-gray-50/80 rounded-xl p-2.5 border border-gray-100 break-words line-clamp-3">
+            {update.notes}
+          </p>
+        )}
+
+        {/* Rejection reason if available */}
+        {update.status === 'REJECTED' && update.rejectionReason && (
+          <div className="flex items-start gap-1.5 rounded-xl border border-rose-200 bg-rose-50/80 p-2.5 text-xs text-rose-700">
+            <span className="font-bold shrink-0">{t('daily_updates.rejection_reason')}:</span>
+            <span className="break-words">{update.rejectionReason}</span>
+          </div>
+        )}
+
+        {/* Details Grid */}
+        <div className="bg-gray-50/80 rounded-xl p-3 space-y-2 text-xs border border-gray-100">
+          <div className="flex items-center justify-between gap-2">
+            <span className="text-gray-500 font-medium">{t('daily_updates.submitted_at')}</span>
+            <span className="text-gray-700">{formatDailyUpdateDate(update.createdAt, i18n.language)}</span>
+          </div>
+          <div className="flex items-center justify-between gap-2">
+            <span className="text-gray-500 font-medium">{t('daily_updates.images')}</span>
+            <span className="text-gray-800 font-semibold font-mono">{update.images?.length ?? 0}</span>
+          </div>
+          {(update.approvedByAdminNameAr || update.approvedByAdminNameEn) && (
+            <div className="flex items-center justify-between gap-2">
+              <span className="text-gray-500 font-medium">{t('daily_updates.reviewer')}</span>
+              <span className="text-gray-800 font-semibold">
+                {localizedValue(i18n.language, update.approvedByAdminNameAr, update.approvedByAdminNameEn)}
+              </span>
+            </div>
+          )}
+        </div>
+
+        {/* Footer Actions */}
+        <div
+          className="flex items-center justify-end gap-2 pt-1 border-t border-gray-100"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <button
+            type="button"
+            onClick={() => setSelectedUpdateForDetails(update)}
+            className="inline-flex items-center justify-center gap-1.5 w-full sm:w-auto px-4 py-2 rounded-xl text-xs font-semibold
+              bg-white border border-gray-200 text-gray-700 hover:text-warm-brown hover:border-warm-brown/40 hover:bg-warm-brown/5
+              shadow-2xs transition-all duration-150 cursor-pointer active:scale-[0.98]"
+          >
+            <EyeIcon className="w-3.5 h-3.5 text-warm-brown" />
+            <span>{t('daily_updates.view_update', { defaultValue: 'View Details' })}</span>
+          </button>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <>
@@ -285,7 +410,7 @@ export default function EngineerDailyUpdates() {
               />
             </DailyUpdatesFilterPanel>
 
-            <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-card sm:p-6">
+            <div className="md:rounded-2xl md:border md:border-gray-200 md:bg-white md:p-5 md:shadow-card md:sm:p-6">
               <DataTable
                 columns={columns}
                 data={updates}
@@ -297,6 +422,7 @@ export default function EngineerDailyUpdates() {
                 pageSize={PAGE_SIZE}
                 emptyMessage={t('daily_updates.empty_copy')}
                 keyExtractor={(update) => update.dailyUpdateId}
+                renderMobileCard={renderEngineerUpdateCard}
               />
             </div>
           </>
@@ -319,6 +445,12 @@ export default function EngineerDailyUpdates() {
 
           setPage(0)
         }}
+      />
+
+      <DailyUpdateDetailsModal
+        isOpen={Boolean(selectedUpdateForDetails)}
+        onClose={() => setSelectedUpdateForDetails(null)}
+        update={selectedUpdateForDetails}
       />
     </>
   )
@@ -344,3 +476,28 @@ function summarizeText(value, fallback) {
   if (!resolvedValue) return fallback
   return resolvedValue.length > 120 ? `${resolvedValue.slice(0, 117)}...` : resolvedValue
 }
+
+function NotebookIcon({ className = 'w-5 h-5' }) {
+  return (
+    <svg className={className} fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25" />
+    </svg>
+  )
+}
+
+function PhotoIcon({ className = 'w-3 h-3' }) {
+  return (
+    <svg className={className} fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Zm10.5-11.25h.008v.008h-.008V8.25Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
+    </svg>
+  )
+}
+
+function EyeIcon({ className = 'w-3.5 h-3.5' }) {
+  return (
+    <svg className={className} fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
+      <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+    </svg>
+  )
+}

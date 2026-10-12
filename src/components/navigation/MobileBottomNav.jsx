@@ -105,14 +105,26 @@ export default function MobileBottomNav({ navItems: customNavItems }) {
     }
   }
 
+  const totalTabsCount = primaryTabs.length + (overflowTabs.length > 0 ? 1 : 0)
+  const gridColsClass =
+    totalTabsCount === 5
+      ? 'grid-cols-5'
+      : totalTabsCount === 4
+      ? 'grid-cols-4'
+      : totalTabsCount === 3
+      ? 'grid-cols-3'
+      : totalTabsCount === 2
+      ? 'grid-cols-2'
+      : 'grid-cols-1'
+
   return (
     <>
       {/* ── Native Fixed Bottom Navigation Bar ───────────────── */}
       <nav
         aria-label="Mobile Bottom Navigation"
-        className="lg:hidden fixed bottom-0 inset-x-0 z-40 bg-white/95 backdrop-blur-md border-t border-[#D9C7B8] shadow-lg select-none"
+        className="lg:hidden fixed bottom-0 inset-x-0 z-40 bg-white/95 backdrop-blur-md border-t border-[#D9C7B8] shadow-lg select-none pb-[env(safe-area-inset-bottom,0px)]"
       >
-        <div className={`grid ${overflowTabs.length > 0 ? 'grid-cols-5' : 'grid-cols-4'} h-16 w-full max-w-lg mx-auto items-center px-1`}>
+        <div className={`grid ${gridColsClass} h-16 w-full max-w-lg mx-auto items-center px-1`}>
           {primaryTabs.map((item) => {
             const active = isActive(item.to)
             const Icon = item.icon
@@ -128,7 +140,7 @@ export default function MobileBottomNav({ navItems: customNavItems }) {
               >
                 {/* Active Indicator Top Pill */}
                 {active && (
-                  <span className="absolute top-0 w-8 h-1 rounded-b-full bg-[#7D583F] shadow-xs animate-fade-in" />
+                  <span className="absolute top-0 inset-x-0 mx-auto w-8 h-1 rounded-b-full bg-[#7D583F] shadow-xs animate-fade-in" />
                 )}
                 {Icon && (
                   <Icon className={`w-5 h-5 transition-transform shrink-0 ${active ? 'scale-110' : ''}`} />

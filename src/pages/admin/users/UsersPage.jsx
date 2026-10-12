@@ -45,6 +45,7 @@ const EMPTY_CREATE_FORM = {
   fullNameEn: '',
   password: '',
   phoneNumber: '',
+  preferredLanguage: 'ar',
 }
 
 const EMPTY_EDIT_FORM = {
@@ -54,6 +55,7 @@ const EMPTY_EDIT_FORM = {
   fullNameEn: '',
   phoneNumber: '',
   roleId: '',
+  preferredLanguage: 'ar',
 }
 
 export default function UsersPage() {
@@ -217,6 +219,7 @@ export default function UsersPage() {
       fullNameEn: user.fullNameEn ?? '',
       phoneNumber: user.phoneNumber ?? '',
       roleId:     matchedRole ? String(matchedRole.roleId) : '',
+      preferredLanguage: user.preferredLanguage ?? 'ar',
     })
     setFieldErrors({})
   }
@@ -267,12 +270,11 @@ export default function UsersPage() {
   /* ── User Active Helper ────────────────────────────── */
   const isUserActive = useCallback((u) => {
     if (!u) return false
-    if (u.active === true || u.status === 'ACTIVE' || u.isActive === true) return true
-    if (u.active === false || u.status === 'DEACTIVATED' || u.isActive === false) return false
     if (u.deletesAt != null || u.deletedAt != null) return false
-    if (activeTab === 'DEACTIVATED') return false
+    if (u.active === false || u.status === 'DEACTIVATED' || u.isActive === false) return false
+    if (u.active === true || u.status === 'ACTIVE' || u.isActive === true) return true
     return true
-  }, [activeTab])
+  }, [])
 
   /* ── Deactivate / Activate Action ──────────────────── */
   const handleToggleStatus = async () => {
@@ -301,9 +303,6 @@ export default function UsersPage() {
   }
 
   /* ── Table Columns ─────────────────────────────────── */
-  const formatDate = (iso) =>
-    iso ? new Date(iso).toLocaleDateString(i18n.language === 'ar' ? 'ar-EG' : 'en-GB') : '—'
-
   const columns = [
     {
       key: 'fullNameEn',
@@ -333,17 +332,12 @@ export default function UsersPage() {
     {
       key: 'active',
       header: t('users.status'),
-      render: (_, row) => (
-        <div className="flex items-center gap-2">
-          <UserBadge active={isUserActive(row)} />
-          <UserBadge roleName={row.roleName} type="role" />
-        </div>
-      ),
+      render: (_, row) => <UserBadge active={isUserActive(row)} />,
     },
     {
-      key: 'createdAt',
-      header: t('standard_items.created_at'),
-      render: (val) => <span className="text-gray-500 text-xs whitespace-nowrap">{formatDate(val)}</span>,
+      key: 'roleName',
+      header: t('users.role'),
+      render: (_, row) => <UserBadge roleName={row.roleName} type="role" />,
     },
     {
       key: '_actions',
@@ -390,8 +384,100 @@ export default function UsersPage() {
     },
   ]
 
+  const formatDate = (iso) =>
+    iso ? new Date(iso).toLocaleDateString(i18n.language === 'ar' ? 'ar-EG' : 'en-US') : '—'
+
   const tabLabelKey =
     activeTab === 'ADMIN' ? 'create_admin' : activeTab === 'ENGINEER' ? 'create_engineer' : 'create_client'
+
+  const displayedUsers = users.filter((u) => {
+    const active = isUserActive(u)
+    return activeTab === 'DEACTIVATED' ? !active : active
+  })
+
+  /* ── Mobile Card Renderer ───────────────────────────── */
+  const renderUserCard = (user) => {
+    const active = isUserActive(user)
+    return (
+      <div
+        onClick={() => setViewTarget(user)}
+        className="bg-white rounded-2xl border border-gray-200/90 p-4 shadow-xs hover:shadow-md transition-all duration-200 space-y-3 cursor-pointer active:scale-[0.99]"
+      >
+        {/* Top Header: Avatar + Names + Badges */}
+        <div className="flex items-start justify-between gap-3">
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="w-10 h-10 rounded-xl bg-warm-brown/10 border border-warm-brown/20 flex items-center justify-center text-warm-brown font-bold text-base shrink-0">
+              {user.fullNameEn?.charAt(0)?.toUpperCase() || 'U'}
+            </div>
+            <div className="min-w-0">
+              <h3 className="text-gray-900 font-semibold text-sm truncate">
+                {user.fullNameEn || '—'}
+              </h3>
+              <p className="text-gray-500 text-xs font-mono truncate">
+                @{user.username}
+              </p>
+            </div>
+          </div>
+
+          <div className="flex flex-col items-end gap-1 shrink-0">
+            <UserBadge active={active} />
+            <UserBadge roleName={user.roleName} type="role" />
+          </div>
+        </div>
+
+        {/* Info Grid */}
+        <div className="bg-gray-50/80 rounded-xl p-3 space-y-2 text-xs border border-gray-100">
+          {user.fullNameAr && (
+            <div className="flex items-center justify-between gap-2">
+              <span className="text-gray-500 font-medium">{t('users.full_name_ar')}</span>
+              <span className="text-gray-800 font-semibold text-right" dir="rtl">{user.fullNameAr}</span>
+            </div>
+          )}
+          <div className="flex items-center justify-between gap-2">
+            <span className="text-gray-500 font-medium">{t('users.email')}</span>
+            <span className="text-gray-700 font-mono text-right truncate max-w-[200px]">{user.email || '—'}</span>
+          </div>
+          <div className="flex items-center justify-between gap-2">
+            <span className="text-gray-500 font-medium">{t('users.phone')}</span>
+            <span className="text-gray-700 font-mono text-right">{user.phoneNumber || '—'}</span>
+          </div>
+        </div>
+
+        {/* Footer Actions */}
+        <div
+          className="flex items-center justify-end gap-2 pt-1 border-t border-gray-100"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <button
+            type="button"
+            onClick={() => openEditModal(user)}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-gray-700 hover:text-warm-brown hover:bg-warm-brown/10 rounded-lg transition-colors cursor-pointer border border-gray-200"
+          >
+            <EditIcon />
+            <span>{t('roles.edit')}</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() =>
+              setConfirmTarget({
+                user,
+                action: active ? 'deactivate' : 'activate',
+              })
+            }
+            className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors cursor-pointer border ${
+              active
+                ? 'text-red-700 bg-red-50/80 border-red-200 hover:bg-red-100'
+                : 'text-emerald-700 bg-emerald-50/80 border-emerald-200 hover:bg-emerald-100'
+            }`}
+          >
+            {active ? <PowerOffIcon /> : <PowerOnIcon />}
+            <span>{active ? t('users.deactivate') : t('users.activate')}</span>
+          </button>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="animate-slide-up space-y-5">
@@ -454,10 +540,10 @@ export default function UsersPage() {
       </div>
 
       {/* Data Table */}
-      <div className="glass-card p-0 overflow-hidden">
+      <div className="md:glass-card md:p-0 md:overflow-hidden">
         <DataTable
           columns={columns}
-          data={users}
+          data={displayedUsers}
           loading={loading}
           totalPages={totalPages}
           totalElements={totalElements}
@@ -467,6 +553,7 @@ export default function UsersPage() {
           onRowClick={(row) => setViewTarget(row)}
           emptyMessage={t('users.no_users')}
           keyExtractor={(row) => String(row.userId)}
+          renderMobileCard={renderUserCard}
         />
       </div>
 
@@ -539,6 +626,36 @@ export default function UsersPage() {
               onChange={(e) => setCreateForm({ ...createForm, phoneNumber: e.target.value })}
               error={fieldErrors.phoneNumber}
             />
+          </div>
+
+          <div>
+            <label className="block text-xs font-bold text-gray-700 mb-1.5">
+              {i18n.language === 'ar' ? 'اللغة المفضلة للنظام' : 'Preferred System Language'}
+            </label>
+            <div className="grid grid-cols-2 gap-3">
+              <button
+                type="button"
+                onClick={() => setCreateForm({ ...createForm, preferredLanguage: 'ar' })}
+                className={`px-3 py-2 rounded-xl border text-xs font-bold flex items-center justify-center gap-2 transition-all cursor-pointer ${
+                  createForm.preferredLanguage === 'ar'
+                    ? 'bg-warm-brown text-white border-warm-brown shadow-xs'
+                    : 'bg-white text-gray-700 border-gray-200 hover:bg-gray-50'
+                }`}
+              >
+                <span>{i18n.language === 'ar' ? 'العربية' : 'Arabic (العربية)'}</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setCreateForm({ ...createForm, preferredLanguage: 'en' })}
+                className={`px-3 py-2 rounded-xl border text-xs font-bold flex items-center justify-center gap-2 transition-all cursor-pointer ${
+                  createForm.preferredLanguage === 'en'
+                    ? 'bg-warm-brown text-white border-warm-brown shadow-xs'
+                    : 'bg-white text-gray-700 border-gray-200 hover:bg-gray-50'
+                }`}
+              >
+                <span>{i18n.language === 'ar' ? 'الإنجليزية' : 'English'}</span>
+              </button>
+            </div>
           </div>
 
           <div className="flex items-center justify-end gap-3 pt-3 border-t border-gray-200">
@@ -622,6 +739,36 @@ export default function UsersPage() {
                   sublabel: r.description,
                 }))}
               />
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-xs font-bold text-gray-700 mb-1.5">
+              {i18n.language === 'ar' ? 'اللغة المفضلة للنظام' : 'Preferred System Language'}
+            </label>
+            <div className="grid grid-cols-2 gap-3">
+              <button
+                type="button"
+                onClick={() => setEditForm({ ...editForm, preferredLanguage: 'ar' })}
+                className={`px-3 py-2 rounded-xl border text-xs font-bold flex items-center justify-center gap-2 transition-all cursor-pointer ${
+                  editForm.preferredLanguage === 'ar'
+                    ? 'bg-warm-brown text-white border-warm-brown shadow-xs'
+                    : 'bg-white text-gray-700 border-gray-200 hover:bg-gray-50'
+                }`}
+              >
+                <span>{i18n.language === 'ar' ? 'العربية' : 'Arabic (العربية)'}</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setEditForm({ ...editForm, preferredLanguage: 'en' })}
+                className={`px-3 py-2 rounded-xl border text-xs font-bold flex items-center justify-center gap-2 transition-all cursor-pointer ${
+                  editForm.preferredLanguage === 'en'
+                    ? 'bg-warm-brown text-white border-warm-brown shadow-xs'
+                    : 'bg-white text-gray-700 border-gray-200 hover:bg-gray-50'
+                }`}
+              >
+                <span>{i18n.language === 'ar' ? 'الإنجليزية' : 'English'}</span>
+              </button>
             </div>
           </div>
 

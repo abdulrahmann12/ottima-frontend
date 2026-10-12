@@ -79,30 +79,83 @@ export default function StatCard({
   const colors = COLOR_MAP[color] ?? COLOR_MAP['warm-brown']
 
   const content = (
-    <div
-      className={`glass-card p-4.5 sm:p-5 flex items-center justify-between gap-3 sm:gap-4
-        transition-all duration-300 select-none group border border-gray-200/90
-        ${to ? 'hover:-translate-y-1 hover:shadow-card-hover hover:border-warm-brown/40 cursor-pointer' : 'cursor-default'}`}
-    >
-      <div className="flex items-center gap-3.5 min-w-0 flex-1">
-        {/* Icon */}
-        <div className={`flex-shrink-0 w-12 h-12 rounded-2xl border flex items-center justify-center transition-transform group-hover:scale-105 ${colors.icon}`}>
-          {icon}
+    <>
+      {/* ── Mobile View (< sm): Sleek, compact horizontal touch card ── */}
+      <div
+        className={`sm:hidden p-3 rounded-xl bg-white border border-gray-200/90 shadow-xs
+          flex items-center justify-between gap-3 transition-all select-none
+          ${to ? 'active:scale-[0.99] hover:border-warm-brown/40 cursor-pointer' : 'cursor-default'}`}
+      >
+        <div className="flex items-center gap-3 min-w-0 flex-1">
+          <div className={`w-9 h-9 rounded-xl border flex items-center justify-center flex-shrink-0 shadow-xs ${colors.icon}`}>
+            {icon}
+          </div>
+          <div className="min-w-0 flex-1">
+            <p className="text-xs font-semibold text-gray-800 truncate" title={label}>
+              {label}
+            </p>
+            {subtitle && (
+              <p className="text-[10px] text-gray-400 truncate mt-0.5">{subtitle}</p>
+            )}
+          </div>
         </div>
 
-        {/* Value & Label */}
-        <div className="flex-1 min-w-0">
+        <div className="flex items-center gap-2 flex-shrink-0 ms-2">
           {loading ? (
-            <div className="space-y-2">
-              <div className="h-6 w-16 bg-gray-200 rounded-lg animate-pulse" />
+            <div className="h-5 w-8 bg-gray-200 rounded animate-pulse" />
+          ) : (
+            <span className={`text-lg font-extrabold tabular-nums tracking-tight ${colors.accent}`}>
+              {typeof value === 'number' ? value.toLocaleString() : value ?? '0'}
+            </span>
+          )}
+          {to && (
+            <svg className="w-3.5 h-3.5 text-gray-300 rtl:rotate-180" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+            </svg>
+          )}
+        </div>
+      </div>
+
+      {/* ── Desktop & Tablet View (>= sm): Luxury Vertical Card ── */}
+      <div
+        className={`hidden sm:flex flex-col justify-between p-4.5 sm:p-5 rounded-2xl bg-white
+          border border-gray-200/90 shadow-xs select-none group min-h-[125px] sm:min-h-[130px]
+          transition-all duration-300
+          ${to ? 'hover:-translate-y-1 hover:shadow-md hover:border-warm-brown/40 cursor-pointer' : 'cursor-default'}`}
+      >
+        {/* Top Header: Icon + Subtle Navigation Arrow */}
+        <div className="flex items-center justify-between mb-2 sm:mb-2.5">
+          <div className={`w-10 h-10 sm:w-11 sm:h-11 rounded-xl border flex items-center justify-center transition-transform duration-300 group-hover:scale-105 shadow-xs ${colors.icon}`}>
+            {icon}
+          </div>
+
+          {to && (
+            <div className="w-6 h-6 rounded-lg flex items-center justify-center text-gray-300 group-hover:text-warm-brown group-hover:bg-warm-brown/5 transition-all">
+              <svg className="w-3.5 h-3.5 rtl:rotate-180 transition-transform duration-300 group-hover:translate-x-0.5 rtl:group-hover:-translate-x-0.5" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+              </svg>
+            </div>
+          )}
+        </div>
+
+        {/* Metric Value & Full Label */}
+        <div className="flex-1 flex flex-col justify-end min-w-0">
+          {loading ? (
+            <div className="space-y-1.5 py-1">
+              <div className="h-7 w-14 bg-gray-200 rounded-lg animate-pulse" />
               <div className="h-3.5 w-24 bg-gray-100 rounded animate-pulse" />
             </div>
           ) : (
             <>
-              <p className={`text-2xl sm:text-[26px] font-bold tabular-nums tracking-tight leading-none ${colors.accent}`}>
+              <p className={`text-2xl sm:text-3xl font-extrabold tabular-nums tracking-tight leading-none ${colors.accent}`}>
                 {typeof value === 'number' ? value.toLocaleString() : value ?? '0'}
               </p>
-              <p className="text-gray-600 text-xs sm:text-sm font-medium mt-1 truncate">{label}</p>
+              <p
+                className="text-gray-600 text-xs sm:text-[13px] font-semibold mt-1.5 leading-snug line-clamp-2"
+                title={label}
+              >
+                {label}
+              </p>
               {subtitle && (
                 <p className="text-gray-400 text-[11px] truncate mt-0.5">{subtitle}</p>
               )}
@@ -110,19 +163,11 @@ export default function StatCard({
           )}
         </div>
       </div>
-
-      {to && (
-        <div className="text-gray-300 group-hover:text-warm-brown group-hover:translate-x-0.5 rtl:group-hover:-translate-x-0.5 transition-all flex-shrink-0">
-          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
-          </svg>
-        </div>
-      )}
-    </div>
+    </>
   )
 
   if (to) {
-    return <Link to={to} className="block no-underline">{content}</Link>
+    return <Link to={to} className="block no-underline h-full">{content}</Link>
   }
 
   return content

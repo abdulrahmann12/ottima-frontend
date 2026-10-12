@@ -6,7 +6,7 @@ import Input from '@/components/ui/Input'
 import Button from '@/components/ui/Button'
 import Alert from '@/components/ui/Alert'
 import { login as loginApi } from '@/api/authApi'
-import useAuthStore from '@/store/authStore'
+import useAuthStore, { syncLanguageWithUser } from '@/store/authStore'
 
 /**
  * LoginClient — /login/client
@@ -48,8 +48,11 @@ export default function LoginClient() {
 
     try {
       const { data: res } = await loginApi(identifier.trim(), password)
-      const { accessToken, refreshToken } = res.data
+      const { accessToken, refreshToken, preferredLanguage } = res.data
       setTokens(accessToken, refreshToken)
+      if (preferredLanguage) {
+        syncLanguageWithUser(preferredLanguage)
+      }
 
       // Strict role authorization check
       try {

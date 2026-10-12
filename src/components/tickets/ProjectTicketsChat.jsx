@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useMemo, useCallback } from 'react'
+import { useState, useEffect, useRef, useMemo, useCallback, memo } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import {
@@ -9,6 +9,7 @@ import {
 import useAuthStore from '@/store/authStore'
 import CreateTicketModal from './CreateTicketModal'
 import EditTicketModal from './EditTicketModal'
+import TicketChatModal from './TicketChatModal'
 import Button from '@/components/ui/Button'
 import Alert from '@/components/ui/Alert'
 import { Spinner } from '@/components/ui/icons/Globe'
@@ -80,6 +81,7 @@ export default function ProjectTicketsChat({
   const [initialType, setInitialType]         = useState('INSTRUCTION')
   const [editModalOpen, setEditModalOpen]     = useState(false)
   const [editingTicket, setEditingTicket]     = useState(null)
+  const [chatModalTicket, setChatModalTicket] = useState(null)
 
   // Document / Image Viewer modal state
   const [activeDoc, setActiveDoc] = useState(null)
@@ -92,6 +94,7 @@ export default function ProjectTicketsChat({
   const [highlightedTicketId, setHighlightedTicketId] = useState(targetTicketId)
 
   const chatBottomRef = useRef(null)
+  const initialScrolledRef = useRef(false)
 
   const fetchTickets = useCallback(async (isSilent = false) => {
     if (!projectId) return
@@ -136,7 +139,7 @@ export default function ProjectTicketsChat({
     })
   }, [sortedTickets, typeFilter, statusFilter, searchQuery])
 
-  // Scroll to target ticket (if deep-linked) or to bottom on initial load / new message
+  // Scroll to target ticket (if deep-linked) or to bottom on initial load only
   useEffect(() => {
     if (loading || filteredTickets.length === 0) return
 
@@ -159,13 +162,14 @@ export default function ProjectTicketsChat({
         clearTimeout(scrollTimer)
         clearTimeout(clearHighlightTimer)
       }
-    } else {
+    } else if (!initialScrolledRef.current) {
+      initialScrolledRef.current = true
       const scrollTimer = setTimeout(() => {
-        chatBottomRef.current?.scrollIntoView({ behavior: 'smooth' })
+        chatBottomRef.current?.scrollIntoView({ behavior: 'auto' })
       }, 50)
       return () => clearTimeout(scrollTimer)
     }
-  }, [targetTicketId, filteredTickets.length, loading])
+  }, [targetTicketId, loading, filteredTickets.length > 0])
 
   // Group tickets by Date
   const groupedTickets = useMemo(() => {
@@ -194,7 +198,7 @@ export default function ProjectTicketsChat({
   }, [filteredTickets, i18n.language])
 
   // ── Status Action (Approve / Reject) ─────────────────────────
-  const handleStatusChange = async (ticketId, newStatus) => {
+  const handleStatusChange = useCallback(async (ticketId, newStatus) => {
     setActionLoadingId(ticketId)
     setError(null)
     try {
@@ -210,10 +214,10 @@ export default function ProjectTicketsChat({
     } finally {
       setActionLoadingId(null)
     }
-  }
+  }, [fetchTickets, t])
 
   // ── Delete Ticket ────────────────────────────────────────────
-  const handleDeleteTicket = async (ticketId) => {
+  const handleDeleteTicket = useCallback(async (ticketId) => {
     if (!window.confirm(t('tickets.delete_confirm', { defaultValue: 'Are you sure you want to delete this pending request?' }))) {
       return
     }
@@ -228,17 +232,17 @@ export default function ProjectTicketsChat({
     } finally {
       setActionLoadingId(null)
     }
-  }
+  }, [fetchTickets, t])
 
-  const openCreateModal = (type = 'INSTRUCTION') => {
+  const openCreateModal = useCallback((type = 'INSTRUCTION') => {
     setInitialType(type)
     setCreateModalOpen(true)
-  }
+  }, [])
 
-  const openEditModal = (ticket) => {
+  const openEditModal = useCallback((ticket) => {
     setEditingTicket(ticket)
     setEditModalOpen(true)
-  }
+  }, [])
 
   return (
     <div className="flex flex-col h-[calc(100dvh-135px)] md:h-[750px] max-h-[88vh] md:max-h-[82vh] rounded-2xl border border-[#D9C7B8] bg-cream overflow-hidden shadow-card animate-fade-in">
@@ -288,8 +292,12 @@ export default function ProjectTicketsChat({
             onChange={(e) => setStatusFilter(e.target.value)}
           >
             <option value="ALL">{t('tickets.all_statuses', { defaultValue: 'All Statuses' })}</option>
+            <option value="NEW">🆕 {t('tickets.statuses.new', { defaultValue: 'New' })}</option>
+            <option value="OPEN">📂 {t('tickets.statuses.open', { defaultValue: 'Open' })}</option>
+            <option value="RESOLVED">✅ {t('tickets.statuses.resolved', { defaultValue: 'Resolved' })}</option>
+            <option value="CLOSED">🔒 {t('tickets.statuses.closed', { defaultValue: 'Closed' })}</option>
             <option value="PENDING">⏳ {t('tickets.statuses.pending', { defaultValue: 'Pending' })}</option>
-            <option value="APPROVED">✅ {t('tickets.statuses.approved', { defaultValue: 'Approved' })}</option>
+            <option value="APPROVED">✔️ {t('tickets.statuses.approved', { defaultValue: 'Approved' })}</option>
             <option value="REJECTED">❌ {t('tickets.statuses.rejected', { defaultValue: 'Rejected' })}</option>
             <option value="VIEWED">👀 {t('tickets.statuses.viewed', { defaultValue: 'Viewed' })}</option>
           </select>
@@ -351,8 +359,8 @@ export default function ProjectTicketsChat({
             </Button>
           </div>
         ) : (
-          groupedTickets.map((group, gIdx) => (
-            <div key={gIdx} className="space-y-4">
+          groupedTickets.map((group) => (
+            <div key={group.date} className="space-y-4">
               {/* Date separator */}
               <div className="flex items-center justify-center my-4">
                 <span className="px-3.5 py-1 rounded-full bg-[#EADBCE]/80 border border-[#D9C7B8] text-[11px] font-bold text-gray-700 shadow-xs tracking-wide">
@@ -366,203 +374,24 @@ export default function ProjectTicketsChat({
                 const isReceiver = Number(ticket.receiverId) === Number(currentUserId)
                 const isPending  = ticket.status === 'PENDING'
                 const isActionLoading = actionLoadingId === ticket.ticketId
+                const isHighlighted = highlightedTicketId === String(ticket.ticketId)
 
                 return (
-                  <div
+                  <TicketBubbleItem
                     key={ticket.ticketId}
-                    id={`ticket-bubble-${ticket.ticketId}`}
-                    className={`flex ${isOutgoing ? 'justify-end' : 'justify-start'} animate-slide-up scroll-mt-24`}
-                  >
-                    <div
-                      className={`relative w-full max-w-[90%] sm:max-w-[75%] md:max-w-[65%] rounded-2xl p-4 shadow-sm transition-all duration-300
-                        ${highlightedTicketId === String(ticket.ticketId) ? 'ring-4 ring-warm-brown ring-offset-2 scale-[1.01] shadow-lg animate-pulse' : ''}
-                        ${isOutgoing
-                          ? 'bg-white border border-[#D9C7B8] rounded-tr-xs'
-                          : 'bg-[#FAF7F2] border border-[#E0D0C0] rounded-tl-xs'
-                        }`}
-                    >
-                      {/* ── Incoming sender label ────────────────── */}
-                      {!isOutgoing && (
-                        <div className="flex flex-wrap items-center justify-between gap-1.5 mb-2 pb-2 border-b border-[#E0D0C0]/60">
-                          <div className="flex items-center gap-1.5 min-w-0">
-                            <div className="w-6 h-6 rounded-full bg-warm-brown text-white text-[10px] font-bold flex items-center justify-center shrink-0 shadow-2xs">
-                              {(ticket.senderNameEn || ticket.senderNameAr || 'U').charAt(0).toUpperCase()}
-                            </div>
-                            <span className="text-xs font-bold text-gray-900 truncate">
-                              {i18n.language === 'ar' ? (ticket.senderNameAr || ticket.senderNameEn || 'User') : (ticket.senderNameEn || ticket.senderNameAr || 'User')}
-                            </span>
-                            {ticket.senderRole && (
-                              <span className="px-1.5 py-0.2 rounded text-[9px] font-medium bg-gray-200/80 text-gray-700 uppercase shrink-0">
-                                {ticket.senderRole}
-                              </span>
-                            )}
-                          </div>
-
-                          <div className="flex items-center gap-1 shrink-0 ml-auto rtl:mr-auto">
-                            <TicketTypeBadge type={ticket.ticketType} />
-                            <TicketStatusBadge status={ticket.status} />
-                          </div>
-                        </div>
-                      )}
-
-                      {/* ── Outgoing top badges & action icons ──── */}
-                      {isOutgoing && (
-                        <div className="flex items-center justify-between gap-2 mb-2 pb-2 border-b border-gray-100">
-                          <div className="flex items-center gap-1.5 min-w-0">
-                            <TicketTypeBadge type={ticket.ticketType} />
-                            <TicketStatusBadge status={ticket.status} />
-                          </div>
-
-                          {/* Edit / Delete Icons for pending outgoing tickets */}
-                          {isPending && (
-                            <div className="flex items-center gap-1 shrink-0">
-                              <button
-                                type="button"
-                                onClick={() => openEditModal(ticket)}
-                                disabled={isActionLoading}
-                                className="p-1 rounded-lg text-gray-400 hover:text-warm-brown hover:bg-warm-brown/10 transition-colors"
-                                title={t('common.edit', { defaultValue: 'Edit' })}
-                              >
-                                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
-                                  <path strokeLinecap="round" strokeLinejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125" />
-                                </svg>
-                              </button>
-                              <button
-                                type="button"
-                                onClick={() => handleDeleteTicket(ticket.ticketId)}
-                                disabled={isActionLoading}
-                                className="p-1 rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors"
-                                title={t('common.delete', { defaultValue: 'Delete' })}
-                              >
-                                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
-                                  <path strokeLinecap="round" strokeLinejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
-                                </svg>
-                              </button>
-                            </div>
-                          )}
-                        </div>
-                      )}
-
-                      {/* ── Title & Content ──────────────────────── */}
-                      <h4 className="text-sm font-bold text-gray-900 leading-snug">
-                        {ticket.title}
-                      </h4>
-
-                      {ticket.description && (
-                        <p className="mt-1.5 text-xs text-gray-700 leading-relaxed whitespace-pre-wrap">
-                          {ticket.description}
-                        </p>
-                      )}
-
-                      {/* ── Expense Amount Highlight ─────────────── */}
-                      {ticket.ticketType === 'EXPENSE' && ticket.amount != null && (
-                        <div className="mt-2.5 px-3 py-2 rounded-xl bg-warm-brown/10 border border-warm-brown/25 flex items-center justify-between">
-                          <span className="text-[11px] font-semibold text-warm-brown flex items-center gap-1">
-                            <span>💰</span> {t('tickets.expense_amount', { defaultValue: 'Expense Amount:' })}
-                          </span>
-                          <span className="text-sm font-extrabold text-gray-950 font-mono tracking-tight">
-                            {fmtAmount(ticket.amount)} <span className="text-xs font-semibold text-warm-brown">EGP</span>
-                          </span>
-                        </div>
-                      )}
-
-                      {/* ── Attachments ──────────────────────────── */}
-                      {ticket.attachments && ticket.attachments.length > 0 && (
-                        <div className="mt-3 pt-2.5 border-t border-gray-100/80 space-y-2">
-                          <p className="text-[10px] font-bold uppercase tracking-wider text-gray-400">
-                            {t('tickets.attachments', { defaultValue: 'Attachments' })} ({ticket.attachments.length})
-                          </p>
-                          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                            {ticket.attachments.map((att, attIdx) => {
-                              const isPdf = isPdfDocument(att.fileUrl, att.fileType)
-                              const attTitle = isPdf
-                                ? (ticket.title ? `${ticket.title} - Document` : 'Document.pdf')
-                                : (ticket.title ? `${ticket.title} - Image` : 'Attachment')
-
-                              return (
-                                <button
-                                  key={att.ticketAttachmentId || att.fileUrl || attIdx}
-                                  type="button"
-                                  onClick={() => setActiveDoc({ url: att.fileUrl, title: attTitle, fileType: att.fileType })}
-                                  className="group relative flex flex-col rounded-xl overflow-hidden border border-gray-200 bg-white hover:border-warm-brown/60 hover:shadow-xs transition-all text-left rtl:text-right focus:outline-none cursor-pointer"
-                                >
-                                  <div className="relative aspect-[4/3] w-full overflow-hidden bg-gray-100 flex items-center justify-center">
-                                    {isPdf ? (
-                                      <>
-                                        <img
-                                          src={getPdfThumbnailUrl(att.fileUrl, { width: 320 })}
-                                          alt="PDF Preview"
-                                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
-                                          loading="lazy"
-                                        />
-                                        <span className="absolute top-1.5 left-1.5 px-1.5 py-0.5 rounded bg-red-600 text-white font-bold text-[9px] shadow-xs">
-                                          PDF
-                                        </span>
-                                      </>
-                                    ) : (
-                                      <img
-                                        src={optimizeCloudinaryUrl(att.fileUrl, { width: 320, quality: 'auto' })}
-                                        alt="Thumbnail"
-                                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
-                                        loading="lazy"
-                                      />
-                                    )}
-                                    <div className="absolute inset-0 bg-black/25 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white">
-                                      <span className="text-[11px] font-bold bg-black/60 px-2 py-1 rounded-lg backdrop-blur-xs flex items-center gap-1">
-                                        <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
-                                          <path strokeLinecap="round" strokeLinejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
-                                          <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
-                                        </svg>
-                                        {t('common.view', { defaultValue: 'View' })}
-                                      </span>
-                                    </div>
-                                  </div>
-                                  <div className="p-1.5 bg-gray-50/90 border-t border-gray-100 flex items-center justify-between gap-1">
-                                    <span className="text-[11px] font-medium text-gray-800 truncate group-hover:text-warm-brown">
-                                      {isPdf ? 'Document.pdf' : 'Image.jpg'}
-                                    </span>
-                                    <span className="text-[9px] text-gray-400 font-bold uppercase">{att.fileType || (isPdf ? 'PDF' : 'IMG')}</span>
-                                  </div>
-                                </button>
-                              )
-                            })}
-                          </div>
-                        </div>
-                      )}
-
-                      {/* ── Receiver Evaluation Actions (Approve / Reject) ── */}
-                      {!isOutgoing && isReceiver && isPending && (
-                        <div className="mt-3.5 pt-3 border-t border-[#E0D0C0] flex items-center justify-end gap-2">
-                          <button
-                            type="button"
-                            disabled={isActionLoading}
-                            onClick={() => handleStatusChange(ticket.ticketId, 'REJECTED')}
-                            className="px-3 py-1.5 rounded-xl border border-red-200 bg-red-50 hover:bg-red-100 text-red-600 text-xs font-semibold transition-all flex items-center gap-1 cursor-pointer disabled:opacity-50"
-                          >
-                            ✕ {t('tickets.reject', { defaultValue: 'Reject' })}
-                          </button>
-                          <button
-                            type="button"
-                            disabled={isActionLoading}
-                            onClick={() => handleStatusChange(ticket.ticketId, 'APPROVED')}
-                            className="px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold shadow-xs transition-all flex items-center gap-1 cursor-pointer disabled:opacity-50"
-                          >
-                            ✓ {t('tickets.approve', { defaultValue: 'Approve' })}
-                          </button>
-                        </div>
-                      )}
-
-                      {/* ── Timestamp + Delivery ticks ────────── */}
-                      <div className="mt-2 flex items-center justify-end gap-1 text-[10px] text-gray-400">
-                        <span>{formatTime(ticket.createdAt, i18n.language)}</span>
-                        {isOutgoing && (
-                          <span className={ticket.status === 'APPROVED' ? 'text-emerald-500' : 'text-gray-400'} title={ticket.status}>
-                            ✓✓
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  </div>
+                    ticket={ticket}
+                    isOutgoing={isOutgoing}
+                    isReceiver={isReceiver}
+                    isPending={isPending}
+                    isActionLoading={isActionLoading}
+                    isHighlighted={isHighlighted}
+                    onOpenEdit={openEditModal}
+                    onDelete={handleDeleteTicket}
+                    onOpenChat={setChatModalTicket}
+                    onStatusChange={handleStatusChange}
+                    onOpenDoc={setActiveDoc}
+                    lang={i18n.language}
+                  />
                 )
               })}
             </div>
@@ -653,6 +482,20 @@ export default function ProjectTicketsChat({
         title={activeDoc?.title}
         fileType={activeDoc?.fileType}
       />
+
+      {/* ── Dedicated Per-Ticket Chat Modal ────────────────── */}
+      {chatModalTicket && (
+        <TicketChatModal
+          isOpen={Boolean(chatModalTicket)}
+          onClose={() => setChatModalTicket(null)}
+          ticketId={chatModalTicket.ticketId}
+          initialTicket={chatModalTicket}
+          onTicketUpdated={(updated) => {
+            setTickets((prev) => prev.map((t) => (t.ticketId === updated.ticketId ? updated : t)))
+            setChatModalTicket(updated)
+          }}
+        />
+      )}
     </div>
   )
 }
@@ -685,6 +528,10 @@ function TicketTypeBadge({ type }) {
 function TicketStatusBadge({ status }) {
   const { t } = useTranslation()
   const styles = {
+    NEW:      'bg-blue-100 text-blue-700 border-blue-300',
+    OPEN:     'bg-amber-100 text-amber-700 border-amber-300',
+    RESOLVED: 'bg-emerald-100 text-emerald-700 border-emerald-300',
+    CLOSED:   'bg-slate-100 text-slate-700 border-slate-300',
     PENDING:  'bg-amber-50 text-amber-700 border-amber-200',
     APPROVED: 'bg-emerald-50 text-emerald-700 border-emerald-200',
     REJECTED: 'bg-red-50 text-red-700 border-red-200',
@@ -697,3 +544,253 @@ function TicketStatusBadge({ status }) {
     </span>
   )
 }
+
+const TicketBubbleItem = memo(function TicketBubbleItem({
+  ticket,
+  isOutgoing,
+  isReceiver,
+  isPending,
+  isActionLoading,
+  isHighlighted,
+  onOpenEdit,
+  onDelete,
+  onOpenChat,
+  onStatusChange,
+  onOpenDoc,
+  lang,
+}) {
+  const { t } = useTranslation()
+  const isAr = lang === 'ar'
+
+  return (
+    <div
+      id={`ticket-bubble-${ticket.ticketId}`}
+      className={`flex ${isOutgoing ? 'justify-end' : 'justify-start'} scroll-mt-24`}
+    >
+      <div
+        className={`relative w-full max-w-[90%] sm:max-w-[75%] md:max-w-[65%] rounded-2xl p-4 shadow-sm transition-all duration-300
+          ${isHighlighted ? 'ring-4 ring-warm-brown ring-offset-2 scale-[1.01] shadow-lg animate-pulse' : ''}
+          ${isOutgoing
+            ? 'bg-white border border-[#D9C7B8] rounded-tr-xs'
+            : 'bg-[#FAF7F2] border border-[#E0D0C0] rounded-tl-xs'
+          }`}
+      >
+        {/* ── Incoming sender label ────────────────── */}
+        {!isOutgoing && (
+          <div className="flex flex-wrap items-center justify-between gap-1.5 mb-2 pb-2 border-b border-[#E0D0C0]/60">
+            <div className="flex items-center gap-1.5 min-w-0">
+              <div className="w-6 h-6 rounded-full bg-warm-brown text-white text-[10px] font-bold flex items-center justify-center shrink-0 shadow-2xs">
+                {(ticket.senderNameEn || ticket.senderNameAr || 'U').charAt(0).toUpperCase()}
+              </div>
+              <span className="text-xs font-bold text-gray-900 truncate">
+                {isAr ? (ticket.senderNameAr || ticket.senderNameEn || 'User') : (ticket.senderNameEn || ticket.senderNameAr || 'User')}
+              </span>
+              {ticket.senderRole && (
+                <span className="px-1.5 py-0.2 rounded text-[9px] font-medium bg-gray-200/80 text-gray-700 uppercase shrink-0">
+                  {ticket.senderRole}
+                </span>
+              )}
+            </div>
+
+            <div className="flex items-center gap-1 shrink-0 ml-auto rtl:mr-auto">
+              <TicketTypeBadge type={ticket.ticketType} />
+              <TicketStatusBadge status={ticket.status} />
+            </div>
+          </div>
+        )}
+
+        {/* ── Outgoing top badges & action icons ──── */}
+        {isOutgoing && (
+          <div className="flex items-center justify-between gap-2 mb-2 pb-2 border-b border-gray-100">
+            <div className="flex items-center gap-1.5 min-w-0">
+              <TicketTypeBadge type={ticket.ticketType} />
+              <TicketStatusBadge status={ticket.status} />
+            </div>
+
+            {/* Edit / Delete Icons for pending outgoing tickets */}
+            {isPending && (
+              <div className="flex items-center gap-1 shrink-0">
+                <button
+                  type="button"
+                  onClick={() => onOpenEdit(ticket)}
+                  disabled={isActionLoading}
+                  className="p-1 rounded-lg text-gray-400 hover:text-warm-brown hover:bg-warm-brown/10 transition-colors"
+                  title={t('common.edit', { defaultValue: 'Edit' })}
+                >
+                  <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125" />
+                  </svg>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => onDelete(ticket.ticketId)}
+                  disabled={isActionLoading}
+                  className="p-1 rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors"
+                  title={t('common.delete', { defaultValue: 'Delete' })}
+                >
+                  <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                  </svg>
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ── Title & Content ──────────────────────── */}
+        <h4 className="text-sm font-bold text-gray-900 leading-snug">
+          {ticket.title}
+        </h4>
+
+        {ticket.description && (
+          <p className="mt-1.5 text-xs text-gray-700 leading-relaxed whitespace-pre-wrap">
+            {ticket.description}
+          </p>
+        )}
+
+        {/* ── Expense Amount Highlight ─────────────── */}
+        {ticket.ticketType === 'EXPENSE' && ticket.amount != null && (
+          <div className="mt-2.5 px-3 py-2 rounded-xl bg-warm-brown/10 border border-warm-brown/25 flex items-center justify-between">
+            <span className="text-[11px] font-semibold text-warm-brown flex items-center gap-1">
+              <span>💰</span> {t('tickets.expense_amount', { defaultValue: 'Expense Amount:' })}
+            </span>
+            <span className="text-sm font-extrabold text-gray-950 font-mono tracking-tight">
+              {fmtAmount(ticket.amount)} <span className="text-xs font-semibold text-warm-brown">EGP</span>
+            </span>
+          </div>
+        )}
+
+        {/* ── Attachments ──────────────────────────── */}
+        {ticket.attachments && ticket.attachments.length > 0 && (
+          <div className="mt-3 pt-2.5 border-t border-gray-100/80 space-y-2">
+            <p className="text-[10px] font-bold uppercase tracking-wider text-gray-400">
+              {t('tickets.attachments', { defaultValue: 'Attachments' })} ({ticket.attachments.length})
+            </p>
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+              {ticket.attachments.map((att, attIdx) => {
+                const isPdf = isPdfDocument(att.fileUrl, att.fileType)
+                const attTitle = isPdf
+                  ? (ticket.title ? `${ticket.title} - Document` : 'Document.pdf')
+                  : (ticket.title ? `${ticket.title} - Image` : 'Attachment')
+
+                return (
+                  <button
+                    key={att.ticketAttachmentId || att.fileUrl || attIdx}
+                    type="button"
+                    onClick={() => onOpenDoc({ url: att.fileUrl, title: attTitle, fileType: att.fileType })}
+                    className="group relative flex flex-col rounded-xl overflow-hidden border border-gray-200 bg-white hover:border-warm-brown/60 hover:shadow-xs transition-all text-left rtl:text-right focus:outline-none cursor-pointer"
+                  >
+                    <div className="relative aspect-[4/3] w-full overflow-hidden bg-gray-100 flex items-center justify-center">
+                      {isPdf ? (
+                        <>
+                          <img
+                            src={getPdfThumbnailUrl(att.fileUrl, { width: 320 })}
+                            alt="PDF Preview"
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+                            loading="lazy"
+                          />
+                          <span className="absolute top-1.5 left-1.5 px-1.5 py-0.5 rounded bg-red-600 text-white font-bold text-[9px] shadow-xs">
+                            PDF
+                          </span>
+                        </>
+                      ) : (
+                        <img
+                          src={optimizeCloudinaryUrl(att.fileUrl, { width: 320, quality: 'auto' })}
+                          alt="Thumbnail"
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+                          loading="lazy"
+                        />
+                      )}
+                      <div className="absolute inset-0 bg-black/25 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white">
+                        <span className="text-[11px] font-bold bg-black/60 px-2 py-1 rounded-lg backdrop-blur-xs flex items-center gap-1">
+                          <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                          </svg>
+                          {t('common.view', { defaultValue: 'View' })}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="p-1.5 bg-gray-50/90 border-t border-gray-100 flex items-center justify-between gap-1">
+                      <span className="text-[11px] font-medium text-gray-800 truncate group-hover:text-warm-brown">
+                        {isPdf ? 'Document.pdf' : 'Image.jpg'}
+                      </span>
+                      <span className="text-[9px] text-gray-400 font-bold uppercase">{att.fileType || (isPdf ? 'PDF' : 'IMG')}</span>
+                    </div>
+                  </button>
+                )
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* ── Per-Ticket Chat Button ── */}
+        <button
+          type="button"
+          onClick={() => onOpenChat(ticket)}
+          className="mt-3 w-full py-2 px-3 rounded-xl bg-warm-brown/10 hover:bg-warm-brown/20 border border-warm-brown/30 text-warm-brown text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer shadow-2xs"
+        >
+          <span>💬</span>
+          <span>{isAr ? 'محادثة التذكرة الخاصة' : 'Open Ticket Chat'}</span>
+          <span className="px-2 py-0.5 rounded-full bg-white text-[10px] font-extrabold text-warm-brown border border-warm-brown/30">
+            {ticket.chatMessages?.length || 0} {isAr ? 'رسالة' : 'msgs'}
+          </span>
+        </button>
+
+        {/* ── Status transitions ── */}
+        <div className="mt-2.5 pt-2 border-t border-[#E0D0C0]/60 flex flex-wrap items-center justify-between gap-1">
+          <span className="text-[10px] text-gray-500 font-semibold">{isAr ? 'الحالة:' : 'Status:'}</span>
+          <div className="flex items-center gap-1">
+            {['NEW', 'OPEN', 'RESOLVED', 'CLOSED'].map((st) => (
+              <button
+                key={st}
+                type="button"
+                disabled={isActionLoading || ticket.status === st}
+                onClick={() => onStatusChange(ticket.ticketId, st)}
+                className={`px-2 py-0.5 rounded text-[10px] font-bold transition-all cursor-pointer ${
+                  ticket.status === st
+                    ? 'bg-warm-brown text-white shadow-2xs'
+                    : 'bg-white hover:bg-gray-100 text-gray-700 border border-gray-200'
+                }`}
+              >
+                {st}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* ── Receiver Evaluation Actions (Approve / Reject legacy fallback) ── */}
+        {!isOutgoing && isReceiver && isPending && (
+          <div className="mt-2 pt-2 border-t border-[#E0D0C0] flex items-center justify-end gap-2">
+            <button
+              type="button"
+              disabled={isActionLoading}
+              onClick={() => onStatusChange(ticket.ticketId, 'REJECTED')}
+              className="px-3 py-1 rounded-xl border border-red-200 bg-red-50 hover:bg-red-100 text-red-600 text-xs font-semibold transition-all flex items-center gap-1 cursor-pointer disabled:opacity-50"
+            >
+              ✕ {t('tickets.reject', { defaultValue: 'Reject' })}
+            </button>
+            <button
+              type="button"
+              disabled={isActionLoading}
+              onClick={() => onStatusChange(ticket.ticketId, 'APPROVED')}
+              className="px-3.5 py-1 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold shadow-xs transition-all flex items-center gap-1 cursor-pointer disabled:opacity-50"
+            >
+              ✓ {t('tickets.approve', { defaultValue: 'Approve' })}
+            </button>
+          </div>
+        )}
+
+        {/* ── Timestamp + Delivery ticks ────────── */}
+        <div className="mt-2 flex items-center justify-end gap-1 text-[10px] text-gray-400">
+          <span>{formatTime(ticket.createdAt, lang)}</span>
+          {isOutgoing && (
+            <span className={ticket.status === 'APPROVED' ? 'text-emerald-500' : 'text-gray-400'} title={ticket.status}>
+              ✓✓
+            </span>
+          )}
+        </div>
+      </div>
+    </div>
+  )
+})

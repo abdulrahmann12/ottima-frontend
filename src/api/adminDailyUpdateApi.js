@@ -22,3 +22,6 @@ export const getAdminDailyUpdates = (projectId, page = 0, size = 10, filters = {
 
 export const evaluateAdminDailyUpdate = (dailyUpdateId, payload) =>
   axiosClient.put(`${adminBase}/daily-updates/${dailyUpdateId}/evaluate`, payload)
+
+export const getDailyUpdateById = (dailyUpdateId) =>
+  axiosClient.get(`/api/v1/daily-updates/${dailyUpdateId}`)

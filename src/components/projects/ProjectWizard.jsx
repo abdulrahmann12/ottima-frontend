@@ -14,7 +14,7 @@ import { useTranslation } from 'react-i18next'
 const responseError = (err, fallback) => err?.response?.data?.message ?? fallback
 
 const EMPTY_PROJECT_FORM = {
-  clientId: '', engineerId: '', nameAr: '', nameEn: '',
+  clientId: '', engineerId: '', engineerIds: [], nameAr: '', nameEn: '',
   addressAr: '', addressEn: '', estimatedBudget: '',
   startDate: '', targetCompletionDate: '',
 }
@@ -47,17 +47,26 @@ export default function ProjectWizard({ onSuccess }) {
     if (!wizardOpen) return
     setLoadingLists(true)
     setError(null)
-    Promise.all([
+    Promise.allSettled([
       getAllClients(0, 200),
       getAllEngineers(0, 200),
       getAllStandardItems('', 0, 200),
     ])
-      .then(([c, e, s]) => {
-        setClients(c.data.data?.content ?? [])
-        setEngineers(e.data.data?.content ?? [])
-        setCatalogItems(s.data.data?.content ?? [])
+      .then(([cRes, eRes, sRes]) => {
+        if (cRes.status === 'fulfilled') {
+          setClients(cRes.value.data?.data?.content ?? [])
+        }
+        if (eRes.status === 'fulfilled') {
+          setEngineers(eRes.value.data?.data?.content ?? [])
+        }
+        if (sRes.status === 'fulfilled') {
+          setCatalogItems(sRes.value.data?.data?.content ?? [])
+        }
+        const rejected = [cRes, eRes, sRes].find((r) => r.status === 'rejected')
+        if (rejected) {
+          setError(responseError(rejected.reason, t('errors.generic')))
+        }
       })
-      .catch((err) => setError(responseError(err, t('errors.generic'))))
       .finally(() => setLoadingLists(false))
   }, [wizardOpen, t])
 
@@ -70,13 +79,21 @@ export default function ProjectWizard({ onSuccess }) {
   // ── Step 1 submit ──────────────────────────────────────────
   const handleStep1Submit = async (e) => {
     e.preventDefault()
+    const selectedEngIds = (projectForm.engineerIds || []).map(Number).filter(Boolean)
+    const primaryEng = selectedEngIds[0] || (projectForm.engineerId ? Number(projectForm.engineerId) : null)
+    if (!primaryEng && selectedEngIds.length === 0) {
+      setError(t('projects.engineer_required', 'At least one engineer must be assigned'))
+      return
+    }
+
     setSaving(true)
     setError(null)
     try {
       const { data } = await createProject({
         ...projectForm,
         clientId: Number(projectForm.clientId),
-        engineerId: Number(projectForm.engineerId),
+        engineerId: primaryEng,
+        engineerIds: selectedEngIds.length > 0 ? selectedEngIds : [primaryEng],
         estimatedBudget: Number(projectForm.estimatedBudget),
       })
       // Store projectId from response and advance to step 2
@@ -158,14 +175,22 @@ export default function ProjectWizard({ onSuccess }) {
                 }))}
               />
 
-              {/* Engineer */}
+              {/* Engineers (Multi-Select) */}
               <SearchableSelect
                 id="step1-engineer"
-                label={t('projects.engineer')}
+                label={t('projects.engineers', 'Engineers')}
                 required
-                value={projectForm.engineerId}
-                onChange={fieldP('engineerId')}
-                placeholder={t('projects.select_engineer')}
+                multiple
+                value={projectForm.engineerIds}
+                onChange={(e) => {
+                  const vals = Array.isArray(e.target.value) ? e.target.value : [e.target.value]
+                  setProjectForm((p) => ({
+                    ...p,
+                    engineerIds: vals,
+                    engineerId: vals[0] || '',
+                  }))
+                }}
+                placeholder={t('projects.select_engineers', 'Select one or more engineers')}
                 options={engineers.map((u) => ({
                   value: u.userId,
                   label: (i18n.language === 'ar' ? (u.fullNameAr || u.fullNameEn) : (u.fullNameEn || u.fullNameAr)) || u.username,

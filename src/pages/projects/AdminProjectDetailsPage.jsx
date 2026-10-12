@@ -4,7 +4,9 @@ import Modal from '@/components/admin/Modal'
 import ProjectDetailContent from '@/components/projects/ProjectDetailContent'
 import ProjectDetailsPageFrame from '@/components/projects/ProjectDetailsPageFrame'
 import ProjectItemAssignmentFields from '@/components/projects/ProjectItemAssignmentFields'
+import ProjectNavigationTabs from '@/components/projects/ProjectNavigationTabs'
 import ProjectTicketsChat from '@/components/tickets/ProjectTicketsChat'
+import ProjectGlobalChat from '@/components/chat/ProjectGlobalChat'
 import Alert from '@/components/ui/Alert'
 import Button from '@/components/ui/Button'
 import { useCallback, useEffect, useState } from 'react'
@@ -126,14 +128,17 @@ export default function AdminProjectDetailsPage() {
   const isProjectDeleted = Boolean(project?.deletedAt || project?.deletesAt)
 
   const [searchParams, setSearchParams] = useSearchParams()
-  const initialTab = searchParams.get('tab') === 'tickets' ? 'TICKETS' : 'OVERVIEW'
+  const tabParam = searchParams.get('tab')
+  const initialTab = tabParam === 'tickets' ? 'TICKETS' : (tabParam === 'chat' || tabParam === 'project_chat') ? 'PROJECT_CHAT' : 'OVERVIEW'
   const [activeViewTab, setActiveViewTab] = useState(initialTab)
 
   useEffect(() => {
-    const tabParam = searchParams.get('tab')
-    if (tabParam === 'tickets') {
+    const currentTab = searchParams.get('tab')
+    if (currentTab === 'tickets') {
       setActiveViewTab('TICKETS')
-    } else if (tabParam === 'overview') {
+    } else if (currentTab === 'chat' || currentTab === 'project_chat') {
+      setActiveViewTab('PROJECT_CHAT')
+    } else if (currentTab === 'overview') {
       setActiveViewTab('OVERVIEW')
     }
   }, [searchParams])
@@ -142,6 +147,8 @@ export default function AdminProjectDetailsPage() {
     setActiveViewTab(tab)
     if (tab === 'TICKETS') {
       setSearchParams({ tab: 'tickets' }, { replace: true })
+    } else if (tab === 'PROJECT_CHAT') {
+      setSearchParams({ tab: 'chat' }, { replace: true })
     } else {
       setSearchParams({}, { replace: true })
     }
@@ -183,46 +190,12 @@ export default function AdminProjectDetailsPage() {
           )}
 
           {/* Navigation Bar: Tabs + Actions */}
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 bg-white p-2 rounded-2xl border border-gray-200 shadow-xs">
-            {/* View switcher tabs */}
-            <div className="flex items-center gap-1.5 overflow-x-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden flex-nowrap pb-1 sm:pb-0">
-              <button
-                type="button"
-                onClick={() => handleTabChange('OVERVIEW')}
-                className={`min-h-[40px] px-3.5 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all shrink-0 cursor-pointer ${
-                  activeViewTab === 'OVERVIEW'
-                    ? 'bg-warm-brown text-white shadow-xs'
-                    : 'text-gray-700 hover:bg-light-blue/40'
-                }`}
-              >
-                📋 {t('projects.tab_overview', { defaultValue: 'Items & Progress' })}
-              </button>
-
-              <button
-                type="button"
-                onClick={() => handleTabChange('TICKETS')}
-                className={`min-h-[40px] px-3.5 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all flex items-center gap-1.5 shrink-0 cursor-pointer ${
-                  activeViewTab === 'TICKETS'
-                    ? 'bg-warm-brown text-white shadow-xs'
-                    : 'text-gray-700 hover:bg-light-blue/40'
-                }`}
-              >
-                💬 {t('projects.tab_tickets', { defaultValue: 'Tickets (Chat)' })}
-              </button>
-            </div>
-
-            <div className="flex items-center gap-2">
-              <Button
-                type="button"
-                className="w-full sm:w-auto min-h-[40px] py-2 px-4 text-xs font-bold"
-                onClick={() => navigate(`/admin/projects/${projectId}/daily-updates`, {
-                  state: { projectSummary: project },
-                })}
-              >
-                📷 {t('nav.daily_updates', { defaultValue: 'Daily Updates' })}
-              </Button>
-            </div>
-          </div>
+          <ProjectNavigationTabs
+            activeTab={activeViewTab}
+            onTabChange={handleTabChange}
+            dailyUpdatesUrl={`/admin/projects/${projectId}/daily-updates`}
+            project={project}
+          />
 
           {/* Active Tab View */}
           {activeViewTab === 'OVERVIEW' ? (
@@ -238,8 +211,13 @@ export default function AdminProjectDetailsPage() {
                 )
               }
             />
-          ) : (
+          ) : activeViewTab === 'TICKETS' ? (
             <ProjectTicketsChat
+              projectId={projectId}
+              project={project}
+            />
+          ) : (
+            <ProjectGlobalChat
               projectId={projectId}
               project={project}
             />

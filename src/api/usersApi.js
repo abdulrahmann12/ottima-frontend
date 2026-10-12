@@ -44,3 +44,6 @@ export const getAllDeactivatedUsers = (page = 0, size = 10) => axiosClient.get('
 // ── Self-service profile (any authenticated role) ─────────────
 export const getMyProfile    = ()     => axiosClient.get('/api/v1/users/data')
 export const updateMyProfile = (data) => axiosClient.put('/api/v1/users/data', data)
+export const updatePreferredLanguage = (language) =>
+  axiosClient.patch('/api/v1/users/preferred-language', { language })
+

@@ -23,8 +23,14 @@ const cldError = (res, payload, fallback) =>
   payload?.error?.message ?? res.headers?.get?.('x-cld-error') ?? fallback
 
 function emptyForm(record = null) {
+  const isExpense = record?.recordType === 'EXPENSE'
+  // An expense is considered "OTHER" if it has no linked project item or already has an expenseCategory
+  const isOther = Boolean(isExpense && (!record?.projectItemId || record?.expenseCategory))
+
   return {
+    expenseType:     isOther ? 'OTHER' : 'ITEM', // 'ITEM' | 'OTHER'
     projectItemId:   record?.projectItemId  ?? '',
+    expenseCategory: record?.expenseCategory ?? (isOther ? 'Other' : ''),
     recordType:      record?.recordType     ?? 'DEPOSIT',
     amount:          record?.amount         ?? '',
     paymentMethod:   record?.paymentMethod  ?? 'CASH',
@@ -72,6 +78,11 @@ export default function FinancialRecordModal({
   useEffect(() => {
     if (!isOpen) return
     const initial = emptyForm(record)
+    // If creating a new EXPENSE and no items exist, default to OTHER
+    if (!record && initial.recordType === 'EXPENSE' && projectItems.length === 0) {
+      initial.expenseType = 'OTHER'
+      initial.expenseCategory = 'Other'
+    }
     setForm(initial)
     setErrors({})
     setError(null)
@@ -79,19 +90,56 @@ export default function FinancialRecordModal({
     setUploading(false)
     setDragActive(false)
     setDocPreview(record?.documentUrl ?? null)
-  }, [isOpen, record])
+  }, [isOpen, record, projectItems.length])
 
   const set = (key) => (e) => {
-    const val = e.target.value
+    const val = e?.target ? e.target.value : e
     setForm((f) => {
       const updated = { ...f, [key]: val }
-      // When switching back to DEPOSIT, clear projectItemId (deposits are project-level)
+      // When switching back to DEPOSIT, clear projectItemId & expenseCategory (deposits are project-level)
       if (key === 'recordType' && val === 'DEPOSIT') {
         updated.projectItemId = ''
+        updated.expenseCategory = ''
+        updated.expenseType = 'ITEM'
+      } else if (key === 'recordType' && val === 'EXPENSE') {
+        if (projectItems.length === 0) {
+          updated.expenseType = 'OTHER'
+          if (!updated.expenseCategory) updated.expenseCategory = 'Other'
+        }
       }
       return updated
     })
-    setErrors((prev) => ({ ...prev, [key]: undefined }))
+    setErrors((prev) => ({ ...prev, [key]: undefined, projectItemId: undefined }))
+  }
+
+  const handleExpenseTypeChange = (type) => {
+    setForm((f) => ({
+      ...f,
+      expenseType: type,
+      projectItemId: type === 'OTHER' ? '' : f.projectItemId,
+      expenseCategory: type === 'OTHER' ? (f.expenseCategory || 'Other') : '',
+    }))
+    setErrors((prev) => ({ ...prev, projectItemId: undefined }))
+  }
+
+  const handleProjectItemChange = (e) => {
+    const val = e?.target ? e.target.value : e
+    if (val === '__OTHER__') {
+      setForm((f) => ({
+        ...f,
+        expenseType: 'OTHER',
+        projectItemId: '',
+        expenseCategory: f.expenseCategory || 'Other',
+      }))
+    } else {
+      setForm((f) => ({
+        ...f,
+        expenseType: 'ITEM',
+        projectItemId: val,
+        expenseCategory: '',
+      }))
+    }
+    setErrors((prev) => ({ ...prev, projectItemId: undefined }))
   }
 
   const validate = () => {
@@ -100,10 +148,16 @@ export default function FinancialRecordModal({
     if (!form.amount || Number(form.amount) <= 0) e.amount = 'Must be a positive number'
     if (!form.paymentMethod)   e.paymentMethod   = 'Required'
     if (!form.transactionDate) e.transactionDate = 'Required'
-    // projectItemId is required for EXPENSE records
-    if (form.recordType === 'EXPENSE' && !form.projectItemId) {
-      e.projectItemId = 'Select the project item this expense belongs to'
+
+    // Expense validation: required to pick a project item ONLY if in 'ITEM' mode
+    if (form.recordType === 'EXPENSE' && form.expenseType === 'ITEM') {
+      if (!form.projectItemId || form.projectItemId === '__OTHER__') {
+        e.projectItemId = language === 'ar'
+          ? 'يرجى اختيار بند المشروع أو التبديل لخيار "أخرى"'
+          : 'Select the project item this expense belongs to or choose Other'
+      }
     }
+
     setErrors(e)
     return Object.keys(e).length === 0
   }
@@ -166,8 +220,11 @@ export default function FinancialRecordModal({
     setError(null)
 
     const isExpense = form.recordType === 'EXPENSE'
+    const isOtherExpense = isExpense && (form.expenseType === 'OTHER' || form.projectItemId === '__OTHER__' || !form.projectItemId)
+
     const payload = {
-      projectItemId:   (isExpense && form.projectItemId) ? form.projectItemId : null,
+      projectItemId:   (isExpense && !isOtherExpense && form.projectItemId) ? form.projectItemId : null,
+      expenseCategory: (isExpense && isOtherExpense) ? (form.expenseCategory?.trim() || 'Other') : null,
       recordType:      form.recordType,
       amount:          Number(form.amount),
       paymentMethod:   form.paymentMethod,
@@ -262,30 +319,146 @@ export default function FinancialRecordModal({
           </Field>
         </div>
 
-        {/* Row 3 — project item: REQUIRED for EXPENSE, hidden for DEPOSIT */}
+        {/* Row 3 — Expense Target: Project Item or Other option */}
         {form.recordType === 'EXPENSE' && (
-          <div>
-            {projectItems.length === 0 ? (
-              <p className="mt-1 rounded-xl border border-amber-300 bg-amber-50 px-3.5 py-2.5 text-xs text-amber-800 font-medium">
-                ⚠ No items found for this project. Please add project items first.
-              </p>
+          <div className="space-y-3 rounded-2xl border border-gray-200/90 bg-gray-50/60 p-3.5 transition-all">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <label className="text-xs font-bold uppercase tracking-wider text-gray-700 flex items-center gap-1.5">
+                <span>{language === 'ar' ? 'بند المصروف' : 'Expense Allocation'}</span>
+                <span className="text-red-500 font-bold">*</span>
+              </label>
+
+              {/* Segmented Pill Selector */}
+              <div className="inline-flex rounded-xl bg-gray-200/80 p-0.5 text-xs font-semibold shadow-inner">
+                <button
+                  type="button"
+                  onClick={() => handleExpenseTypeChange('ITEM')}
+                  disabled={saving || projectItems.length === 0}
+                  className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-lg transition-all ${
+                    form.expenseType === 'ITEM'
+                      ? 'bg-white text-gray-900 shadow-xs font-bold'
+                      : 'text-gray-600 hover:text-gray-900'
+                  } ${projectItems.length === 0 ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+                >
+                  <span>📋</span>
+                  <span>{language === 'ar' ? 'بند من المشروع' : 'Project Item'}</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleExpenseTypeChange('OTHER')}
+                  disabled={saving}
+                  className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-lg transition-all cursor-pointer ${
+                    form.expenseType === 'OTHER'
+                      ? 'bg-warm-brown text-white shadow-xs font-bold'
+                      : 'text-gray-600 hover:text-gray-900'
+                  }`}
+                >
+                  <span>🏷️</span>
+                  <span>{language === 'ar' ? 'أخرى (مصروفات عامة)' : 'Other'}</span>
+                </button>
+              </div>
+            </div>
+
+            {form.expenseType === 'ITEM' ? (
+              <div>
+                {projectItems.length === 0 ? (
+                  <div className="rounded-xl border border-amber-300 bg-amber-50 px-3.5 py-2.5 text-xs text-amber-800 font-medium">
+                    <p className="font-semibold">
+                      {language === 'ar' ? '⚠ لا توجد بنود لهذا المشروع حتى الآن.' : '⚠ No items found for this project.'}
+                    </p>
+                    <p className="mt-1 text-amber-700">
+                      {language === 'ar'
+                        ? 'يمكنك تسجيل هذا المصروف كـ "أخرى" (مصروفات عامة).'
+                        : 'You can record this as an "Other" general expense.'}
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() => handleExpenseTypeChange('OTHER')}
+                      className="mt-2 inline-flex items-center gap-1 font-bold text-warm-brown hover:underline cursor-pointer"
+                    >
+                      {language === 'ar' ? 'التبديل إلى خيار "أخرى" ←' : 'Switch to Other Option →'}
+                    </button>
+                  </div>
+                ) : (
+                  <div>
+                    <SearchableSelect
+                      id="fin-project-item"
+                      required
+                      error={errors.projectItemId}
+                      value={form.projectItemId}
+                      onChange={handleProjectItemChange}
+                      disabled={saving}
+                      placeholder={language === 'ar' ? '— اختر بند المشروع أو خيار أخرى —' : '— Select project item or Other option —'}
+                      options={[
+                        {
+                          value: '__OTHER__',
+                          label: language === 'ar' ? '🏷️ أخرى (مصروفات عامة)' : '🏷️ Other (General Expense)',
+                          sublabel: language === 'ar' ? 'تسجيل المصروف كـ أخرى بدون ربطه ببند محدد' : 'Save as Other (Item ID will be null)',
+                        },
+                        ...[...projectItems]
+                          .sort((a, b) => (a.sequenceOrder ?? 0) - (b.sequenceOrder ?? 0))
+                          .map((item) => ({
+                            value: item.projectItemId,
+                            label: (language === 'ar' ? item.itemNameAr : item.itemNameEn) || item.itemNameEn || item.itemNameAr,
+                          })),
+                      ]}
+                    />
+                    <p className="mt-1.5 text-[11px] text-gray-500">
+                      {language === 'ar'
+                        ? 'اختر البند الذي يتبع له هذا المصروف، أو حدد "أخرى" للمصروفات العامة.'
+                        : 'Choose the project item or select "Other" for general unlinked expenses.'}
+                    </p>
+                  </div>
+                )}
+              </div>
             ) : (
-              <SearchableSelect
-                id="fin-project-item"
-                label="Project Item"
-                required
-                error={errors.projectItemId}
-                value={form.projectItemId}
-                onChange={set('projectItemId')}
-                disabled={saving}
-                placeholder="— Select the item this expense belongs to —"
-                options={[...projectItems]
-                  .sort((a, b) => (a.sequenceOrder ?? 0) - (b.sequenceOrder ?? 0))
-                  .map((item) => ({
-                    value: item.projectItemId,
-                    label: (language === 'ar' ? item.itemNameAr : item.itemNameEn) || item.itemNameEn || item.itemNameAr,
-                  }))}
-              />
+              <div className="space-y-3 rounded-xl border border-warm-brown/20 bg-warm-brown/5 p-3.5 animate-fade-in">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-warm-brown/20 text-sm">
+                      🏷️
+                    </span>
+                    <div>
+                      <p className="text-xs font-bold text-gray-800">
+                        {language === 'ar' ? 'مصروف عام (أخرى)' : 'Other General Expense'}
+                      </p>
+                      <p className="text-[11px] text-gray-500">
+                        {language === 'ar'
+                          ? 'سيتم الحفظ كـ أخرى وبدون ربطه ببند محدد (project_item_id = null)'
+                          : 'Will save in database as "Other" and project item ID will be null'}
+                      </p>
+                    </div>
+                  </div>
+                  {projectItems.length > 0 && (
+                    <button
+                      type="button"
+                      onClick={() => handleExpenseTypeChange('ITEM')}
+                      className="text-xs font-semibold text-warm-brown hover:underline cursor-pointer"
+                    >
+                      {language === 'ar' ? 'ربط ببند محدد؟' : 'Link to item?'}
+                    </button>
+                  )}
+                </div>
+
+                <div>
+                  <label className="block text-xs font-medium text-gray-700 mb-1">
+                    {language === 'ar' ? 'تصنيف / مسمى المصروف (اختياري)' : 'Category / Label (optional)'}
+                  </label>
+                  <input
+                    type="text"
+                    className="input-base text-sm bg-white"
+                    value={form.expenseCategory}
+                    onChange={set('expenseCategory')}
+                    placeholder="Other"
+                    disabled={saving}
+                  />
+                  <p className="mt-1 text-[11px] text-gray-500">
+                    {language === 'ar'
+                      ? 'القيمة المحفوظة في قاعدة البيانات (الافتراضي: Other).'
+                      : 'Saved in database as other (default: Other).'}
+                  </p>
+                </div>
+              </div>
             )}
           </div>
         )}

@@ -12,6 +12,7 @@ import { useNavigate } from 'react-router-dom'
  * Reference type badge style mapping matching the luxury palette
  */
 function ReferenceTypeBadge({ type }) {
+  const { t } = useTranslation()
   const refType = (type || '').toUpperCase()
   let badgeColor = 'bg-gray-100 text-gray-700 border-gray-200'
 
@@ -23,11 +24,17 @@ function ReferenceTypeBadge({ type }) {
     badgeColor = 'bg-olive/10 text-olive border-olive/20'
   } else if (refType === 'TICKET' || refType === 'FINANCE') {
     badgeColor = 'bg-indigo-50 text-indigo-700 border-indigo-200'
+  } else if (refType === 'PROJECT_CHAT' || refType === 'CHAT') {
+    badgeColor = 'bg-sky-50 text-sky-700 border-sky-200'
   }
+
+  const labelKey = `notifications.ref_types.${refType.toLowerCase()}`
+  const defaultLabel = refType === 'PROJECT_CHAT' ? 'Chat' : (refType || 'INFO')
+  const label = t(labelKey, { defaultValue: defaultLabel })
 
   return (
     <span className={`px-2 py-0.5 rounded-md text-[10px] font-bold border uppercase tracking-wider ${badgeColor}`}>
-      {refType || 'INFO'}
+      {label}
     </span>
   )
 }

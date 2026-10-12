@@ -14,13 +14,17 @@ function buildInitialForm(update) {
     ? update.status
     : 'APPROVED'
 
+  const isRejected = resolvedStatus === 'REJECTED'
+
   return {
     status: resolvedStatus,
     title: update?.title ?? '',
     notes: update?.notes ?? '',
+    rejectionReason: update?.rejectionReason ?? '',
     imageEvaluations: (update?.images ?? []).map((image) => ({
       updateImageId: image.updateImageId,
-      approved: image.approved ?? resolvedStatus !== 'REJECTED',
+      approved: isRejected ? false : (image.approved ?? true),
+      rejectionReason: image.rejectionReason ?? '',
     })),
   }
 }
@@ -60,8 +64,27 @@ export default function AdminDailyUpdateEvaluationModal({
   }
 
   const setDecision = (status) => {
-    setForm((current) => ({ ...current, status }))
-    setErrors((current) => ({ ...current, status: undefined }))
+    setForm((current) => ({
+      ...current,
+      status,
+      // When daily update is rejected, automatically reject all images!
+      imageEvaluations: status === 'REJECTED'
+        ? current.imageEvaluations.map((img) => ({
+            ...img,
+            approved: false,
+          }))
+        : current.imageEvaluations.map((img) => ({
+            ...img,
+            approved: true,
+          })),
+    }))
+    setErrors((current) => {
+      const next = { ...current, status: undefined, rejectionReason: undefined }
+      form.imageEvaluations.forEach((img) => {
+        delete next[`image_${img.updateImageId}`]
+      })
+      return next
+    })
   }
 
   const setImageDecision = (updateImageId, approved) => {
@@ -70,6 +93,23 @@ export default function AdminDailyUpdateEvaluationModal({
       imageEvaluations: current.imageEvaluations.map((image) => (
         image.updateImageId === updateImageId ? { ...image, approved } : image
       )),
+    }))
+    setErrors((current) => ({
+      ...current,
+      [`image_${updateImageId}`]: undefined,
+    }))
+  }
+
+  const setImageRejectionReason = (updateImageId, reason) => {
+    setForm((current) => ({
+      ...current,
+      imageEvaluations: current.imageEvaluations.map((image) => (
+        image.updateImageId === updateImageId ? { ...image, rejectionReason: reason } : image
+      )),
+    }))
+    setErrors((current) => ({
+      ...current,
+      [`image_${updateImageId}`]: undefined,
     }))
   }
 
@@ -84,6 +124,19 @@ export default function AdminDailyUpdateEvaluationModal({
       nextErrors.status = t('common.required')
     }
 
+    if (form.status === 'REJECTED' && !form.rejectionReason?.trim()) {
+      nextErrors.rejectionReason = t('daily_updates.rejection_reason_required')
+    }
+
+    // Only require image rejection reason when update is APPROVED and an individual image is rejected
+    if (form.status === 'APPROVED') {
+      form.imageEvaluations.forEach((image) => {
+        if (image.approved === false && !image.rejectionReason?.trim()) {
+          nextErrors[`image_${image.updateImageId}`] = t('daily_updates.image_rejection_reason_required')
+        }
+      })
+    }
+
     setErrors(nextErrors)
     return Object.keys(nextErrors).length === 0
   }
@@ -96,11 +149,19 @@ export default function AdminDailyUpdateEvaluationModal({
     setError(null)
 
     try {
+      const isRejected = form.status === 'REJECTED'
       await evaluateAdminDailyUpdate(update.dailyUpdateId, {
         status: form.status,
         title: form.title.trim(),
         notes: form.notes.trim() || undefined,
-        imageEvaluations: form.imageEvaluations,
+        rejectionReason: isRejected ? form.rejectionReason.trim() : null,
+        imageEvaluations: form.imageEvaluations.map((img) => ({
+          updateImageId: img.updateImageId,
+          approved: isRejected ? false : img.approved,
+          rejectionReason: (isRejected || img.approved === false)
+            ? (img.rejectionReason?.trim() || (isRejected ? form.rejectionReason.trim() : null))
+            : null,
+        })),
       })
 
       await onSaved?.()
@@ -156,6 +217,27 @@ export default function AdminDailyUpdateEvaluationModal({
             })}
           </div>
           {errors.status && <p className="text-xs text-red-500">{errors.status}</p>}
+
+          {form.status === 'REJECTED' && (
+            <div className="rounded-xl border border-rose-200 bg-rose-50/70 p-3.5 space-y-2 transition-all">
+              <label htmlFor="admin-rejection-reason" className="block text-xs font-bold text-rose-900 uppercase tracking-wider">
+                {t('daily_updates.rejection_reason')} <span className="text-rose-500">*</span>
+              </label>
+              <textarea
+                id="admin-rejection-reason"
+                className={`input-base min-h-[85px] resize-y bg-white text-sm ${
+                  errors.rejectionReason ? 'border-red-400 focus:border-red-500 focus:ring-red-200' : 'border-rose-200'
+                }`}
+                placeholder={t('daily_updates.rejection_reason_placeholder')}
+                value={form.rejectionReason}
+                onChange={updateField('rejectionReason')}
+                disabled={saving}
+              />
+              {errors.rejectionReason && (
+                <p className="text-xs font-semibold text-rose-600">{errors.rejectionReason}</p>
+              )}
+            </div>
+          )}
         </div>
 
         <Input
@@ -209,17 +291,19 @@ export default function AdminDailyUpdateEvaluationModal({
                         <button
                           type="button"
                           onClick={() => setImageDecision(image.updateImageId, true)}
+                          disabled={form.status === 'REJECTED' || saving}
                           className={`flex-1 rounded-lg border px-3 py-2 text-xs font-semibold transition-colors ${
                             verdict?.approved
                               ? 'border-emerald-300 bg-emerald-100 text-emerald-800 ring-1 ring-emerald-400'
                               : 'border-gray-200 bg-white text-gray-600 hover:border-emerald-200 hover:bg-emerald-50/50 hover:text-emerald-700'
-                          }`}
+                          } ${form.status === 'REJECTED' ? 'opacity-40 cursor-not-allowed' : ''}`}
                         >
                           {t('daily_updates.mark_image_approved')}
                         </button>
                         <button
                           type="button"
                           onClick={() => setImageDecision(image.updateImageId, false)}
+                          disabled={form.status === 'REJECTED' || saving}
                           className={`flex-1 rounded-lg border px-3 py-2 text-xs font-semibold transition-colors ${
                             verdict?.approved === false
                               ? 'border-rose-300 bg-rose-100 text-rose-800 ring-1 ring-rose-400'
@@ -229,6 +313,35 @@ export default function AdminDailyUpdateEvaluationModal({
                           {t('daily_updates.mark_image_rejected')}
                         </button>
                       </div>
+
+                      {verdict?.approved === false && (
+                        <div className="space-y-1.5 rounded-lg border border-rose-200 bg-rose-50/80 p-2.5 transition-all">
+                          <label
+                            htmlFor={`image-rejection-${image.updateImageId}`}
+                            className="block text-[11px] font-bold text-rose-900"
+                          >
+                            {t('daily_updates.image_rejection_reason')} {form.status === 'APPROVED' ? <span className="text-rose-500">*</span> : null}
+                          </label>
+                          <textarea
+                            id={`image-rejection-${image.updateImageId}`}
+                            rows={2}
+                            className={`input-base !py-2 !px-3 text-xs min-h-[50px] resize-y bg-white ${
+                              errors[`image_${image.updateImageId}`]
+                                ? 'border-red-400 focus:border-red-500 focus:ring-red-200'
+                                : 'border-rose-200 focus:border-rose-400 focus:ring-rose-200'
+                            }`}
+                            placeholder={t('daily_updates.image_rejection_reason_placeholder')}
+                            value={verdict?.rejectionReason ?? ''}
+                            onChange={(e) => setImageRejectionReason(image.updateImageId, e.target.value)}
+                            disabled={saving}
+                          />
+                          {errors[`image_${image.updateImageId}`] && (
+                            <p className="text-[11px] font-medium text-red-600">
+                              {errors[`image_${image.updateImageId}`]}
+                            </p>
+                          )}
+                        </div>
+                      )}
                     </div>
                   </div>
                 )

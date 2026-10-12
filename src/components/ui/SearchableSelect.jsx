@@ -39,6 +39,7 @@ export default function SearchableSelect({
   error,
   className = '',
   required = false,
+  multiple = false,
 }) {
   const { t, i18n } = useTranslation()
   const generatedId = useId()
@@ -75,11 +76,21 @@ export default function SearchableSelect({
     })
   }, [options])
 
-  // Find currently selected option
-  const selectedOption = useMemo(() => {
-    if (value === '' || value === null || value === undefined) return null
-    return normalizedOptions.find((opt) => String(opt.value) === String(value)) ?? null
-  }, [normalizedOptions, value])
+  // Multi-select or single-select values
+  const selectedValues = useMemo(() => {
+    if (!multiple) {
+      return value === '' || value === null || value === undefined ? [] : [String(value)]
+    }
+    if (Array.isArray(value)) return value.map(String)
+    if (value === '' || value === null || value === undefined) return []
+    return [String(value)]
+  }, [value, multiple])
+
+  const selectedOptions = useMemo(() => {
+    return normalizedOptions.filter((opt) => selectedValues.includes(String(opt.value)))
+  }, [normalizedOptions, selectedValues])
+
+  const selectedOption = selectedOptions[0] ?? null
 
   // Filter options based on search input (case insensitive & diacritics insensitive)
   const filteredOptions = useMemo(() => {
@@ -136,24 +147,64 @@ export default function SearchableSelect({
 
   const handleSelect = (val) => {
     if (disabled || loading) return
-    setIsOpen(false)
-    setSearchTerm('')
-    setHighlightedIndex(-1)
 
-    if (onChange) {
-      // Create synthetic event for compatibility with standard (e) => setSelected(e.target.value)
-      const syntheticEvent = {
-        target: { name: name || selectId, value: val },
-        currentTarget: { name: name || selectId, value: val },
-        value: val,
+    if (!multiple) {
+      setIsOpen(false)
+      setSearchTerm('')
+      setHighlightedIndex(-1)
+
+      if (onChange) {
+        const syntheticEvent = {
+          target: { name: name || selectId, value: val },
+          currentTarget: { name: name || selectId, value: val },
+          value: val,
+        }
+        onChange(syntheticEvent, val)
       }
-      onChange(syntheticEvent, val)
+    } else {
+      const exists = selectedValues.includes(String(val))
+      const nextValues = exists
+        ? selectedValues.filter((v) => v !== String(val))
+        : [...selectedValues, String(val)]
+
+      if (onChange) {
+        const syntheticEvent = {
+          target: { name: name || selectId, value: nextValues },
+          currentTarget: { name: name || selectId, value: nextValues },
+          value: nextValues,
+        }
+        onChange(syntheticEvent, nextValues)
+      }
+    }
+  }
+
+  const handleRemoveChip = (e, valToRemove) => {
+    e.stopPropagation()
+    const nextValues = selectedValues.filter((v) => v !== String(valToRemove))
+    if (onChange) {
+      const syntheticEvent = {
+        target: { name: name || selectId, value: nextValues },
+        currentTarget: { name: name || selectId, value: nextValues },
+        value: nextValues,
+      }
+      onChange(syntheticEvent, nextValues)
     }
   }
 
   const handleClear = (e) => {
     e.stopPropagation()
-    handleSelect('')
+    if (multiple) {
+      if (onChange) {
+        const syntheticEvent = {
+          target: { name: name || selectId, value: [] },
+          currentTarget: { name: name || selectId, value: [] },
+          value: [],
+        }
+        onChange(syntheticEvent, [])
+      }
+    } else {
+      handleSelect('')
+    }
   }
 
   const handleKeyDown = (e) => {
@@ -239,6 +290,34 @@ export default function SearchableSelect({
               </svg>
               {resolvedLoadingLabel}
             </span>
+          ) : multiple ? (
+            selectedOptions.length > 0 ? (
+              <span className="flex flex-wrap gap-1.5 py-0.5 max-h-24 overflow-y-auto">
+                {selectedOptions.map((opt) => (
+                  <span
+                    key={opt.value}
+                    className="inline-flex items-center gap-1 rounded-lg bg-warm-brown/10 px-2 py-0.5 text-xs font-medium text-warm-brown border border-warm-brown/20"
+                  >
+                    <span className="truncate max-w-[150px]">{opt.label}</span>
+                    {!disabled && !loading && (
+                      <span
+                        role="button"
+                        tabIndex={-1}
+                        onClick={(e) => handleRemoveChip(e, opt.value)}
+                        className="hover:bg-warm-brown/20 rounded p-0.5 transition-colors cursor-pointer"
+                        title="Remove"
+                      >
+                        <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                      </span>
+                    )}
+                  </span>
+                ))}
+              </span>
+            ) : (
+              <span className="text-gray-400">{resolvedPlaceholder}</span>
+            )
           ) : selectedOption ? (
             <span className="font-medium text-gray-900">
               {selectedOption.label}
@@ -252,7 +331,7 @@ export default function SearchableSelect({
         </span>
 
         <div className="flex items-center gap-1.5 shrink-0 text-gray-400">
-          {isClearable && selectedOption && !disabled && !loading && (
+          {isClearable && (selectedOption || (multiple && selectedOptions.length > 0)) && !disabled && !loading && (
             <span
               role="button"
               tabIndex={-1}
@@ -334,7 +413,7 @@ export default function SearchableSelect({
               </li>
             ) : (
               filteredOptions.map((opt, idx) => {
-                const isSelected = String(opt.value) === String(value)
+                const isSelected = selectedValues.includes(String(opt.value))
                 const isHighlighted = idx === highlightedIndex
 
                 return (
@@ -354,6 +433,22 @@ export default function SearchableSelect({
                         : 'text-gray-700 hover:bg-gray-50'
                     }`}
                   >
+                    {multiple && (
+                      <div
+                        className={`w-4 h-4 rounded border flex items-center justify-center shrink-0 transition-colors ${
+                          isSelected
+                            ? 'bg-warm-brown border-warm-brown text-white'
+                            : 'border-gray-300 bg-white'
+                        }`}
+                      >
+                        {isSelected && (
+                          <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+                          </svg>
+                        )}
+                      </div>
+                    )}
+
                     <div className="truncate flex-1">
                       <p className="truncate text-xs sm:text-sm">{opt.label}</p>
                       {opt.sublabel && (
@@ -361,7 +456,7 @@ export default function SearchableSelect({
                       )}
                     </div>
 
-                    {isSelected && (
+                    {!multiple && isSelected && (
                       <svg
                         className="w-4 h-4 text-warm-brown shrink-0"
                         fill="none"

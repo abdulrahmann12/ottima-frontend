@@ -1,18 +1,28 @@
 import { useTranslation } from 'react-i18next'
 import { Globe } from './icons/Globe'
+import useAuthStore from '@/store/authStore'
+import { updatePreferredLanguage } from '@/api/usersApi'
 
 /**
  * LanguageSwitcher
  *
  * Toggles between English (LTR) and Arabic (RTL).
  * The i18n module handles updating document.dir/lang automatically.
+ * When authenticated, also syncs the preferred language to the backend user table.
  */
 export default function LanguageSwitcher({ className = '' }) {
   const { i18n, t } = useTranslation()
+  const { isAuthenticated, updateUserLanguage } = useAuthStore()
 
   const toggle = () => {
     const next = i18n.language === 'ar' ? 'en' : 'ar'
     i18n.changeLanguage(next)
+    if (isAuthenticated) {
+      updateUserLanguage(next)
+      updatePreferredLanguage(next).catch(() => {
+        // Silently catch background preference sync failures
+      })
+    }
   }
 
   return (

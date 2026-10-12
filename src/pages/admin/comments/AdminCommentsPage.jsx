@@ -3,6 +3,7 @@ import { getAdminDailyUpdates } from '@/api/adminDailyUpdateApi'
 import { getAdminProjects } from '@/api/projectsApi'
 import ConfirmDialog from '@/components/admin/ConfirmDialog'
 import Modal from '@/components/admin/Modal'
+import ForwardCommentModal from '@/components/chat/ForwardCommentModal'
 import Alert from '@/components/ui/Alert'
 import Button from '@/components/ui/Button'
 import SearchableSelect from '@/components/ui/SearchableSelect'
@@ -44,6 +45,9 @@ export default function AdminCommentsPage() {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [commentToDelete, setCommentToDelete] = useState(null)
   const [deleting, setDeleting] = useState(false)
+
+  // Forward to Project Chat Modal State
+  const [forwardingComment, setForwardingComment] = useState(null)
 
   // URL Search Parameters & Deep-Linking Resolution
   const [searchParams] = useSearchParams()
@@ -441,21 +445,23 @@ export default function AdminCommentsPage() {
                     ref={(el) => {
                       if (el) commentRefs.current[String(commentId)] = el
                     }}
-                    className={`bg-white border rounded-2xl p-5 space-y-4 shadow-card transition-all duration-300 ${
+                    className={`bg-white border rounded-2xl p-4 sm:p-5 space-y-3.5 sm:space-y-4 shadow-card transition-all duration-300 overflow-hidden ${
                       isHighlighted
                         ? 'border-warm-brown ring-2 ring-warm-brown/40 bg-warm-brown/5 shadow-card-hover'
                         : 'border-gray-200 hover:border-gray-300'
                     }`}
                   >
                     {/* Header: Author + Date + Actions */}
-                    <div className="flex items-start justify-between gap-4 border-b border-gray-100 pb-3">
-                      <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 rounded-full bg-blue-100 border border-blue-200 flex items-center justify-center text-xs font-bold text-blue-700">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-4 border-b border-gray-100 pb-3">
+                      <div className="flex items-center gap-3 min-w-0">
+                        <div className="w-9 h-9 rounded-full bg-blue-100 border border-blue-200 flex items-center justify-center text-xs font-bold text-blue-700 shrink-0">
                           {authorInitial}
                         </div>
-                        <div>
-                          <p className="text-sm font-bold text-gray-900">{authorName}</p>
-                          <span className="text-[11px] text-gray-400">
+                        <div className="min-w-0">
+                          <p className="text-sm font-bold text-gray-900 break-all leading-snug">
+                            {authorName}
+                          </p>
+                          <span className="text-[11px] text-gray-400 block">
                             {comment.createdAt
                               ? new Intl.DateTimeFormat(i18n.language === 'ar' ? 'ar-EG' : 'en-US', {
                                   dateStyle: 'medium',
@@ -467,26 +473,39 @@ export default function AdminCommentsPage() {
                       </div>
 
                       {/* Action Buttons */}
-                      <div className="flex items-center gap-2">
-                        <Button
-                          variant="secondary"
-                          size="sm"
-                          onClick={() => handleOpenReply(comment)}
-                          className="text-xs py-1.5 px-3 flex items-center gap-1.5"
+                      <div className="flex items-center gap-2 self-end sm:self-auto shrink-0 flex-wrap">
+                        {/* Forward to Project Chat */}
+                        <button
+                          type="button"
+                          onClick={() => setForwardingComment(comment)}
+                          className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-warm-brown/30 bg-warm-brown/5 text-warm-brown hover:bg-warm-brown/10 text-xs font-medium transition-colors"
+                          title={t('comments.forward_to_chat', 'Forward to Project Chat')}
                         >
-                          <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                          <span className="text-xs leading-none">📢</span>
+                          <span className="hidden xs:inline sm:inline">{t('comments.forward_button', 'Forward to Chat')}</span>
+                        </button>
+
+                        {/* Reply / Edit Reply */}
+                        <button
+                          type="button"
+                          onClick={() => handleOpenReply(comment)}
+                          className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 text-xs font-medium transition-colors shadow-2xs"
+                          title={hasReply ? t('comments.edit_reply', 'Edit Reply') : t('comments.reply_button', 'Reply')}
+                        >
+                          <svg className="w-3.5 h-3.5 text-gray-500 shrink-0" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" d="M9 15 3 9m0 0 6-6M3 9h12a6 6 0 0 1 0 12h-3" />
                           </svg>
-                          {hasReply ? t('comments.edit_reply', 'Edit Reply') : t('comments.reply_button', 'Reply')}
-                        </Button>
+                          <span>{hasReply ? t('comments.edit_reply', 'Edit Reply') : t('comments.reply_button', 'Reply')}</span>
+                        </button>
 
+                        {/* Delete Comment */}
                         <button
                           type="button"
                           onClick={() => handleOpenDelete(comment)}
-                          className="p-1.5 rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors"
+                          className="p-1.5 rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 border border-gray-100 sm:border-transparent hover:border-red-100 transition-colors"
                           title={t('comments.delete_button', 'Delete')}
                         >
-                          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                          <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
                           </svg>
                         </button>
@@ -498,21 +517,21 @@ export default function AdminCommentsPage() {
                       <span className="text-[10px] font-semibold uppercase tracking-wider text-blue-600 block mb-1">
                         {t('comments.client_comment', 'Client Comment')}
                       </span>
-                      <p className="text-sm text-gray-900 leading-relaxed">
+                      <p className="text-xs sm:text-sm text-gray-900 leading-relaxed break-words">
                         {comment.clientComment || comment.text || comment.commentText || comment.content || '—'}
                       </p>
                     </div>
 
                     {/* Admin Reply Section (if reply exists) */}
                     {hasReply && (
-                      <div className="bg-amber-50/70 border border-amber-200 rounded-xl p-3.5 ms-4 border-s-4 border-s-amber-400 space-y-1">
+                      <div className="bg-amber-50/70 border border-amber-200 rounded-xl p-3 sm:p-3.5 ms-2 sm:ms-4 border-s-4 border-s-amber-400 space-y-1">
                         <div className="flex items-center justify-between">
                           <span className="text-[10px] font-bold uppercase tracking-wider text-amber-700 flex items-center gap-1.5">
                             <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
                             {t('comments.admin_reply', 'Admin Reply')} {adminReplierName && adminReplierName !== 'Admin' ? `(${adminReplierName})` : ''}
                           </span>
                         </div>
-                        <p className="text-sm text-gray-900 leading-relaxed">
+                        <p className="text-xs sm:text-sm text-gray-900 leading-relaxed break-words">
                           {comment.adminReply || comment.reply}
                         </p>
                       </div>
@@ -599,6 +618,19 @@ export default function AdminCommentsPage() {
         loading={deleting}
         confirmLabel={t('comments.delete_button', 'Delete')}
       />
+
+      {/* Forward Comment to Project Chat Modal */}
+      {forwardingComment && (
+        <ForwardCommentModal
+          isOpen={Boolean(forwardingComment)}
+          onClose={() => setForwardingComment(null)}
+          projectId={selectedProjectId}
+          comment={forwardingComment}
+          onSuccess={() => {
+            setSuccessMsg(t('comments.forwarded_success', 'Comment successfully forwarded to Project Chat!'))
+          }}
+        />
+      )}
     </div>
   )
 }

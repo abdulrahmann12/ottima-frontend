@@ -29,6 +29,7 @@ export default function DataTable({
   emptyMessage,
   keyExtractor,
   onRowClick,
+  renderMobileCard,
 }) {
   const { t } = useTranslation()
 
@@ -128,11 +129,18 @@ export default function DataTable({
         ) : (
           data.map((row, i) => {
             const key = keyExtractor ? keyExtractor(row) : row.id ?? i
+            if (renderMobileCard) {
+              return (
+                <div key={key}>
+                  {renderMobileCard(row)}
+                </div>
+              )
+            }
             return (
               <div
                 key={key}
                 onClick={() => onRowClick && onRowClick(row)}
-                className={`bg-white rounded-2xl border border-[#D9C7B8] p-4 shadow-xs space-y-2.5 transition-all duration-150 ${
+                className={`bg-white rounded-2xl border border-gray-200/90 p-4 shadow-xs space-y-2.5 transition-all duration-150 ${
                   onRowClick ? 'cursor-pointer active:scale-[0.99] active:bg-[#F4EDE4]/40 hover:border-warm-brown/60' : ''
                 }`}
               >

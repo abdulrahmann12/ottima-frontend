@@ -28,6 +28,9 @@ export function getNotificationRoute(referenceType, referenceId, userRole) {
         case 'PROJECT':
           return refId ? `/admin/projects/${refId}` : '/admin/projects'
 
+        case 'PROJECT_CHAT':
+          return refId ? `/admin/projects/${refId}?tab=chat` : '/admin/projects'
+
         case 'DAILY_UPDATE':
           return refId ? `/admin/daily-updates?targetUpdateId=${refId}` : '/admin/daily-updates'
 
@@ -53,6 +56,9 @@ export function getNotificationRoute(referenceType, referenceId, userRole) {
       switch (refType) {
         case 'PROJECT':
           return refId ? `/engineer/projects/${refId}` : '/engineer/projects'
+
+        case 'PROJECT_CHAT':
+          return refId ? `/engineer/projects/${refId}?tab=chat` : '/engineer/projects'
 
         case 'DAILY_UPDATE':
           return refId ? `/engineer/daily-updates?targetUpdateId=${refId}` : '/engineer/daily-updates'
@@ -180,6 +186,13 @@ export async function resolveAndNavigateNotification(notification, userRole, nav
     }
     const fallbackPath = role === 'ADMIN' ? '/admin/tickets' : '/engineer/tickets'
     navigate(fallbackPath)
+    return
+  }
+
+  // Handle Project Chat routing for Admin & Engineer
+  if (refType === 'PROJECT_CHAT' && refId) {
+    const basePath = role === 'ADMIN' ? '/admin/projects' : '/engineer/projects'
+    navigate(`${basePath}/${refId}?tab=chat`)
     return
   }
 

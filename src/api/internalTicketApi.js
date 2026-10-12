@@ -8,7 +8,7 @@ import axiosClient from './axiosClient'
  */
 
 export const TICKET_TYPES = ['EXPENSE', 'MEASUREMENT', 'INSTRUCTION', 'SITE_REPORT']
-export const TICKET_STATUSES = ['PENDING', 'VIEWED', 'APPROVED', 'REJECTED']
+export const TICKET_STATUSES = ['NEW', 'OPEN', 'RESOLVED', 'CLOSED', 'PENDING', 'VIEWED', 'APPROVED', 'REJECTED']
 
 /**
  * Create a new internal ticket under a specific project
@@ -25,13 +25,18 @@ export const updateTicket = (ticketId, data) =>
   axiosClient.put(`/api/v1/internal-tickets/${ticketId}`, data)
 
 /**
- * Update ticket status (Approve, Reject, View)
+ * Update ticket status (NEW, OPEN, RESOLVED, CLOSED, etc.)
  * PATCH /api/v1/internal-tickets/{ticketId}/status
- * @param {string} ticketId
- * @param {string} status ('PENDING' | 'VIEWED' | 'APPROVED' | 'REJECTED')
  */
 export const updateTicketStatus = (ticketId, status) =>
   axiosClient.patch(`/api/v1/internal-tickets/${ticketId}/status`, { status })
+
+/**
+ * Post a chat message to a specific ticket chat thread
+ * POST /api/v1/internal-tickets/{ticketId}/messages
+ */
+export const addTicketMessage = (ticketId, data) =>
+  axiosClient.post(`/api/v1/internal-tickets/${ticketId}/messages`, data)
 
 /**
  * Delete a ticket

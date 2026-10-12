@@ -1,7 +1,9 @@
 import { getEngineerProject } from '@/api/projectsApi'
 import ProjectDetailContent from '@/components/projects/ProjectDetailContent'
 import ProjectDetailsPageFrame from '@/components/projects/ProjectDetailsPageFrame'
+import ProjectNavigationTabs from '@/components/projects/ProjectNavigationTabs'
 import ProjectTicketsChat from '@/components/tickets/ProjectTicketsChat'
+import ProjectGlobalChat from '@/components/chat/ProjectGlobalChat'
 import Button from '@/components/ui/Button'
 import { useCallback, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -20,13 +22,16 @@ export default function EngineerProjectDetailsPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   
-  const initialTab = searchParams.get('tab') === 'tickets' ? 'TICKETS' : 'OVERVIEW'
+  const initialTabParam = searchParams.get('tab')
+  const initialTab = initialTabParam === 'tickets' ? 'TICKETS' : (initialTabParam === 'chat' || initialTabParam === 'project_chat') ? 'PROJECT_CHAT' : 'OVERVIEW'
   const [activeViewTab, setActiveViewTab] = useState(initialTab)
 
   useEffect(() => {
     const tabParam = searchParams.get('tab')
     if (tabParam === 'tickets') {
       setActiveViewTab('TICKETS')
+    } else if (tabParam === 'chat' || tabParam === 'project_chat') {
+      setActiveViewTab('PROJECT_CHAT')
     } else if (tabParam === 'overview') {
       setActiveViewTab('OVERVIEW')
     }
@@ -36,6 +41,8 @@ export default function EngineerProjectDetailsPage() {
     setActiveViewTab(tab)
     if (tab === 'TICKETS') {
       setSearchParams({ tab: 'tickets' }, { replace: true })
+    } else if (tab === 'PROJECT_CHAT') {
+      setSearchParams({ tab: 'chat' }, { replace: true })
     } else {
       setSearchParams({}, { replace: true })
     }
@@ -82,52 +89,20 @@ export default function EngineerProjectDetailsPage() {
     >
       <div className="space-y-5">
         {/* Navigation Bar: Tabs + Actions */}
-        <div className="flex flex-wrap items-center justify-between gap-3 bg-white p-2 rounded-2xl border border-gray-200 shadow-xs">
-          {/* View switcher tabs */}
-          <div className="flex items-center gap-1.5">
-            <button
-              type="button"
-              onClick={() => handleTabChange('OVERVIEW')}
-              className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all ${
-                activeViewTab === 'OVERVIEW'
-                  ? 'bg-warm-brown text-white shadow-xs'
-                  : 'text-gray-700 hover:bg-light-blue/40'
-              }`}
-            >
-              📋 {t('projects.tab_overview', { defaultValue: 'Items & Progress' })}
-            </button>
-
-            <button
-              type="button"
-              onClick={() => handleTabChange('TICKETS')}
-              className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all flex items-center gap-1.5 ${
-                activeViewTab === 'TICKETS'
-                  ? 'bg-warm-brown text-white shadow-xs'
-                  : 'text-gray-700 hover:bg-light-blue/40'
-              }`}
-            >
-              💬 {t('projects.tab_tickets', { defaultValue: 'Internal Requests (Chat)' })}
-            </button>
-          </div>
-
-          <div className="flex items-center gap-2">
-            <Button
-              type="button"
-              className="w-auto py-2 px-4 text-xs"
-              onClick={() => navigate(`/engineer/projects/${projectId}/daily-updates`, {
-                state: { projectSummary: project },
-              })}
-            >
-              📷 {t('nav.daily_updates', { defaultValue: 'Daily Updates' })}
-            </Button>
-          </div>
-        </div>
+        <ProjectNavigationTabs
+          activeTab={activeViewTab}
+          onTabChange={handleTabChange}
+          dailyUpdatesUrl={`/engineer/projects/${projectId}/daily-updates`}
+          project={project}
+        />
 
         {/* Active Tab View */}
         {activeViewTab === 'OVERVIEW' ? (
           <ProjectDetailContent project={project} role="ENGINEER" onRefresh={fetchProject} />
-        ) : (
+        ) : activeViewTab === 'TICKETS' ? (
           <ProjectTicketsChat projectId={projectId} project={project} />
+        ) : (
+          <ProjectGlobalChat projectId={projectId} project={project} />
         )}
       </div>
     </ProjectDetailsPageFrame>

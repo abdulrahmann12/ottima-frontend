@@ -231,9 +231,9 @@ export default function ProjectsPage() {
       </div>
 
       {/* ── Projects card ──────────────────────────────── */}
-      <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
-        {/* Card header */}
-        <div className="flex items-center justify-between border-b border-gray-200 px-5 py-4">
+      <div className="overflow-hidden bg-transparent border-0 shadow-none sm:bg-white sm:border sm:border-gray-200 sm:shadow-sm sm:rounded-2xl">
+        {/* Card header (desktop) */}
+        <div className="hidden sm:flex items-center justify-between border-b border-gray-200 px-5 py-4">
           <div>
             <p className="text-sm font-semibold text-gray-900">{t('projects.title')}</p>
             {totalElements > 0 && (

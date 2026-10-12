@@ -22,7 +22,7 @@ import { useLocation, useNavigate } from 'react-router-dom'
  */
 export default function ProfilePage() {
   const { t, i18n } = useTranslation()
-  const { isAuthenticated, role } = useAuthStore()
+  const { isAuthenticated, role, setUser, updateUserLanguage } = useAuthStore()
   const navigate = useNavigate()
   const location = useLocation()
 
@@ -37,6 +37,7 @@ export default function ProfilePage() {
     fullNameAr: '',
     fullNameEn: '',
     phoneNumber: '',
+    preferredLanguage: 'ar',
   })
   const [profileErrors, setProfileErrors] = useState({})
   const [profileSaving, setProfileSaving] = useState(false)
@@ -80,6 +81,7 @@ export default function ProfilePage() {
           fullNameAr: u.fullNameAr ?? '',
           fullNameEn: u.fullNameEn ?? '',
           phoneNumber: u.phoneNumber ?? '',
+          preferredLanguage: u.preferredLanguage ?? 'ar',
         })
       })
       .catch((err) => {
@@ -118,10 +120,15 @@ export default function ProfilePage() {
 
     try {
       const { data: res } = await updateMyProfile(profileForm)
-      setProfile(res.data)
+      const updatedUser = res.data
+      setProfile(updatedUser)
+      setUser(updatedUser)
+      if (updatedUser?.preferredLanguage) {
+        updateUserLanguage(updatedUser.preferredLanguage)
+      }
       setProfileSuccess(true)
     } catch (err) {
-      setProfileErrorMsg(err.response?.data?.message ?? t('errors.generic'))
+      setProfileErrorMsg(err.response?.data?.message ?? err.message ?? t('errors.generic'))
     } finally {
       setProfileSaving(false)
     }
@@ -278,6 +285,36 @@ export default function ProfilePage() {
                   onChange={(e) => setProfileForm({ ...profileForm, phoneNumber: e.target.value })}
                   error={profileErrors.phoneNumber}
                 />
+
+                <div className="space-y-1.5">
+                  <label className="block text-xs font-bold text-gray-700">
+                    {t('users.preferred_language', { defaultValue: i18n.language === 'ar' ? 'اللغة المفضلة للنظام' : 'Preferred System Language' })}
+                  </label>
+                  <div className="grid grid-cols-2 gap-3">
+                    <button
+                      type="button"
+                      onClick={() => setProfileForm({ ...profileForm, preferredLanguage: 'ar' })}
+                      className={`px-4 py-2.5 rounded-xl border text-xs font-bold flex items-center justify-center gap-2 transition-all cursor-pointer ${
+                        profileForm.preferredLanguage === 'ar'
+                          ? 'bg-warm-brown text-white border-warm-brown shadow-sm'
+                          : 'bg-white text-gray-700 border-gray-200 hover:bg-gray-50'
+                      }`}
+                    >
+                      <span>{i18n.language === 'ar' ? 'العربية' : 'Arabic (العربية)'}</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setProfileForm({ ...profileForm, preferredLanguage: 'en' })}
+                      className={`px-4 py-2.5 rounded-xl border text-xs font-bold flex items-center justify-center gap-2 transition-all cursor-pointer ${
+                        profileForm.preferredLanguage === 'en'
+                          ? 'bg-warm-brown text-white border-warm-brown shadow-sm'
+                          : 'bg-white text-gray-700 border-gray-200 hover:bg-gray-50'
+                      }`}
+                    >
+                      <span>{i18n.language === 'ar' ? 'الإنجليزية' : 'English'}</span>
+                    </button>
+                  </div>
+                </div>
                 <div className="pt-3 border-t border-gray-100 flex items-center justify-end">
                   <button
                     type="submit"

@@ -92,7 +92,7 @@ export default function ProjectItemAssignmentFields({
           />
         </label>
         <label className="text-xs text-gray-600">
-          {t('projects.weight')} % *
+          {t('projects.weight')} (%) *
           <input
             id={ids.weight ?? 'project-item-weight'}
             className="input-base mt-1 block w-full text-sm"
