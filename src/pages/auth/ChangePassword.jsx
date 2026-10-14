@@ -87,8 +87,8 @@ export default function ChangePassword() {
           flex items-center justify-center mb-3 shadow-sm text-warm-brown">
           <ShieldIcon className="w-5 h-5" />
         </div>
-        <h2 className="text-2xl font-extrabold text-gray-900 tracking-tight">{t('change_password.title')}</h2>
-        <p className="mt-1 text-gray-600 text-sm">{t('change_password.subtitle')}</p>
+        <h2 className="text-2xl font-medium text-gray-900 tracking-tight">{t('change_password.title')}</h2>
+        <p className="mt-1 text-gray-600 text-sm font-light">{t('change_password.subtitle')}</p>
       </div>
 
       {/* Alerts */}

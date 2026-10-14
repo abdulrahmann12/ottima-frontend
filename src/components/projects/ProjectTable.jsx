@@ -119,11 +119,11 @@ export default function ProjectTable({
                   className={`group transition-colors ${rowClickable ? 'cursor-pointer hover:bg-gray-50' : ''}`}
                 >
                   <td className="px-4 py-3.5">
-                    <p className={`font-semibold leading-tight transition-colors text-gray-900 ${rowClickable ? 'group-hover:text-warm-brown' : ''}`}>
+                    <p className={`font-medium leading-tight transition-colors text-gray-900 ${rowClickable ? 'group-hover:text-warm-brown' : ''}`}>
                       {isRtl ? project.nameAr : project.nameEn}
                     </p>
                     {(project.addressEn || project.addressAr) && (
-                      <p className="mt-0.5 text-[11px] leading-tight text-gray-500">
+                      <p className="mt-0.5 text-[11px] font-light leading-tight text-gray-500">
                         {isRtl ? project.addressAr : project.addressEn}
                       </p>
                     )}
@@ -238,11 +238,11 @@ export default function ProjectTable({
               {/* Header: Title + Status */}
               <div className="flex items-start justify-between gap-2">
                 <div className="min-w-0 flex-1">
-                  <h3 className="text-sm font-bold text-gray-900 leading-snug truncate">
+                  <h3 className="text-sm font-medium text-gray-900 leading-snug truncate">
                     {isRtl ? project.nameAr : project.nameEn}
                   </h3>
                   {(project.addressEn || project.addressAr) && (
-                    <p className="text-[11px] text-gray-500 truncate mt-0.5 flex items-center gap-1">
+                    <p className="text-[11px] text-gray-500 font-light truncate mt-0.5 flex items-center gap-1">
                       <svg className="w-3 h-3 text-gray-400 shrink-0" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
                         <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />

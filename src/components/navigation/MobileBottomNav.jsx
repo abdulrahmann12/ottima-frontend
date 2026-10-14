@@ -192,10 +192,10 @@ export default function MobileBottomNav({ navItems: customNavItems }) {
                   {(user?.fullNameEn || user?.username || 'U').charAt(0).toUpperCase()}
                 </div>
                 <div>
-                  <p className="text-xs font-bold text-gray-900 leading-none">
+                  <p className="text-xs font-medium text-gray-900 leading-none">
                     {user?.fullNameEn || user?.fullNameAr || user?.username}
                   </p>
-                  <p className="text-[10px] text-gray-400 uppercase mt-0.5">{role}</p>
+                  <p className="text-[10px] text-gray-400 font-light uppercase mt-0.5">{role}</p>
                 </div>
               </div>
 

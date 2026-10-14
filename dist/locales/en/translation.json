@@ -2,7 +2,20 @@
   "app": {
     "name": "OTTIMA",
     "tagline": "Finishing Project Tracking System",
-    "subtitle": "Manage construction finishing projects with precision and clarity."
+    "subtitle": "Manage construction finishing projects with precision and clarity.",
+    "badge": "Architectural Finishing Platform",
+    "pillars": {
+      "supervision_title": "Site Supervision & QA",
+      "supervision_desc": "Continuous on-site tracking of finishing phases, materials, and architectural specifications.",
+      "snagging_title": "Snag & Defect Resolution",
+      "snagging_desc": "Digital punch lists with photo evidence and engineer sign-offs before turnkey handover.",
+      "transparency_title": "Client Transparency",
+      "transparency_desc": "Daily site logs and real-time milestone progress shared directly with project owners."
+    },
+    "assurance": {
+      "quality": "Specification-Grade Tracking",
+      "handover": "Zero-Defect Handover Protocol"
+    }
   },
   "common": {
     "loading": "Please wait...",

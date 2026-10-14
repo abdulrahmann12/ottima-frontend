@@ -289,8 +289,8 @@ export default function AdminFinancePage() {
       <div className="flex items-center justify-between bg-white border border-gray-200 rounded-xl shadow-sm px-5 py-4">
         <div>
           <p className="text-xs font-semibold uppercase tracking-widest text-gray-400">Financial Management</p>
-          <h1 className="mt-1 text-xl font-bold text-gray-900">Finance</h1>
-          <p className="mt-0.5 text-sm text-gray-500">Track deposits, expenses, and receipts across all projects.</p>
+          <h1 className="mt-1 text-xl font-medium text-gray-900">Finance</h1>
+          <p className="mt-0.5 text-sm text-gray-500 font-light">Track deposits, expenses, and receipts across all projects.</p>
         </div>
       </div>
 

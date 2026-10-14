@@ -34,10 +34,10 @@ export default function RoleSelect() {
     <AuthLayout>
       {/* Header */}
       <div className="text-center mb-8">
-        <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-900 mb-2 tracking-tight">
+        <h2 className="text-2xl sm:text-3xl font-medium text-gray-900 mb-2 tracking-tight">
           {t('role.select_title')}
         </h2>
-        <p className="text-gray-600 text-sm">
+        <p className="text-gray-600 text-sm font-light">
           {t('role.select_subtitle')}
         </p>
       </div>
@@ -66,10 +66,10 @@ export default function RoleSelect() {
 
             {/* Text */}
             <div className="flex-1 min-w-0">
-              <p className="text-gray-900 font-bold text-base group-hover:text-warm-brown transition-colors">
+              <p className="text-gray-900 font-medium text-base group-hover:text-warm-brown transition-colors">
                 {t(`role.${key}`)}
               </p>
-              <p className="text-gray-500 text-xs sm:text-sm mt-0.5 truncate">
+              <p className="text-gray-500 text-xs sm:text-sm font-light mt-0.5 truncate">
                 {t(`role.${key}_desc`)}
               </p>
             </div>

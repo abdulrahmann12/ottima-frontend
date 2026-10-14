@@ -651,7 +651,7 @@ export default function ProjectGlobalChat({
           </div>
           <div className="min-w-0">
             <div className="flex items-center gap-2">
-              <h3 className="text-sm sm:text-base font-extrabold text-slate-800 truncate">
+              <h3 className="text-sm sm:text-base font-medium text-slate-800 truncate">
                 {isAr ? 'محادثة المشروع العامة' : 'Project Global Chat'}
               </h3>
               <span className="hidden sm:inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
@@ -659,7 +659,7 @@ export default function ProjectGlobalChat({
                 {isAr ? 'مباشر' : 'Live'}
               </span>
             </div>
-            <p className="text-xs text-slate-500 truncate mt-0.5 flex items-center gap-1.5">
+            <p className="text-xs text-slate-500 font-light truncate mt-0.5 flex items-center gap-1.5">
               <span>{isAr ? 'قناة التواصل المشتركة بين الإدارة والمهندسين' : 'Admin & Engineers collaboration channel'}</span>
               {project?.engineerName && (
                 <>
@@ -712,10 +712,10 @@ export default function ProjectGlobalChat({
             <div className="w-16 h-16 rounded-3xl bg-white border border-[#E5DACF] flex items-center justify-center text-3xl shadow-xs mb-3">
               💬
             </div>
-            <h4 className="text-sm font-bold text-slate-800 mb-1">
+            <h4 className="text-sm font-medium text-slate-800 mb-1">
               {isAr ? 'لا توجد رسائل بعد في هذه المحادثة' : 'No messages yet in this project chat'}
             </h4>
-            <p className="text-xs text-slate-500 max-w-sm leading-relaxed">
+            <p className="text-xs text-slate-500 font-light max-w-sm leading-relaxed">
               {isAr
                 ? 'ابدأ النقاش والتنسيق مع المهندسين أو أرسل ملاحظات وتحديثات المشروع هنا.'
                 : 'Start the conversation with assigned engineers, share updates, or forward client feedback.'}

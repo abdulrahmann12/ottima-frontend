@@ -86,8 +86,8 @@ export default function ResetPassword() {
           flex items-center justify-center mb-3 shadow-sm text-warm-brown">
           <KeyIcon className="w-5 h-5" />
         </div>
-        <h2 className="text-2xl font-extrabold text-gray-900 tracking-tight">{t('reset_password.title')}</h2>
-        <p className="mt-1 text-gray-600 text-sm">{t('reset_password.subtitle')}</p>
+        <h2 className="text-2xl font-medium text-gray-900 tracking-tight">{t('reset_password.title')}</h2>
+        <p className="mt-1 text-gray-600 text-sm font-light">{t('reset_password.subtitle')}</p>
       </div>
 
       {/* Errors */}
@@ -100,10 +100,10 @@ export default function ResetPassword() {
             flex items-center justify-center mx-auto mb-3 text-emerald-600">
             <CheckIcon className="w-6 h-6" />
           </div>
-          <h3 className="text-gray-900 font-bold text-lg mb-1.5">
+          <h3 className="text-gray-900 font-medium text-lg mb-1.5">
             {t('reset_password.success_title')}
           </h3>
-          <p className="text-gray-600 text-sm mb-6 leading-relaxed">
+          <p className="text-gray-600 text-sm font-light mb-6 leading-relaxed">
             {t('reset_password.success_message')}
           </p>
           <Button

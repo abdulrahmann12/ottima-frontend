@@ -197,10 +197,10 @@ export default function Dashboard() {
       {/* ── Page Header ────────────────────────────────────────── */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 tracking-tight">
+          <h1 className="text-2xl font-medium text-gray-900 tracking-tight">
             {t('dashboard.title', 'Executive Dashboard')}
           </h1>
-          <p className="text-gray-500 text-sm mt-1">
+          <p className="text-gray-500 text-sm font-light mt-1">
             {t('dashboard.subtitle', 'Real-time project operations, performance KPIs, and system analytics')}
           </p>
         </div>
@@ -238,10 +238,10 @@ export default function Dashboard() {
       <div className="rounded-2xl border border-gray-200 bg-white p-4 sm:p-6 shadow-sm">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-gray-100 pb-4 mb-4 sm:mb-6">
           <div>
-            <h3 className="text-base sm:text-lg font-bold text-gray-900">
+            <h3 className="text-base sm:text-lg font-medium text-gray-900">
               {t('dashboard.project_breakdown_title', 'Project Lifecycle Distribution')}
             </h3>
-            <p className="text-xs text-gray-500 mt-0.5">
+            <p className="text-xs text-gray-500 font-light mt-0.5">
               {t('dashboard.project_breakdown_desc', 'Breakdown of finishing projects across operational stages')}
             </p>
           </div>
@@ -338,10 +338,10 @@ export default function Dashboard() {
           <div>
             <div className="flex items-center justify-between gap-2 border-b border-gray-100 pb-3.5 mb-4">
               <div>
-                <h3 className="text-base font-bold text-gray-900">
+                <h3 className="text-base font-medium text-gray-900">
                   {t('dashboard.recent_projects_title', 'Recent Active Projects')}
                 </h3>
-                <p className="text-xs text-gray-500 mt-0.5">
+                <p className="text-xs text-gray-500 font-light mt-0.5">
                   {t('dashboard.recent_projects_desc', 'Latest construction finishing projects and progress')}
                 </p>
               </div>
@@ -374,13 +374,13 @@ export default function Dashboard() {
                         <div className="flex items-center gap-2">
                           <Link
                             to={`/admin/projects/${project.projectId}`}
-                            className="text-sm font-semibold text-gray-900 hover:text-warm-brown truncate"
+                            className="text-sm font-medium text-gray-900 hover:text-warm-brown truncate"
                           >
                             {pName}
                           </Link>
                           <StatusPill status={project.overallStatus} t={t} />
                         </div>
-                        <p className="text-xs text-gray-500 mt-0.5 truncate">
+                        <p className="text-xs text-gray-500 font-light mt-0.5 truncate">
                           {project.clientName ? `Client: ${project.clientName}` : ''}
                           {project.engineerName ? ` • Eng: ${project.engineerName}` : ''}
                         </p>
@@ -430,10 +430,10 @@ export default function Dashboard() {
           <div>
             <div className="flex items-center justify-between gap-2 border-b border-gray-100 pb-3.5 mb-4">
               <div>
-                <h3 className="text-base font-bold text-gray-900">
+                <h3 className="text-base font-medium text-gray-900">
                   {t('dashboard.recent_activity_title', 'System Activity Stream')}
                 </h3>
-                <p className="text-xs text-gray-500 mt-0.5">
+                <p className="text-xs text-gray-500 font-light mt-0.5">
                   {t('dashboard.recent_activity_desc', 'Live audit trail of administrative events')}
                 </p>
               </div>
@@ -463,13 +463,13 @@ export default function Dashboard() {
                     >
                       <ActionBadge action={actionType} />
                       <div className="flex-1 min-w-0">
-                        <p className="font-semibold text-gray-800 truncate">
+                        <p className="font-medium text-gray-800 truncate">
                           {log.userName || log.username || 'System User'}
                           <span className="font-normal text-gray-500 ms-1.5">
                             {log.details || log.entityName || actionType}
                           </span>
                         </p>
-                        <p className="text-[11px] text-gray-400 mt-0.5">
+                        <p className="text-[11px] text-gray-400 font-light mt-0.5">
                           {time} {log.ipAddress ? `• ${log.ipAddress}` : ''}
                         </p>
                       </div>

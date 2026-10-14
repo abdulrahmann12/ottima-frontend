@@ -157,8 +157,8 @@ export default function ProjectsPage() {
       {/* ── Page header ─────────────────────────────────── */}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-xl font-bold text-gray-900">{t('projects.title')}</h1>
-          <p className="mt-0.5 text-sm text-gray-500">{t('projects.admin_subtitle')}</p>
+          <h1 className="text-xl font-medium text-gray-900">{t('projects.title')}</h1>
+          <p className="mt-0.5 text-sm text-gray-500 font-light">{t('projects.admin_subtitle')}</p>
         </div>
         {/* Only show create wizard when NOT in deleted view */}
         {!filters.isDeleted && (

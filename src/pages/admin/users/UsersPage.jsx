@@ -410,7 +410,7 @@ export default function UsersPage() {
               {user.fullNameEn?.charAt(0)?.toUpperCase() || 'U'}
             </div>
             <div className="min-w-0">
-              <h3 className="text-gray-900 font-semibold text-sm truncate">
+              <h3 className="text-gray-900 font-medium text-sm truncate">
                 {user.fullNameEn || '—'}
               </h3>
               <p className="text-gray-500 text-xs font-mono truncate">
@@ -484,8 +484,8 @@ export default function UsersPage() {
       {/* Page Heading & Actions */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h2 className="text-xl font-bold text-gray-900">{t('users.title')}</h2>
-          <p className="text-gray-500 text-sm mt-0.5">{t('users.subtitle')}</p>
+          <h2 className="text-xl font-medium text-gray-900">{t('users.title')}</h2>
+          <p className="text-gray-500 text-sm font-light mt-0.5">{t('users.subtitle')}</p>
         </div>
         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
           <input
@@ -797,8 +797,8 @@ export default function UsersPage() {
                  {viewTarget.fullNameEn?.charAt(0) || 'U'}
                </div>
                <div>
-                 <h2 className="text-lg font-bold text-gray-900">{viewTarget.fullNameEn}</h2>
-                 <p className="text-gray-500 text-sm font-mono">@{viewTarget.username}</p>
+                 <h2 className="text-lg font-medium text-gray-900">{viewTarget.fullNameEn}</h2>
+                 <p className="text-gray-500 text-sm font-light font-mono">@{viewTarget.username}</p>
                </div>
             </div>
             <div className="grid grid-cols-2 gap-4 text-sm mt-2">

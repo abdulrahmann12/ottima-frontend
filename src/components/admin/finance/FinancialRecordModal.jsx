@@ -363,10 +363,10 @@ export default function FinancialRecordModal({
               <div>
                 {projectItems.length === 0 ? (
                   <div className="rounded-xl border border-amber-300 bg-amber-50 px-3.5 py-2.5 text-xs text-amber-800 font-medium">
-                    <p className="font-semibold">
+                    <p className="font-medium">
                       {language === 'ar' ? '⚠ لا توجد بنود لهذا المشروع حتى الآن.' : '⚠ No items found for this project.'}
                     </p>
-                    <p className="mt-1 text-amber-700">
+                    <p className="mt-1 text-amber-700 font-light">
                       {language === 'ar'
                         ? 'يمكنك تسجيل هذا المصروف كـ "أخرى" (مصروفات عامة).'
                         : 'You can record this as an "Other" general expense.'}
@@ -564,10 +564,10 @@ export default function FinancialRecordModal({
                     <UploadIcon className="w-6 h-6" />
                   </div>
                 )}
-                <p className="text-sm font-semibold text-gray-800">
+                <p className="text-sm font-medium text-gray-800">
                   {uploading ? 'Compressing & uploading...' : 'Drop receipt here or click to browse'}
                 </p>
-                <p className="text-xs text-gray-500">Supports images (JPG, PNG, WEBP) & PDF documents</p>
+                <p className="text-xs font-light text-gray-500">Supports images (JPG, PNG, WEBP) & PDF documents</p>
               </div>
             </label>
           )}

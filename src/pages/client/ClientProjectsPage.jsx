@@ -92,7 +92,7 @@ export default function ClientProjectsPage() {
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
         <div>
           <div className="flex items-center gap-3">
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 tracking-tight">
+            <h1 className="text-2xl sm:text-3xl font-medium text-gray-900 tracking-tight">
               {t('projects.title', { defaultValue: isRtl ? 'المشاريع' : 'Projects' })}
             </h1>
             {totalElements > 0 && (
@@ -101,7 +101,7 @@ export default function ClientProjectsPage() {
               </span>
             )}
           </div>
-          <p className="mt-1 text-sm text-gray-600">
+          <p className="mt-1 text-sm text-gray-600 font-light">
             {t('projects.client_subtitle', {
               defaultValue: isRtl
                 ? 'تابع تقدم مشروعك وإنفاقه'
@@ -217,12 +217,12 @@ export default function ClientProjectsPage() {
               <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 12.75V12A2.25 2.25 0 0 1 4.5 9.75h15A2.25 2.25 0 0 1 21.75 12v.75m-8.69-6.44-2.12-2.12a1.5 1.5 0 0 0-1.061-.44H4.5A2.25 2.25 0 0 0 2.25 6v12a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9a2.25 2.25 0 0 0-2.25-2.25h-5.379a1.5 1.5 0 0 1-1.06-.44Z" />
             </svg>
           </div>
-          <h3 className="text-base font-bold text-gray-900">
+          <h3 className="text-base font-medium text-gray-900">
             {searchQuery
               ? (isRtl ? 'لا توجد مشاريع تطابق بحثك' : 'No projects match your search')
               : (isRtl ? 'لا توجد مشاريع مسجلة حالياً' : 'No projects found')}
           </h3>
-          <p className="mt-1 text-xs text-gray-500 max-w-sm">
+          <p className="mt-1 text-xs text-gray-500 font-light max-w-sm">
             {searchQuery
               ? (isRtl ? 'جرب البحث بكلمات أخرى أو امسح حقل البحث' : 'Try searching with different terms or clear the search field.')
               : (isRtl ? 'سيتم إدراج مشاريعك وتفاصيلها هنا فور إسنادها لحسابك من قبل الإدارة.' : 'Your assigned projects will appear here once configured by the admin.')}

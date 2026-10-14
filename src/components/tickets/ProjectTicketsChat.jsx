@@ -257,14 +257,14 @@ export default function ProjectTicketsChat({
           </div>
           <div className="min-w-0">
             <div className="flex items-center gap-2">
-              <h2 className="text-xs sm:text-sm font-bold text-gray-900 truncate">
+              <h2 className="text-xs sm:text-sm font-medium text-gray-900 truncate">
                 {t('tickets.chat_title', { defaultValue: 'Internal Requests & Tickets Feed' })}
               </h2>
               <span className="px-1.5 sm:px-2 py-0.5 rounded-full bg-warm-brown/10 text-warm-brown text-[10px] sm:text-[11px] font-bold border border-warm-brown/20 shrink-0">
                 {filteredTickets.length}
               </span>
             </div>
-            <p className="text-[10px] sm:text-[11px] text-gray-600 truncate">
+            <p className="text-[10px] sm:text-[11px] text-gray-600 font-light truncate">
               {t('tickets.chat_subtitle', { defaultValue: 'Direct Admin ↔ Engineer coordination channel' })}
             </p>
           </div>
@@ -344,10 +344,10 @@ export default function ProjectTicketsChat({
                 <path strokeLinecap="round" strokeLinejoin="round" d="M20.25 8.511c.884.284 1.5 1.128 1.5 2.097v4.286c0 1.136-.847 2.1-1.98 2.193-.34.027-.68.052-1.02.072v3.091l-3-3c-1.354 0-2.694-.055-4.02-.163a2.115 2.115 0 0 1-.825-.242m9.345-8.334a2.126 2.126 0 0 0-.476-.095 48.64 48.64 0 0 0-8.048 0c-1.131.094-1.976 1.057-1.976 2.192v4.286c0 .837.46 1.58 1.155 1.951m9.345-8.334V6.637c0-1.621-1.152-3.026-2.76-3.235A48.455 48.455 0 0 0 11.25 3c-2.115 0-4.198.137-6.24.402-1.608.209-2.76 1.614-2.76 3.235v6.226c0 1.621 1.152 3.026 2.76 3.235.577.075 1.157.14 1.74.194V21l4.155-4.155" />
               </svg>
             </div>
-            <h3 className="text-sm font-bold text-gray-900 mb-1">
+            <h3 className="text-sm font-medium text-gray-900 mb-1">
               {t('tickets.empty_chat_title', { defaultValue: 'No Requests Found' })}
             </h3>
-            <p className="text-xs text-gray-600 max-w-sm mb-4">
+            <p className="text-xs text-gray-600 font-light max-w-sm mb-4">
               {t('tickets.empty_chat_desc', { defaultValue: 'Start the conversation by creating an internal request or expense approval.' })}
             </p>
             <Button
@@ -582,7 +582,7 @@ const TicketBubbleItem = memo(function TicketBubbleItem({
               <div className="w-6 h-6 rounded-full bg-warm-brown text-white text-[10px] font-bold flex items-center justify-center shrink-0 shadow-2xs">
                 {(ticket.senderNameEn || ticket.senderNameAr || 'U').charAt(0).toUpperCase()}
               </div>
-              <span className="text-xs font-bold text-gray-900 truncate">
+              <span className="text-xs font-medium text-gray-900 truncate">
                 {isAr ? (ticket.senderNameAr || ticket.senderNameEn || 'User') : (ticket.senderNameEn || ticket.senderNameAr || 'User')}
               </span>
               {ticket.senderRole && (
@@ -638,12 +638,12 @@ const TicketBubbleItem = memo(function TicketBubbleItem({
         )}
 
         {/* ── Title & Content ──────────────────────── */}
-        <h4 className="text-sm font-bold text-gray-900 leading-snug">
+        <h4 className="text-sm font-medium text-gray-900 leading-snug">
           {ticket.title}
         </h4>
 
         {ticket.description && (
-          <p className="mt-1.5 text-xs text-gray-700 leading-relaxed whitespace-pre-wrap">
+          <p className="mt-1.5 text-xs text-gray-700 font-light leading-relaxed whitespace-pre-wrap">
             {ticket.description}
           </p>
         )}
@@ -663,7 +663,7 @@ const TicketBubbleItem = memo(function TicketBubbleItem({
         {/* ── Attachments ──────────────────────────── */}
         {ticket.attachments && ticket.attachments.length > 0 && (
           <div className="mt-3 pt-2.5 border-t border-gray-100/80 space-y-2">
-            <p className="text-[10px] font-bold uppercase tracking-wider text-gray-400">
+            <p className="text-[10px] font-medium uppercase tracking-wider text-gray-400">
               {t('tickets.attachments', { defaultValue: 'Attachments' })} ({ticket.attachments.length})
             </p>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">

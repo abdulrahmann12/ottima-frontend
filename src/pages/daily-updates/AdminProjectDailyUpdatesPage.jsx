@@ -150,10 +150,10 @@ export default function AdminProjectDailyUpdatesPage() {
                 <p className="text-xs font-semibold uppercase tracking-[0.24em] text-warm-brown">
                   {t('nav.daily_updates')}
                 </p>
-                <h2 className="mt-2 text-2xl font-bold text-gray-900">
+                <h2 className="mt-2 text-2xl font-medium text-gray-900">
                   {t('daily_updates.admin_hero_title')}
                 </h2>
-                <p className="mt-2 text-sm leading-6 text-gray-600">
+                <p className="mt-2 text-sm leading-6 text-gray-600 font-light">
                   {t('daily_updates.admin_hero_copy')}
                 </p>
               </div>
@@ -235,8 +235,8 @@ export default function AdminProjectDailyUpdatesPage() {
               <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl border border-gray-200 bg-cream text-warm-brown">
                 <NotebookIcon className="h-7 w-7" />
               </div>
-              <h3 className="mt-4 text-lg font-semibold text-gray-900">{t('daily_updates.empty_title')}</h3>
-              <p className="mt-2 text-sm text-gray-500">{t('daily_updates.empty_copy')}</p>
+              <h3 className="mt-4 text-lg font-medium text-gray-900">{t('daily_updates.empty_title')}</h3>
+              <p className="mt-2 text-sm text-gray-500 font-light">{t('daily_updates.empty_copy')}</p>
             </div>
           ) : (
             <div className="space-y-4">
@@ -311,10 +311,10 @@ function AdminDailyUpdateCard({ update, language, t, onEvaluate, onPreviewImage 
         <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
           <div className="min-w-0 flex-1">
             <div className="flex flex-wrap items-center gap-2.5">
-              <p className="text-lg font-bold text-gray-900">{update.title}</p>
+              <p className="text-lg font-medium text-gray-900">{update.title}</p>
               <StatusPill status={update.status} />
             </div>
-            <p className="mt-1.5 text-sm font-medium text-gray-600">{itemName || t('daily_updates.unknown_item')}</p>
+            <p className="mt-1.5 text-sm font-light text-gray-600">{itemName || t('daily_updates.unknown_item')}</p>
             <div className="mt-3 flex flex-wrap gap-x-4 gap-y-2 text-xs text-gray-500">
               <span className="flex items-center gap-1">
                 <span className="font-medium text-gray-700">{t('daily_updates.published_by', { name: engineerName || update.engineerUsername || '—' })}</span>

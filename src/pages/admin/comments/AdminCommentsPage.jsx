@@ -312,10 +312,10 @@ export default function AdminCommentsPage() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white border border-gray-200 shadow-card px-5 py-5 rounded-2xl">
         <div>
           <p className="text-xs font-semibold uppercase tracking-widest text-warm-brown">{t('nav.comments')}</p>
-          <h1 className="mt-1 text-2xl font-bold text-gray-900 tracking-tight">
+          <h1 className="mt-1 text-2xl font-medium text-gray-900 tracking-tight">
             {t('comments.title', 'Comments Management')}
           </h1>
-          <p className="text-xs text-gray-500 mt-1">
+          <p className="text-xs text-gray-500 font-light mt-1">
             {t('comments.subtitle', 'Manage and reply to client comments on project daily updates')}
           </p>
         </div>
@@ -335,7 +335,7 @@ export default function AdminCommentsPage() {
 
       {/* Cascading Selection Searchable Dropdowns */}
       <div className="bg-white border border-gray-200 shadow-card px-5 py-5 rounded-2xl space-y-4">
-        <h2 className="text-xs font-bold text-gray-700 uppercase tracking-wider flex items-center gap-2">
+        <h2 className="text-xs font-medium text-gray-700 uppercase tracking-wider flex items-center gap-2">
           <svg className="w-4 h-4 text-warm-brown" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6A2.25 2.25 0 0 1 6 3.75h2.25A2.25 2.25 0 0 1 10.5 6v2.25a2.25 2.25 0 0 1-2.25 2.25H6a2.25 2.25 0 0 1-2.25-2.25V6ZM3.75 15.75A2.25 2.25 0 0 1 6 13.5h2.25a2.25 2.25 0 0 1 2.25 2.25V18a2.25 2.25 0 0 1-2.25 2.25H6A2.25 2.25 0 0 1 3.75 18v-2.25ZM13.5 6a2.25 2.25 0 0 1 2.25-2.25H18A2.25 2.25 0 0 1 20.25 6v2.25A2.25 2.25 0 0 1 18 10.5h-2.25a2.25 2.25 0 0 1-2.25-2.25V6ZM13.5 15.75a2.25 2.25 0 0 1 2.25-2.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-2.25A2.25 2.25 0 0 1 13.5 18v-2.25Z" />
           </svg>
@@ -390,17 +390,17 @@ export default function AdminCommentsPage() {
               <path strokeLinecap="round" strokeLinejoin="round" d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 0 1 .865-.501 48.172 48.172 0 0 0 3.423-.379c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018Z" />
             </svg>
           </div>
-          <h3 className="text-base font-bold text-gray-900">
+          <h3 className="text-base font-medium text-gray-900">
             {t('comments.select_prompt', 'Please select a Project and Daily Update to view comments.')}
           </h3>
-          <p className="text-xs text-gray-500 mt-1">
+          <p className="text-xs text-gray-500 font-light mt-1">
             Comments are organized per daily update to maintain clear audit context.
           </p>
         </div>
       ) : (
         <div className="space-y-4">
           <div className="flex items-center justify-between px-1">
-            <h2 className="text-sm font-bold text-gray-900 uppercase tracking-wider flex items-center gap-2">
+            <h2 className="text-sm font-medium text-gray-900 uppercase tracking-wider flex items-center gap-2">
               <svg className="w-4 h-4 text-warm-brown" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M8.625 12a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H8.25m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H12m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 0 1-2.555-.337A5.972 5.972 0 0 1 5.41 20.97a5.969 5.969 0 0 1-.474-.065 4.48 4.48 0 0 1-.978-.35c-.412-.207-.63-.64-.537-1.077.067-.306.27-.604.53-.878A7.72 7.72 0 0 0 4.5 14.5c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25Z" />
               </svg>
@@ -458,10 +458,10 @@ export default function AdminCommentsPage() {
                           {authorInitial}
                         </div>
                         <div className="min-w-0">
-                          <p className="text-sm font-bold text-gray-900 break-all leading-snug">
+                          <p className="text-sm font-medium text-gray-900 break-all leading-snug">
                             {authorName}
                           </p>
-                          <span className="text-[11px] text-gray-400 block">
+                          <span className="text-[11px] text-gray-400 font-light block">
                             {comment.createdAt
                               ? new Intl.DateTimeFormat(i18n.language === 'ar' ? 'ar-EG' : 'en-US', {
                                   dateStyle: 'medium',

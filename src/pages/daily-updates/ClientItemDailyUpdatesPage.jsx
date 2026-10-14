@@ -162,8 +162,8 @@ export default function ClientItemDailyUpdatesPage() {
               <p className="mt-4 text-xs font-semibold uppercase tracking-[0.24em] text-warm-brown">
                 {t('nav.daily_updates')}
               </p>
-              <h1 className="mt-2 text-2xl sm:text-3xl font-bold text-gray-900">{itemName}</h1>
-              <p className="mt-2 text-sm leading-6 text-gray-600">
+              <h1 className="mt-2 text-2xl sm:text-3xl font-medium text-gray-900">{itemName}</h1>
+              <p className="mt-2 text-sm leading-6 text-gray-600 font-light">
                 {projectName || t('daily_updates.client_hero_copy')}
               </p>
             </div>
@@ -171,7 +171,7 @@ export default function ClientItemDailyUpdatesPage() {
             <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
               <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-gray-400">{t('daily_updates.total_updates')}</p>
               <p className="mt-1 text-3xl font-extrabold text-warm-brown">{totalElements}</p>
-              <p className="mt-1 text-xs text-gray-500">{t('daily_updates.client_page_subtitle')}</p>
+              <p className="mt-1 text-xs text-gray-500 font-light">{t('daily_updates.client_page_subtitle')}</p>
             </div>
           </div>
         </div>
@@ -190,14 +190,14 @@ export default function ClientItemDailyUpdatesPage() {
           <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl border border-gray-200 bg-cream text-warm-brown">
             <TimelineIcon className="h-7 w-7" />
           </div>
-          <h2 className="mt-4 text-lg font-semibold text-gray-900">{t('daily_updates.timeline_empty_title')}</h2>
-          <p className="mt-2 text-sm text-gray-500">{t('daily_updates.timeline_empty_copy')}</p>
+          <h2 className="mt-4 text-lg font-medium text-gray-900">{t('daily_updates.timeline_empty_title')}</h2>
+          <p className="mt-2 text-sm text-gray-500 font-light">{t('daily_updates.timeline_empty_copy')}</p>
         </div>
       ) : (
         <section className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-card">
           <div className="border-b border-gray-200 bg-gray-50 px-5 py-4 sm:px-6">
-            <h2 className="text-lg font-semibold text-gray-900">{t('daily_updates.client_hero_title')}</h2>
-            <p className="mt-0.5 text-sm text-gray-500">{t('daily_updates.client_page_subtitle')}</p>
+            <h2 className="text-lg font-medium text-gray-900">{t('daily_updates.client_hero_title')}</h2>
+            <p className="mt-0.5 text-sm text-gray-500 font-light">{t('daily_updates.client_page_subtitle')}</p>
           </div>
 
           <div className="p-5 sm:p-6">
@@ -229,12 +229,12 @@ export default function ClientItemDailyUpdatesPage() {
                       <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                         <div className="min-w-0 flex-1">
                           <div className="flex flex-wrap items-center gap-2">
-                            <p className="text-xl font-bold text-gray-900">{update.title}</p>
+                            <p className="text-xl font-medium text-gray-900">{update.title}</p>
                             <span className="inline-flex items-center rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-0.5 text-[11px] font-semibold text-emerald-700">
                               {t('daily_updates.approved')}
                             </span>
                           </div>
-                          <p className="mt-1 text-sm text-gray-500">
+                          <p className="mt-1 text-sm text-gray-500 font-light">
                             {t('daily_updates.published_by', {
                               name: (i18n.language === 'ar' ? update.engineerNameAr : update.engineerNameEn) || update.engineerUsername || '—',
                             })}

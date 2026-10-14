@@ -61,7 +61,7 @@ export default function OttimaLogo({
               loading="eager"
             />
             {subtitle && (
-              <p className="text-gray-700 text-[11px] font-medium tracking-wide truncate mt-0.5 font-sans">
+              <p className="text-gray-700 text-[11px] font-light tracking-wide truncate mt-0.5 font-sans">
                 {subtitle}
               </p>
             )}

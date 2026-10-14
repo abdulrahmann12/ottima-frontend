@@ -60,7 +60,7 @@ export default function ForwardCommentModal({
           <p className="text-slate-800 italic bg-white p-2.5 rounded-lg border border-amber-100">
             &ldquo;{commentText}&rdquo;
           </p>
-          <p className="text-[11px] text-amber-800 mt-2">
+          <p className="text-[11px] font-light text-amber-800 mt-2">
             ℹ️ {isAr
               ? 'سيتم إرسال هذه الملاحظة إلى محادثة المشروع العامة ليراها المهندسون المسؤولون مع الحفاظ على خصوصية باقي تعليقات العميل.'
               : 'This comment will be posted to the Project Global Chat so assigned engineers can take action, while keeping other client feedback private.'}

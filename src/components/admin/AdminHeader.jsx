@@ -42,7 +42,7 @@ export default function AdminHeader({ title, onMenuToggle }) {
 
           {/* Page title */}
           <div className="min-w-0">
-            <h1 className="text-black font-extrabold text-base tracking-tight truncate">{title}</h1>
+            <h1 className="text-black font-medium text-base tracking-tight truncate">{title}</h1>
           </div>
         </div>
 

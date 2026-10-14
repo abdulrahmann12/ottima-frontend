@@ -55,8 +55,8 @@ export default function EngineerProjectsPage() {
     <div className="space-y-5 animate-slide-up">
       {/* ── Page header ─────────────────────────────── */}
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">{t('projects.title')}</h1>
-        <p className="mt-1 text-sm text-gray-600">{t('projects.engineer_subtitle')}</p>
+        <h1 className="text-2xl font-medium text-gray-900">{t('projects.title')}</h1>
+        <p className="mt-1 text-sm text-gray-600 font-light">{t('projects.engineer_subtitle')}</p>
       </div>
 
       <Alert message={error} variant="error" onClose={() => setError(null)} />

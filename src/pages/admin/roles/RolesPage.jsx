@@ -277,7 +277,7 @@ export default function RolesPage() {
             </div>
             <div className="min-w-0">
               <div className="flex items-center gap-1.5">
-                <h3 className="text-gray-900 font-bold text-sm truncate">
+                <h3 className="text-gray-900 font-medium text-sm truncate">
                   {role.roleName}
                 </h3>
                 {isSystem && (
@@ -379,8 +379,8 @@ export default function RolesPage() {
       {/* Page heading + actions */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h2 className="text-xl font-bold text-gray-900">{t('roles.title')}</h2>
-          <p className="text-gray-500 text-sm mt-0.5">{t('roles.subtitle')}</p>
+          <h2 className="text-xl font-medium text-gray-900">{t('roles.title')}</h2>
+          <p className="text-gray-500 text-sm font-light mt-0.5">{t('roles.subtitle')}</p>
         </div>
         <button
           id="create-role-btn"

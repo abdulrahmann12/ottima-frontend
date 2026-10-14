@@ -103,8 +103,8 @@ export default function LoginEngineer() {
           bg-[#4A5D4E]/10 border border-[#4A5D4E]/25 text-[#4A5D4E]">
           {t('role.engineer')}
         </span>
-        <h2 className="mt-3 text-2xl font-extrabold text-gray-900 tracking-tight">{t('login.title_engineer')}</h2>
-        <p className="mt-1 text-gray-600 text-sm">{t('login.subtitle')}</p>
+        <h2 className="mt-3 text-2xl font-medium text-gray-900 tracking-tight">{t('login.title_engineer')}</h2>
+        <p className="mt-1 text-gray-600 text-sm font-light">{t('login.subtitle')}</p>
       </div>
 
       {/* Error */}

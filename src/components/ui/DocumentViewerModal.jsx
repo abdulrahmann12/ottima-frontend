@@ -179,10 +179,10 @@ export default function DocumentViewerModal({
               {isPdf ? 'PDF' : 'IMG'}
             </div>
             <div className="min-w-0">
-              <h3 className="text-xs sm:text-sm font-bold text-gray-900 truncate">
+              <h3 className="text-xs sm:text-sm font-medium text-gray-900 truncate">
                 {title || (isPdf ? 'Document.pdf' : 'Image.jpg')}
               </h3>
-              <p className="text-[10px] text-gray-500">
+              <p className="text-[10px] text-gray-500 font-light">
                 {isPdf ? t('document_viewer.pdf_doc', { defaultValue: 'PDF Document' }) : t('document_viewer.image_doc', { defaultValue: 'Image Attachment' })}
               </p>
             </div>
@@ -300,10 +300,10 @@ export default function DocumentViewerModal({
                   <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z" />
                 </svg>
               </div>
-              <h4 className="text-sm font-bold text-gray-900 mb-1">
+              <h4 className="text-sm font-medium text-gray-900 mb-1">
                 {t('document_viewer.page_not_found', { defaultValue: 'Failed to load document page' })}
               </h4>
-              <p className="text-xs text-gray-500 mb-4">
+              <p className="text-xs text-gray-500 font-light mb-4">
                 {t('document_viewer.page_error_desc', { defaultValue: 'The requested page could not be retrieved.' })}
               </p>
               <button

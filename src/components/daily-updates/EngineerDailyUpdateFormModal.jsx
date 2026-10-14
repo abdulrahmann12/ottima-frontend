@@ -256,7 +256,7 @@ export default function EngineerDailyUpdateFormModal({
             <p className="text-sm font-medium text-gray-700">
               {t('daily_updates.attach_images', { defaultValue: 'Attach progress images' })}
             </p>
-            <p className="mt-1 text-xs text-gray-500">
+            <p className="mt-1 text-xs font-light text-gray-500">
               {t('daily_updates.cloudinary_hint', { defaultValue: 'Images upload directly to Cloudinary and only secure URLs are sent to the backend.' })}
             </p>
           </div>
@@ -291,12 +291,12 @@ export default function EngineerDailyUpdateFormModal({
                 {uploading ? <Spinner className="h-6 w-6" /> : <UploadIcon className="h-6 w-6" />}
               </div>
               <div>
-                <p className="text-sm font-semibold text-gray-900">
+                <p className="text-sm font-medium text-gray-900">
                   {uploading
                     ? t('daily_updates.uploading_images', { defaultValue: 'Uploading images...' })
                     : t('daily_updates.dropzone_title', { defaultValue: 'Drop images here or click to browse' })}
                 </p>
-                <p className="mt-1 text-xs text-gray-500">
+                <p className="mt-1 text-xs font-light text-gray-500">
                   {t('daily_updates.dropzone_subtitle', { defaultValue: 'PNG, JPG, and WEBP are supported. Multiple files are allowed.' })}
                 </p>
               </div>
@@ -305,10 +305,10 @@ export default function EngineerDailyUpdateFormModal({
 
           {uploadQueue.length > 0 && (
             <div className="rounded-xl border border-gray-200 bg-gray-50 p-3 text-xs text-gray-600">
-              <p className="font-semibold text-gray-900">
+              <p className="font-medium text-gray-900">
                 {t('daily_updates.upload_queue', { defaultValue: 'Uploading now' })}
               </p>
-              <p className="mt-1 text-gray-500">{uploadQueue.join(' · ')}</p>
+              <p className="mt-1 text-gray-500 font-light">{uploadQueue.join(' · ')}</p>
             </div>
           )}
 

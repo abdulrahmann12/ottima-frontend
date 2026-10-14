@@ -179,8 +179,8 @@ export default function ProfilePage() {
       {/* Page Heading */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h2 className="text-xl font-bold text-gray-900">{t('profile.title', 'My Profile')}</h2>
-          <p className="text-gray-500 text-sm mt-0.5">
+          <h2 className="text-xl font-medium text-gray-900">{t('profile.title', 'My Profile')}</h2>
+          <p className="text-gray-500 text-sm font-light mt-0.5">
             {t('profile.subtitle', 'View and update your personal info and security settings')}
           </p>
         </div>
@@ -193,7 +193,7 @@ export default function ProfilePage() {
             {initialLetter}
           </div>
           <div className="space-y-1">
-            <h2 className="text-xl font-bold text-gray-900">
+            <h2 className="text-xl font-medium text-gray-900">
               {i18n.language === 'ar'
                 ? profile?.fullNameAr || profile?.fullNameEn
                 : profile?.fullNameEn || profile?.fullNameAr || profile?.username}
@@ -224,8 +224,8 @@ export default function ProfilePage() {
                 <UserIcon className="w-5 h-5" />
               </div>
               <div>
-                <h3 className="text-base font-bold text-gray-900">{t('profile.personal_info')}</h3>
-                <p className="text-gray-500 text-xs mt-0.5">{t('profile.personal_info_subtitle')}</p>
+                <h3 className="text-base font-medium text-gray-900">{t('profile.personal_info')}</h3>
+                <p className="text-gray-500 text-xs font-light mt-0.5">{t('profile.personal_info_subtitle')}</p>
               </div>
             </div>
 
@@ -347,8 +347,8 @@ export default function ProfilePage() {
                 <LockIcon className="w-5 h-5" />
               </div>
               <div>
-                <h3 className="text-base font-bold text-gray-900">{t('profile.security')}</h3>
-                <p className="text-gray-500 text-xs mt-0.5">{t('profile.security_subtitle')}</p>
+                <h3 className="text-base font-medium text-gray-900">{t('profile.security')}</h3>
+                <p className="text-gray-500 text-xs font-light mt-0.5">{t('profile.security_subtitle')}</p>
               </div>
             </div>
 

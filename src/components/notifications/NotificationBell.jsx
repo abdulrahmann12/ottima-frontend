@@ -177,7 +177,7 @@ export default function NotificationBell() {
           {/* Popover Header */}
           <div className="flex items-center justify-between px-4 py-3.5 border-b border-gray-200/80 bg-gray-50/90">
             <div className="flex items-center gap-2">
-              <h3 className="text-xs font-bold text-gray-900 uppercase tracking-wider">
+              <h3 className="text-xs font-medium text-gray-900 uppercase tracking-wider">
                 {t('notifications.title', 'Notifications')}
               </h3>
               {unreadCount > 0 && (
@@ -239,13 +239,13 @@ export default function NotificationBell() {
                     {/* Content */}
                     <div className="flex-1 min-w-0 space-y-1">
                       <div className="flex items-center justify-between gap-2">
-                        <p className={`text-xs truncate ${isUnread ? 'font-bold text-gray-950' : 'font-medium text-gray-700'}`}>
+                        <p className={`text-xs truncate font-medium ${isUnread ? 'text-gray-950' : 'text-gray-700'}`}>
                           {item.title || 'Notification'}
                         </p>
                         <ReferenceTypeBadge type={item.referenceType} />
                       </div>
 
-                      <p className="text-xs text-gray-600 line-clamp-2 leading-relaxed">
+                      <p className="text-xs text-gray-600 font-light line-clamp-2 leading-relaxed">
                         {item.message}
                       </p>
 

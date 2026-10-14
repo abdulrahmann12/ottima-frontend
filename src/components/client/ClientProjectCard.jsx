@@ -132,11 +132,11 @@ export default function ClientProjectCard({ project, onClick }) {
 
         {/* Project Title & Address */}
         <div>
-          <h2 className="text-base sm:text-lg font-bold text-gray-900 group-hover:text-[#7D583F] transition-colors leading-snug line-clamp-1">
+          <h2 className="text-base sm:text-lg font-medium text-gray-900 group-hover:text-[#7D583F] transition-colors leading-snug line-clamp-1">
             {title}
           </h2>
           {address ? (
-            <p className="text-xs text-gray-500 truncate mt-1 flex items-center gap-1.5">
+            <p className="text-xs text-gray-500 font-light truncate mt-1 flex items-center gap-1.5">
               <svg className="w-3.5 h-3.5 text-gray-400 shrink-0" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
                 <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />
@@ -144,7 +144,7 @@ export default function ClientProjectCard({ project, onClick }) {
               <span className="truncate">{address}</span>
             </p>
           ) : (
-            <p className="text-xs text-gray-400 italic mt-1">
+            <p className="text-xs text-gray-400 font-light italic mt-1">
               {isRtl ? 'لا يوجد عنوان محدد' : 'No address specified'}
             </p>
           )}

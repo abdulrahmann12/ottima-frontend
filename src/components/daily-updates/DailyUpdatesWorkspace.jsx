@@ -32,8 +32,8 @@ export function DailyUpdatesSelectionCard({
                 {eyebrow}
               </p>
             )}
-            <h1 className="mt-1 text-2xl font-bold text-gray-900">{title}</h1>
-            {description && <p className="mt-1 text-sm text-gray-600">{description}</p>}
+            <h1 className="mt-1 text-2xl font-medium text-gray-900">{title}</h1>
+            {description && <p className="mt-1 text-sm text-gray-600 font-light">{description}</p>}
           </div>
           {action ? <div className="flex shrink-0">{action}</div> : null}
         </div>
@@ -88,8 +88,8 @@ export function DailyUpdatesPlaceholder({ title, copy }) {
       <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl border border-gray-200 bg-cream text-warm-brown">
         <NotebookIcon className="h-7 w-7" />
       </div>
-      <h2 className="mt-4 text-lg font-bold text-gray-900">{title}</h2>
-      <p className="mt-2 text-sm text-gray-500">{copy}</p>
+      <h2 className="mt-4 text-lg font-medium text-gray-900">{title}</h2>
+      <p className="mt-2 text-sm text-gray-500 font-light">{copy}</p>
     </div>
   )
 }

@@ -452,7 +452,7 @@ export default function SearchableSelect({
                     <div className="truncate flex-1">
                       <p className="truncate text-xs sm:text-sm">{opt.label}</p>
                       {opt.sublabel && (
-                        <p className="text-[11px] text-gray-400 font-normal truncate mt-0.5">{opt.sublabel}</p>
+                        <p className="text-[11px] text-gray-400 font-light truncate mt-0.5">{opt.sublabel}</p>
                       )}
                     </div>
 

@@ -535,8 +535,8 @@ export default function CommentsSection({ dailyUpdateId, userRole, updateStatus,
           <ChatBubbleIcon />
         </div>
         <div>
-          <h2 className="text-base font-semibold text-gray-900">Comments</h2>
-          <p className="text-[11px] text-gray-500">
+          <h2 className="text-base font-medium text-gray-900">Comments</h2>
+          <p className="text-[11px] text-gray-500 font-light">
             {totalElements} {totalElements === 1 ? 'comment' : 'comments'}
           </p>
         </div>

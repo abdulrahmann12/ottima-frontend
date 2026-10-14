@@ -226,7 +226,7 @@ export default function TicketChatModal({
 
             {/* Description */}
             {ticket.description && (
-              <p className="text-xs text-slate-600 line-clamp-2 mt-2 font-medium">
+              <p className="text-xs text-slate-600 line-clamp-2 mt-2 font-light">
                 {ticket.description}
               </p>
             )}
@@ -271,10 +271,10 @@ export default function TicketChatModal({
           ) : messages.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-48 text-slate-400 text-center">
               <span className="text-3xl mb-2">💬</span>
-              <p className="text-xs font-bold text-slate-700">
+              <p className="text-xs font-medium text-slate-700">
                 {isAr ? 'لا توجد رسائل بعد في هذه التذكرة' : 'No messages in this ticket thread'}
               </p>
-              <p className="text-[11px] text-slate-400 max-w-xs mt-0.5">
+              <p className="text-[11px] font-light text-slate-400 max-w-xs mt-0.5">
                 {isAr ? 'ابدأ النقاش التفاعلي مع المسؤولين عن هذا الطلب بالأسفل' : 'Start the discussion between admin and engineer below'}
               </p>
             </div>

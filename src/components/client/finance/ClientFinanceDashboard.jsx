@@ -407,7 +407,7 @@ function SectionTitle({ icon, children }) {
       <span className="flex h-7 w-7 items-center justify-center rounded-xl border border-warm-brown/20 bg-warm-brown/10">
         {icon}
       </span>
-      <h2 className="text-sm font-bold text-gray-900 flex items-center">{children}</h2>
+      <h2 className="text-sm font-medium text-gray-900 flex items-center">{children}</h2>
     </div>
   )
 }

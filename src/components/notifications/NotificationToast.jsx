@@ -201,7 +201,7 @@ export default function NotificationToast() {
           {/* Content Body */}
           <div className="flex-1 min-w-0">
             <div className="flex items-center justify-between gap-2">
-              <span className="text-sm font-extrabold text-gray-950 truncate leading-snug">
+              <span className="text-sm font-medium text-gray-950 truncate leading-snug">
                 {currentToast.title || t('notifications.new_notification', { defaultValue: 'New Notification' })}
               </span>
 
@@ -226,7 +226,7 @@ export default function NotificationToast() {
               </div>
             </div>
 
-            <p className="text-xs text-gray-700 font-medium line-clamp-2 mt-1 leading-relaxed">
+            <p className="text-xs text-gray-700 font-light line-clamp-2 mt-1 leading-relaxed">
               {currentToast.message || currentToast.body}
             </p>
 

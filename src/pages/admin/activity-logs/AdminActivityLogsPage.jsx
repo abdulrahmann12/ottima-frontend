@@ -1077,10 +1077,10 @@ export default function AdminActivityLogsPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-xl font-bold text-gray-900">
+          <h1 className="text-xl font-medium text-gray-900">
             {t('activity_logs.title', 'System Activity Logs')}
           </h1>
-          <p className="text-sm text-gray-500 mt-0.5">
+          <p className="text-sm text-gray-500 font-light mt-0.5">
             {t('activity_logs.subtitle', 'Track all system actions, updates, and user operations in clear business terms')}
           </p>
         </div>
@@ -1237,10 +1237,10 @@ export default function AdminActivityLogsPage() {
                         {activeStory.categoryLabel}
                       </span>
                     </div>
-                    <h3 className="text-base font-bold text-gray-900 leading-snug mt-1">
+                    <h3 className="text-base font-medium text-gray-900 leading-snug mt-1">
                       {activeStory.headline}
                     </h3>
-                    <p className="text-xs text-gray-600 mt-1 leading-relaxed">
+                    <p className="text-xs text-gray-600 font-light mt-1 leading-relaxed">
                       {activeStory.subDescription}
                     </p>
                   </div>
@@ -1270,12 +1270,12 @@ export default function AdminActivityLogsPage() {
                   <span className="text-[10px] font-semibold uppercase tracking-wider text-gray-500 block">
                     {t('activity_logs.modal.operator_info', 'Who Did This?')}
                   </span>
-                  <p className="text-xs font-bold text-gray-900 truncate mt-0.5">
+                  <p className="text-xs font-medium text-gray-900 truncate mt-0.5">
                     {isAr && selectedLog.user?.fullNameAr
                       ? selectedLog.user.fullNameAr
                       : selectedLog.user?.fullNameEn || selectedLog.username || (selectedLog.userId ? `User #${selectedLog.userId}` : isAr ? 'النظام' : 'System')}
                   </p>
-                  <p className="text-[11px] text-gray-500 truncate font-mono">
+                  <p className="text-[11px] text-gray-500 truncate font-mono font-light">
                     @{selectedLog.username || selectedLog.user?.username || 'system'}
                   </p>
                 </div>
@@ -1292,13 +1292,13 @@ export default function AdminActivityLogsPage() {
                   <span className="text-[10px] font-semibold uppercase tracking-wider text-gray-500 block">
                     {t('activity_logs.modal.target_info', 'Target Subject')}
                   </span>
-                  <p className="text-xs font-bold text-sky-800 truncate mt-0.5">
+                  <p className="text-xs font-medium text-sky-800 truncate mt-0.5">
                     {ENTITY_DICTIONARY[selectedLog.entityName]
                       ? (isAr ? ENTITY_DICTIONARY[selectedLog.entityName].ar : ENTITY_DICTIONARY[selectedLog.entityName].en)
                       : selectedLog.entityName || (isAr ? 'عنصر بالنظام' : 'System Event')}
                   </p>
                   {(selectedLog.entityId || selectedLog.entity_id) && (
-                    <p className="text-[11px] text-gray-500 truncate">
+                    <p className="text-[11px] text-gray-500 truncate font-light">
                       {isAr ? 'رقم السجل: ' : 'ID: '}#{selectedLog.entityId || selectedLog.entity_id}
                     </p>
                   )}
@@ -1316,10 +1316,10 @@ export default function AdminActivityLogsPage() {
                   <span className="text-[10px] font-semibold uppercase tracking-wider text-gray-500 block">
                     {t('activity_logs.modal.session_info', 'Device & Location')}
                   </span>
-                  <p className="text-xs font-semibold text-gray-800 truncate mt-0.5">
+                  <p className="text-xs font-medium text-gray-800 truncate mt-0.5">
                     {humanizeUserAgent(selectedLog.userAgent || selectedLog.user_agent, lang)}
                   </p>
-                  <p className="text-[11px] font-mono text-gray-500 truncate">
+                  <p className="text-[11px] font-mono text-gray-500 truncate font-light">
                     IP: {selectedLog.ipAddress || selectedLog.ip_address || '—'}
                   </p>
                 </div>
@@ -1336,7 +1336,7 @@ export default function AdminActivityLogsPage() {
                   <span className="text-[10px] font-semibold uppercase tracking-wider text-gray-500 block">
                     {t('activity_logs.modal.date_time', 'Date & Time')}
                   </span>
-                  <p className="text-xs font-semibold text-gray-800 truncate mt-0.5">
+                  <p className="text-xs font-medium text-gray-800 truncate mt-0.5">
                     {selectedLog.createdAt
                       ? new Date(selectedLog.createdAt).toLocaleTimeString(isAr ? 'ar-EG' : 'en-US', {
                           hour: '2-digit',
@@ -1345,7 +1345,7 @@ export default function AdminActivityLogsPage() {
                         })
                       : '—'}
                   </p>
-                  <p className="text-[11px] text-gray-500 truncate">
+                  <p className="text-[11px] text-gray-500 truncate font-light">
                     {selectedLog.createdAt
                       ? new Date(selectedLog.createdAt).toLocaleDateString(isAr ? 'ar-EG' : 'en-US', {
                           year: 'numeric',
@@ -1382,7 +1382,7 @@ export default function AdminActivityLogsPage() {
                   <svg className="w-4 h-4 text-warm-brown" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M7.5 21 3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5" />
                   </svg>
-                  <h3 className="text-sm font-bold text-gray-900">
+                  <h3 className="text-sm font-medium text-gray-900">
                     {selectedLog.action === 'CREATE'
                       ? t('activity_logs.modal.created_data', 'Registered Information')
                       : selectedLog.action === 'DELETE'
@@ -1450,7 +1450,7 @@ export default function AdminActivityLogsPage() {
                           {/* Field Title & Badge */}
                           <div className="min-w-0">
                             <div className="flex items-center gap-2 flex-wrap">
-                              <h4 className="text-xs font-bold text-gray-900">{diff.label}</h4>
+                              <h4 className="text-xs font-medium text-gray-900">{diff.label}</h4>
                               {isChanged && (
                                 <span className="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-amber-50 text-amber-700 border border-amber-200">
                                   {isAr ? 'تم تعديله' : 'Modified'}

@@ -137,14 +137,14 @@ export default function FinancialSummaryCards({
               >
                 {card.icon}
               </div>
-              <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-gray-500">
+              <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-gray-500">
                 {card.label}
               </p>
               <p className={`mt-2 text-2xl font-bold tracking-tight ${card.textColor}`}>
                 {formatMoney(card.amount, i18n.language)}
               </p>
               {card.count != null && (
-                <p className="mt-1 text-xs text-gray-400">
+                <p className="mt-1 text-xs text-gray-400 font-light">
                   {card.count} {t('finance.transactions', { defaultValue: 'transaction(s)' })}
                 </p>
               )}

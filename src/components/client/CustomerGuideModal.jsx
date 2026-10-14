@@ -297,10 +297,10 @@ export default function CustomerGuideModal({ isOpen, onClose }) {
                     OTTIMA CLIENT EXPERIENCE
                   </span>
                 </div>
-                <h2 className="text-lg sm:text-xl font-black text-white tracking-tight truncate mt-0.5">
+                <h2 className="text-lg sm:text-xl font-medium text-white tracking-tight truncate mt-0.5">
                   {isArabic ? 'دليل العميل الذكي للتشطيبات' : 'Smart Client Finishing Guide'}
                 </h2>
-                <p className="text-xs text-[#D9C7B8] truncate hidden sm:block">
+                <p className="text-xs text-[#D9C7B8] font-light truncate hidden sm:block">
                   {isArabic
                     ? 'دليلك الشامل لمتابعة كل مليم وكل خطوة في تشطيب وحدتك بأعلى معايير الدقة والشفافية'
                     : 'Your comprehensive guide to track every penny and milestone with total transparency'}
@@ -401,10 +401,10 @@ export default function CustomerGuideModal({ isOpen, onClose }) {
                       {isArabic ? currentChapter.badgeAr : currentChapter.badgeEn}
                     </span>
                   </div>
-                  <h3 className="text-xl sm:text-2xl font-black text-gray-950 mt-1">
+                  <h3 className="text-xl sm:text-2xl font-medium text-gray-950 mt-1">
                     {isArabic ? currentChapter.titleAr : currentChapter.titleEn}
                   </h3>
-                  <p className="text-xs sm:text-sm text-[#7D583F] font-semibold mt-0.5">
+                  <p className="text-xs sm:text-sm text-[#7D583F] font-light mt-0.5">
                     {isArabic ? currentChapter.subtitleAr : currentChapter.subtitleEn}
                   </p>
                 </div>
@@ -433,10 +433,10 @@ export default function CustomerGuideModal({ isOpen, onClose }) {
                   <div className="p-4 rounded-xl bg-gradient-to-br from-[#F4EDE4]/60 to-white border border-[#D9C7B8]/50 flex flex-col sm:flex-row items-center justify-between gap-4">
                     <div className="space-y-1 text-start">
                       <p className="text-xs font-extrabold text-[#7D583F]">OTTIMA FINISHING PORTAL</p>
-                      <h4 className="text-base font-black text-gray-900">
+                      <h4 className="text-base font-medium text-gray-900">
                         {isArabic ? 'وحدتك في أيدي مهندسين محترفين' : 'Your Property in Master Hands'}
                       </h4>
-                      <p className="text-xs text-gray-500">
+                      <p className="text-xs text-gray-500 font-light">
                         {isArabic ? 'تحديثات صور فورية • جداول بنود معتمدة • أمان مالي تام' : 'Real-time photos • Approved items • Full financial security'}
                       </p>
                     </div>
@@ -454,10 +454,10 @@ export default function CustomerGuideModal({ isOpen, onClose }) {
                   <div className="p-4 rounded-xl bg-white border border-gray-200 shadow-sm space-y-3">
                     <div className="flex items-center justify-between">
                       <div>
-                        <h4 className="text-sm font-bold text-gray-900">
+                        <h4 className="text-sm font-medium text-gray-900">
                           {isArabic ? 'مشروع فيلا الياسمين (تشطيب كامل)' : 'Al-Yasmin Villa (Full Finishing)'}
                         </h4>
-                        <p className="text-xs text-gray-500 flex items-center gap-1 mt-0.5">
+                        <p className="text-xs text-gray-500 font-light flex items-center gap-1 mt-0.5">
                           📍 {isArabic ? 'التجمع الخامس، القاهرة' : 'New Cairo, Egypt'}
                         </p>
                       </div>
@@ -562,10 +562,10 @@ export default function CustomerGuideModal({ isOpen, onClose }) {
                   >
                     <div>
                       <span className="text-2xl">{feat.icon}</span>
-                      <h4 className="text-sm font-extrabold text-gray-900 mt-2">
+                      <h4 className="text-sm font-medium text-gray-900 mt-2">
                         {isArabic ? feat.titleAr : feat.titleEn}
                       </h4>
-                      <p className="text-xs text-gray-600 mt-1 leading-relaxed">
+                      <p className="text-xs text-gray-600 font-light mt-1 leading-relaxed">
                         {isArabic ? feat.descAr : feat.descEn}
                       </p>
                     </div>
@@ -579,10 +579,10 @@ export default function CustomerGuideModal({ isOpen, onClose }) {
           {viewMode === 'catalog' && (
             <div className="space-y-4 max-w-3xl mx-auto animate-fade-in">
               <div className="text-center max-w-md mx-auto mb-6">
-                <h3 className="text-xl font-black text-gray-900">
+                <h3 className="text-xl font-medium text-gray-900">
                   {isArabic ? 'فهرس فصول الدليل الذكي' : 'All Guide Chapters'}
                 </h3>
-                <p className="text-xs text-gray-500 mt-1">
+                <p className="text-xs text-gray-500 font-light mt-1">
                   {isArabic ? 'اختر أي موضوع للانتقال إليه مباشرة والاطلاع على تفاصيله' : 'Select any chapter to jump directly to its details'}
                 </p>
               </div>
@@ -607,10 +607,10 @@ export default function CustomerGuideModal({ isOpen, onClose }) {
                           {isArabic ? 'عرض الفصل ›' : 'View ›'}
                         </span>
                       </div>
-                      <h4 className="text-base font-bold text-gray-900 group-hover:text-[#7D583F] transition-colors">
+                      <h4 className="text-base font-medium text-gray-900 group-hover:text-[#7D583F] transition-colors">
                         {isArabic ? ch.titleAr : ch.titleEn}
                       </h4>
-                      <p className="text-xs text-gray-500 line-clamp-2 mt-1 leading-relaxed">
+                      <p className="text-xs text-gray-500 font-light line-clamp-2 mt-1 leading-relaxed">
                         {isArabic ? ch.subtitleAr : ch.subtitleEn}
                       </p>
                     </div>
@@ -624,10 +624,10 @@ export default function CustomerGuideModal({ isOpen, onClose }) {
           {viewMode === 'faq' && (
             <div className="space-y-4 max-w-3xl mx-auto animate-fade-in">
               <div className="text-center max-w-md mx-auto mb-6">
-                <h3 className="text-xl font-black text-gray-900">
+                <h3 className="text-xl font-medium text-gray-900">
                   {isArabic ? 'الأسئلة الأكثر شيوعاً للعملاء' : 'Frequently Asked Questions'}
                 </h3>
-                <p className="text-xs text-gray-500 mt-1">
+                <p className="text-xs text-gray-500 font-light mt-1">
                   {isArabic ? 'إجابات واضحة ومباشرة لأهم التساؤلات حول متابعة تشطيب وحدتك' : 'Clear answers to essential questions regarding your project'}
                 </p>
               </div>

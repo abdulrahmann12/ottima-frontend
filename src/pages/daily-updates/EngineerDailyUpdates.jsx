@@ -251,10 +251,10 @@ export default function EngineerDailyUpdates() {
               <NotebookIcon className="w-5 h-5" />
             </div>
             <div className="min-w-0">
-              <h3 className="text-gray-900 font-bold text-sm truncate">
+              <h3 className="text-gray-900 font-medium text-sm truncate">
                 {update.title}
               </h3>
-              <p className="text-gray-500 text-xs truncate">
+              <p className="text-gray-500 text-xs font-light truncate">
                 {localizedValue(i18n.language, update.itemNameAr, update.itemNameEn)}
               </p>
             </div>

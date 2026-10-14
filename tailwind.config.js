@@ -45,9 +45,11 @@ export default {
       },
 
       fontFamily: {
-        sans:   ['Montserrat', 'Alexandria', 'system-ui', '-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'Roboto', 'sans-serif'],
-        brand:  ['Montserrat', 'Alexandria', 'sans-serif'],
-        arabic: ['Alexandria', 'Cairo', 'system-ui', '-apple-system', 'sans-serif'],
+        sans:       ['Montserrat', 'Alexandria', 'system-ui', '-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'Roboto', 'sans-serif'],
+        brand:      ['Montserrat', 'Alexandria', 'sans-serif'],
+        heading:    ['Montserrat', 'Alexandria', 'system-ui', '-apple-system', 'sans-serif'],
+        subheading: ['Montserrat', 'Alexandria', 'system-ui', '-apple-system', 'sans-serif'],
+        arabic:     ['Alexandria', 'Cairo', 'system-ui', '-apple-system', 'sans-serif'],
       },
 
       backgroundImage: {

@@ -112,7 +112,7 @@ export default function DailyUpdateDetailsModal({
                 <DailyUpdateStatusPill status={effectiveUpdate.status} />
               </div>
 
-              <h3 className="mt-2.5 text-base sm:text-lg font-extrabold text-slate-900 leading-snug">
+              <h3 className="mt-2.5 text-base sm:text-lg font-medium text-slate-900 leading-snug">
                 {effectiveUpdate.title}
               </h3>
 
@@ -148,7 +148,7 @@ export default function DailyUpdateDetailsModal({
 
             {/* Notes Section */}
             <div>
-              <p className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5">
+              <p className="text-xs font-light uppercase tracking-wider text-slate-500 mb-1.5">
                 📝 {isAr ? 'ملاحظات المهندس' : 'Engineer Notes'}
               </p>
               <div className="rounded-xl border border-slate-200 bg-white p-3.5 text-xs sm:text-sm leading-relaxed text-slate-800 shadow-2xs whitespace-pre-wrap">

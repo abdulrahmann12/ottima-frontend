@@ -221,7 +221,7 @@ export default function ProjectDetailContent({
 
       <section>
         <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
-          <h3 className="text-sm font-semibold text-gray-900">{t('projects.items')}</h3>
+          <h3 className="text-sm font-medium text-gray-900">{t('projects.items')}</h3>
           {itemHeaderAction}
         </div>
         <div className="space-y-3">
@@ -282,8 +282,8 @@ function ProjectItemCard({ item, projectId, isAdmin, isEngineer, saving, t, i18n
     <article className="rounded-xl border border-gray-200 bg-gray-50 p-4">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0 flex-1">
-          <p className="truncate font-semibold text-gray-900">{name}</p>
-          <p className="mt-0.5 text-xs text-gray-500">
+          <p className="truncate font-medium text-gray-900">{name}</p>
+          <p className="mt-0.5 text-xs text-gray-500 font-light">
             {t('projects.sequence')}: {item.sequenceOrder ?? '—'} · {t('projects.weight')}: {item.weightPercentage ?? 0}%
           </p>
         </div>
@@ -306,7 +306,7 @@ function ProjectItemCard({ item, projectId, isAdmin, isEngineer, saving, t, i18n
             <NotesIcon className="w-4 h-4 shrink-0" />
             <span>{t('projects.notes', 'Engineer Notes')}</span>
           </div>
-          <p className="whitespace-pre-wrap text-gray-800 leading-relaxed font-normal">{item.generalNotes}</p>
+          <p className="whitespace-pre-wrap text-gray-800 leading-relaxed font-light">{item.generalNotes}</p>
         </div>
       )}
 

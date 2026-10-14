@@ -265,11 +265,11 @@ export default function StandardItemsPage() {
               <CatalogIcon className="w-5 h-5" />
             </div>
             <div className="min-w-0">
-              <h3 className="text-gray-900 font-bold text-sm truncate">
+              <h3 className="text-gray-900 font-medium text-sm truncate">
                 {primaryName || '—'}
               </h3>
               {secondaryName && (
-                <p className="text-gray-500 text-xs truncate">
+                <p className="text-gray-500 text-xs font-light truncate">
                   {secondaryName}
                 </p>
               )}
@@ -342,8 +342,8 @@ export default function StandardItemsPage() {
       {/* Page heading + actions */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h2 className="text-xl font-bold text-gray-900">{t('standard_items.title')}</h2>
-          <p className="text-gray-500 text-sm mt-0.5">{t('standard_items.subtitle')}</p>
+          <h2 className="text-xl font-medium text-gray-900">{t('standard_items.title')}</h2>
+          <p className="text-gray-500 text-sm font-light mt-0.5">{t('standard_items.subtitle')}</p>
         </div>
         <button
           id="create-standard-item-btn"

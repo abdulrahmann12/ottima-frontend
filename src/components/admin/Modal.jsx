@@ -68,7 +68,7 @@ export default function Modal({ isOpen, onClose, title, size = 'md', children })
 
         {/* Header */}
         <div className="flex items-center justify-between px-5 sm:px-6 py-3.5 sm:py-4 border-b border-gray-100 sm:border-gray-200 flex-shrink-0">
-          <h2 id="modal-title" className="text-gray-900 font-bold text-sm sm:text-base leading-snug">
+          <h2 id="modal-title" className="text-gray-900 font-medium text-sm sm:text-base leading-snug">
             {title}
           </h2>
           <button

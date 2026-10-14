@@ -95,7 +95,7 @@ export default function StatCard({
               {label}
             </p>
             {subtitle && (
-              <p className="text-[10px] text-gray-400 truncate mt-0.5">{subtitle}</p>
+              <p className="text-[10px] text-gray-400 font-light truncate mt-0.5">{subtitle}</p>
             )}
           </div>
         </div>
@@ -157,7 +157,7 @@ export default function StatCard({
                 {label}
               </p>
               {subtitle && (
-                <p className="text-gray-400 text-[11px] truncate mt-0.5">{subtitle}</p>
+                <p className="text-gray-400 text-[11px] font-light truncate mt-0.5">{subtitle}</p>
               )}
             </>
           )}

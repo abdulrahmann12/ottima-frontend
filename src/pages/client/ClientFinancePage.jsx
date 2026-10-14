@@ -49,8 +49,8 @@ export default function ClientFinancePage() {
           <p className="text-xs font-semibold uppercase tracking-[0.24em] text-warm-brown">
             {t('nav.finance', 'Financial Transparency')}
           </p>
-          <h1 className="mt-2 text-2xl sm:text-3xl font-bold text-gray-900">{t('finance.title', 'Finance')}</h1>
-          <p className="mt-1 text-sm leading-6 text-gray-600">
+          <h1 className="mt-2 text-2xl sm:text-3xl font-medium text-gray-900">{t('finance.title', 'Finance')}</h1>
+          <p className="mt-1 text-sm leading-6 text-gray-600 font-light">
             {t('finance.client_subtitle', "Your project's financial overview — deposits, expenses, and receipt gallery.")}
           </p>
         </div>

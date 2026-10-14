@@ -126,10 +126,10 @@ export default function EngineerProjectDailyUpdatesPage() {
                   <p className="text-xs font-semibold uppercase tracking-[0.24em] text-warm-brown">
                     {t('nav.daily_updates', { defaultValue: 'Daily Updates' })}
                   </p>
-                  <h2 className="mt-2 text-2xl font-bold text-gray-900">
+                  <h2 className="mt-2 text-2xl font-medium text-gray-900">
                     {t('daily_updates.engineer_hero_title', { defaultValue: 'Capture field progress while it is still fresh.' })}
                   </h2>
-                  <p className="mt-2 text-sm leading-6 text-gray-600">
+                  <p className="mt-2 text-sm leading-6 text-gray-600 font-light">
                     {t('daily_updates.engineer_hero_copy', { defaultValue: 'Upload site photos straight to Cloudinary, attach notes for a specific project item, and keep a clean approval trail for every submission.' })}
                   </p>
                 </div>
@@ -216,10 +216,10 @@ export default function EngineerProjectDailyUpdatesPage() {
               <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl border border-gray-200 bg-cream text-warm-brown">
                 <NotebookIcon className="h-7 w-7" />
               </div>
-              <h3 className="mt-4 text-lg font-semibold text-gray-900">
+              <h3 className="mt-4 text-lg font-medium text-gray-900">
                 {t('daily_updates.empty_title', { defaultValue: 'No daily updates yet' })}
               </h3>
-              <p className="mt-2 text-sm text-gray-500">
+              <p className="mt-2 text-sm text-gray-500 font-light">
                 {t('daily_updates.empty_copy', { defaultValue: 'Create the first update for this project to start the review timeline.' })}
               </p>
               <div className="mt-5">
@@ -298,10 +298,10 @@ function EngineerDailyUpdateCard({ update, language, t, onPreviewImage }) {
         <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
           <div className="min-w-0 flex-1">
             <div className="flex flex-wrap items-center gap-2.5">
-              <p className="text-lg font-bold text-gray-900">{update.title}</p>
+              <p className="text-lg font-medium text-gray-900">{update.title}</p>
               <StatusPill status={update.status} />
             </div>
-            <p className="mt-1.5 text-sm font-medium text-gray-600">{itemName || t('daily_updates.unknown_item', { defaultValue: 'Unlabeled project item' })}</p>
+            <p className="mt-1.5 text-sm font-light text-gray-600">{itemName || t('daily_updates.unknown_item', { defaultValue: 'Unlabeled project item' })}</p>
             <div className="mt-3 flex flex-wrap gap-x-4 gap-y-2 text-xs text-gray-500">
               <span>{formatDate(update.createdAt, language)}</span>
               <span>·</span>

@@ -148,10 +148,10 @@ export default function InternalTicketsDashboard() {
       {/* ── Page Header ─────────────────────────────────────── */}
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <h1 className="text-xl sm:text-2xl font-extrabold text-gray-900 tracking-tight">
+          <h1 className="text-xl sm:text-2xl font-medium text-gray-900 tracking-tight">
             {t('tickets.dashboard_title', { defaultValue: 'Internal Requests Center' })}
           </h1>
-          <p className="text-xs sm:text-sm text-gray-600 mt-0.5">
+          <p className="text-xs sm:text-sm text-gray-600 font-light mt-0.5">
             {t('tickets.dashboard_subtitle', { defaultValue: 'Manage all engineering requests, expense approvals, and site notes' })}
           </p>
         </div>
@@ -277,15 +277,15 @@ export default function InternalTicketsDashboard() {
                               <button
                                 type="button"
                                 onClick={() => navigateToProjectChat(tk.projectId)}
-                                className="font-bold text-gray-900 hover:text-warm-brown text-left rtl:text-right transition-colors truncate"
+                                className="font-medium text-gray-900 hover:text-warm-brown text-left rtl:text-right transition-colors truncate"
                               >
                                 {tk.title}
                               </button>
                             ) : (
-                              <p className="font-bold text-gray-900 truncate">{tk.title}</p>
+                              <p className="font-medium text-gray-900 truncate">{tk.title}</p>
                             )}
                             {tk.description && (
-                              <p className="text-gray-500 text-[11px] truncate mt-0.5">{tk.description}</p>
+                              <p className="text-gray-500 text-[11px] font-light truncate mt-0.5">{tk.description}</p>
                             )}
                             {(tk.projectNameEn || tk.projectNameAr) && (
                               <div className="mt-1 flex items-center gap-1">
@@ -372,7 +372,7 @@ export default function InternalTicketsDashboard() {
                     {/* Top Row: Title + Status */}
                     <div className="flex items-start justify-between gap-2">
                       <div className="min-w-0 flex-1">
-                        <h3 className="text-sm font-bold text-gray-900 leading-snug">
+                        <h3 className="text-sm font-medium text-gray-900 leading-snug">
                           {tk.title}
                         </h3>
                         {(tk.projectNameEn || tk.projectNameAr) && (
@@ -385,7 +385,7 @@ export default function InternalTicketsDashboard() {
                     </div>
 
                     {tk.description && (
-                      <p className="text-xs text-gray-600 line-clamp-2 leading-relaxed">
+                      <p className="text-xs text-gray-600 font-light line-clamp-2 leading-relaxed">
                         {tk.description}
                       </p>
                     )}
@@ -487,15 +487,15 @@ export default function InternalTicketsDashboard() {
             {/* Sender & Receiver Info */}
             <div className="grid grid-cols-2 gap-3 p-3 rounded-xl bg-gray-50 border border-gray-200 text-xs">
               <div>
-                <span className="text-gray-500 font-medium">{t('tickets.sender', { defaultValue: 'Sender:' })}</span>
-                <p className="font-bold text-gray-900 mt-0.5">
+                <span className="text-gray-500 font-light">{t('tickets.sender', { defaultValue: 'Sender:' })}</span>
+                <p className="font-medium text-gray-900 mt-0.5">
                   {i18n.language === 'ar' ? selectedTicket.senderNameAr || selectedTicket.senderNameEn : selectedTicket.senderNameEn || selectedTicket.senderNameAr}
                   <span className="ml-1.5 text-[10px] text-gray-500 uppercase">({selectedTicket.senderRole})</span>
                 </p>
               </div>
               <div>
-                <span className="text-gray-500 font-medium">{t('tickets.receiver', { defaultValue: 'Receiver:' })}</span>
-                <p className="font-bold text-gray-900 mt-0.5">
+                <span className="text-gray-500 font-light">{t('tickets.receiver', { defaultValue: 'Receiver:' })}</span>
+                <p className="font-medium text-gray-900 mt-0.5">
                   {i18n.language === 'ar' ? selectedTicket.receiverNameAr || selectedTicket.receiverNameEn : selectedTicket.receiverNameEn || selectedTicket.receiverNameAr}
                   <span className="ml-1.5 text-[10px] text-gray-500 uppercase">({selectedTicket.receiverRole})</span>
                 </p>
@@ -515,10 +515,10 @@ export default function InternalTicketsDashboard() {
             {/* Description */}
             {selectedTicket.description && (
               <div>
-                <p className="text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
+                <p className="text-xs font-medium text-gray-700 uppercase tracking-wider mb-1">
                   {t('tickets.details', { defaultValue: 'Description / Instructions' })}
                 </p>
-                <div className="p-3.5 rounded-xl bg-gray-50 border border-gray-200 text-xs text-gray-800 whitespace-pre-wrap leading-relaxed">
+                <div className="p-3.5 rounded-xl bg-gray-50 border border-gray-200 text-xs text-gray-800 whitespace-pre-wrap leading-relaxed font-light">
                   {selectedTicket.description}
                 </div>
               </div>
@@ -527,7 +527,7 @@ export default function InternalTicketsDashboard() {
             {/* Attachments */}
             {selectedTicket.attachments && selectedTicket.attachments.length > 0 && (
               <div>
-                <p className="text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">
+                <p className="text-xs font-medium text-gray-700 uppercase tracking-wider mb-2">
                   {t('tickets.attachments', { defaultValue: 'Attachments' })} ({selectedTicket.attachments.length})
                 </p>
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
